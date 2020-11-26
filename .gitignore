@@ -1,0 +1,13 @@
+#Executable
+
+*.exe
+
+#Itensor compilation files
+
+options.mk
+this_dir.mk
+
+
+
+# code output
+*.dat
