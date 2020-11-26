@@ -1,0 +1,42 @@
+include ./this_dir.mk
+include ./options.mk
+
+#Define Flags ----------
+
+TENSOR_HEADERS=$(PREFIX)/itensor/core.h
+CCFLAGS= -I. $(ITENSOR_INCLUDEFLAGS) $(CPPFLAGS) $(OPTIMIZATIONS)
+CCGFLAGS= -I. $(ITENSOR_INCLUDEFLAGS) $(DEBUGFLAGS)
+LIBFLAGS=-L$(ITENSOR_LIBDIR) $(ITENSOR_LIBFLAGS)
+LIBGFLAGS=-L$(ITENSOR_LIBDIR) $(ITENSOR_LIBGFLAGS)
+
+
+MKL_LINEAR_ALGEBRA=-L$(MKLROOT)/lib/intel64/  -lmkl_gf_lp64 -lmkl_core -lmkl_gnu_thread
+
+#Rules ------------------
+
+%.o: %.cc $(ITENSOR_LIBS) $(TENSOR_HEADERS)
+	$(CCCOM) -c $(CCFLAGS) -o $@ $<
+
+.debug_objs/%.o: %.cc $(ITENSOR_GLIBS) $(TENSOR_HEADERS)
+	$(CCCOM) -c $(CCGFLAGS) -o $@ $<
+
+#Targets -----------------
+
+TEDMIQ.exe:TEDM.cc $(ITENSOR_LIBS) $(TENSOR_HEADERS)
+	$(CCCOM) $(CCFLAGS) -D_USE_QN_ TEDM.cc -o $@ $(LIBFLAGS)
+
+TEDM.exe: TEDM.cc $(ITENSOR_LIBS) $(TENSOR_HEADERS)
+	$(CCCOM) $(CCFLAGS) TEDM.cc -o $@ $(LIBFLAGS)
+
+S1.exe: TEDM.cc $(ITENSOR_LIBS) $(TENSOR_HEADERS)
+	$(CCCOM) $(CCFLAGS) -D_USE_QN_ -D_S1_ TEDM.cc -o $@ $(LIBFLAGS)
+
+
+ff.exe: FF_RLM.cpp FF_RLM.hpp FreeFermions.hpp ff.cpp
+	g++ -v
+	$(CCCOM) $(CCFLAGS)  -fopenmp ff.cpp  -o $@ -L$(MKLROOT)/lib/intel64/  -lmkl_gf_lp64 -lmkl_core -lmkl_gnu_thread  
+
+all: TEDMIQ.exe TEDM.exe ff.exe
+clean:
+	rm *.exe *.o
+

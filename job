@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -N TEDM
+#PBS -o TEDM
+#PBS -M kemal.bidzhie@u-psud.fr
+#PBS -m bae
+#PBS -j oe
+#PBS -l cput=24:00:00,mem=10mb,nodes=1:ppn=1 
+
+
+echo $HOST
+a=" ~/TEDM/test/"
+cd $a
+	ln -s ../TEDM_code/TEDM .
+	./TEDM  
+
