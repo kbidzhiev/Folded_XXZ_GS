@@ -320,7 +320,7 @@ int main(int argc, char *argv[]) {
 
 	ThreeSiteHamiltonian Init_H(sites, param);
 	auto H0 = toMPO(Init_H.ampo);
-	double energy = 0;
+	double energy_initial = 0;
 
 	if (param.longval("GroundState") == 1) {
 		// GS of the initial Hamiltonian
@@ -334,12 +334,12 @@ int main(int argc, char *argv[]) {
 		cout << "Before DMRG" << endl;
 
 		cout << "Norm is = " << inner(psi, psi) << endl;
-		energy = inner(psi, H0, psi); //<psi|H0|psi>
-		cout << "1. Initial energy=" << energy << endl;
+		energy_initial = inner(psi, H0, psi); //<psi|H0|psi>
+		cout << "1. Initial energy=" << energy_initial << endl;
 
 		MyDMRGObserver obs(psi, param.val("energy"));
 
-		tie(energy, psi) = dmrg(H0, psi, sweeps, obs, "Quiet");
+		tie(energy_initial, psi) = dmrg(H0, psi, sweeps, obs, "Quiet");
 
 		cout << "After DMRG" << endl;
 
@@ -354,10 +354,8 @@ int main(int argc, char *argv[]) {
 		for (int i = N / 2 + 1; i <= N; ++i)
 			initState.set(i, "Dn");
 		psi = MPS(initState);
-		energy = inner(psi, H0, psi); //<psi|H0|psi>
-		cout << "Initial energy=" << energy << endl;
 
-		psi0 = psi;
+		//psi0 = psi;
 	} else if (param.longval("RandomState") == 1) {
 		// Random state
 		cout << "initial state  is random state" << endl;
@@ -369,8 +367,8 @@ int main(int argc, char *argv[]) {
 	}
 	//cout << "PSI = " << psi << endl;
 
-	energy = inner(psi, H0, psi); //<psi|H0|psi>
-	cout << "2. Initial energy psi =" << energy << endl;
+	energy_initial = inner(psi, H0, psi); //<psi|H0|psi>
+	cout << "2. Initial energy psi =" << energy_initial << endl;
 
 //--------------------------------------------------------------
 
@@ -576,9 +574,11 @@ int main(int argc, char *argv[]) {
 			expH.Evolve(psi, args);
 			psi.orthogonalize(args);
 
+			double energy = real(innerC(psi, H, psi));
 			cout << "max bond dim = " << maxLinkDim(psi) << endl;
 			cout << "Norm = " << real(innerC(psi, psi)) << endl;
-			cout << "Energy = " << real(innerC(psi, H, psi)) << endl;
+			cout << "Energy = " << energy << endl;
+			cout << "dE/E = " << (energy - energy_initial)/energy_initial << endl;
 
 		}
 	}
