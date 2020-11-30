@@ -94,7 +94,6 @@ public:
 		//and their default values
 		operator[]("N") = 10; //Length of the chain
 		operator[]("J") = 1.0;
-		operator[]("mu") = 1.0;
 		operator[]("tau") = 0.1;  //time step for the unitary evolution
 		operator[]("T") = 2;  //Total (final) time
 		operator[]("Sz") = 0;
@@ -108,7 +107,7 @@ public:
 		operator[]("DomainWall") = 0;
 		operator[]("RandomState") = 0;
 		operator[]("begin") = 1;
-		operator[]("end") = 10;
+		//operator[]("end") = 10;
 		operator[]("hL") = 0; //chemical potential
 		operator[]("hR") = 0;
 		operator[]("Q2Profile") = 0;
@@ -140,7 +139,9 @@ private:
 	int N;
 	void init(const ThreeSiteParam &param) {    //.init (param)
 		const double J = param.val("J");
-		const double mu = param.val("mu");
+		double mu = 0;
+		const double hL = param.val("hL");
+		const double hR = param.val("hR");
 		dot = (N) / 2;  //Position of the "dot"
 		//cout << "The dot is on site #" << dot << endl;
 		//if ((2*N)<=3) cout<<"Error, N="<<N<<" is too small.\n",exit(0);
@@ -155,6 +156,11 @@ private:
 			//cout << "j = "<< j << "/ " << N-3 << endl;
 			cout << "site (" << j << ", " << j + 1 << ", " << j + 2 << ")"
 					<< endl;
+			if(j <= dot){
+				mu = hL;
+			}else{
+				mu = hR;
+			}
 			ampo += mu, "Sz", j;
 		}
 		ampo += mu, "Sz", N-1;
@@ -182,12 +188,12 @@ public:
 			const complex<double> tau) {
 		//const int begin = param.val("begin");
 		const int begin = 1;
-		const int end = param.val("end");
+		const int end = param.val("N");
 		const int order = param.val("TrotterOrder");
 		if (order == 1) {
 			cout << "trotter 1 scheme" << endl;
 
-			TimeGates(begin, end, tau, sites, param);
+			TimeGates(begin,     end, tau, sites, param);
 			TimeGates(begin + 1, end, tau, sites, param);
 			TimeGates(begin + 2, end, tau, sites, param);
 
@@ -232,22 +238,18 @@ public:
 		const int step = 3;
 		const double J = param.val("J");
 		cout << "Gates starts from " << begin << endl;
-		for (int j = begin; j < end - 2; j += step) {
+		for (int j = begin; j < end - 1; j += step) {
 			cout << "j = (" << j << ", " << j + 1 << ", " << j + 2 << ")"
 					<< endl;
 			//this part act on real sites
 			auto hh = J * 4 * 0.25 * op(sites, "Sp", j) * op(sites, "Id", j + 1)
 					* op(sites, "Sm", j + 2);
-
 			hh += J * 4 * 0.25 * op(sites, "Sm", j) * op(sites, "Id", j + 1)
 					* op(sites, "Sp", j + 2);
-
 			hh += -J * 8 * 0.25 * op(sites, "Sp", j) * op(sites, "Sz", j + 1)
 					* op(sites, "Sm", j + 2);
-
 			hh += -J * 8 * 0.25 * op(sites, "Sm", j) * op(sites, "Sz", j + 1)
 					* op(sites, "Sp", j + 2);
-
 			auto G = expHermitian(hh, tau);
 			gates.emplace_back(j, move(G));
 		}
