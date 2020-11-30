@@ -108,14 +108,20 @@ public:
 		operator[]("trunc") = 1e-10;  //maximum truncation error
 		operator[]("energy") = 1e-10;  //convergence criterium on the energy
 		operator[]("sweeps") = 999;  //maximum number of sweeps in the DMRG
-		operator[]("TrotterOrder") = 4;
+		operator[]("TrotterOrder") = 2;
 		operator[]("GS") = 1;
 		operator[]("antal") = 0;
 		operator[]("rnd_state") = 0;
-		operator[]("XXZ") = 0;
-		operator[]("PBC") = 0;
-		operator[]("beta") = 0;
+		operator[]("begin") = 1;
+		operator[]("end") = 10;
+		operator[]("T") = 0;  //Total (final) time
+		operator[]("hL") = 0; //alternating chemical potential or staggered magnetization
+		operator[]("hR") = 0;
+		operator[]("Q2Prof") = 0;
+		operator[]("CurrentProf") = 0;
+		operator[]("Current") = 0;
 	}
+
 };
 //_____________________________________________________
 
@@ -127,8 +133,7 @@ public:
 	AutoMPO ampo;  //variable ampo
 	//Define a constructor for this class 'ThreeSiteHamiltonian'
 	ThreeSiteHamiltonian(const SiteSet &sites, const ThreeSiteParam &param) :
-			ampo(sites),
-			N(length(sites)){
+			ampo(sites), N(length(sites)) {
 		//N = length(sites); // size of Hamiltonian comes with onject SiteSet sites, not just as number N
 		init(param);   // initializing the Hamiltonian
 		cout << "A Hamiltonian with " << N << " sites was constructed." << endl;
@@ -158,25 +163,6 @@ private:
 		ampo += mu, "Sz", 1;
 		ampo += mu, "Sz", N;
 		cout << "H = 3site is construcnted" << endl;
-		if (param.val("PBC")) {
-			// This part realizes Periodic Boundary Condition (PBC)
-			// term (N-1,N,1)
-			ampo += J * 4 * 0.25, "S+", N - 1, "S-", 1;
-			ampo += J * 4 * 0.25, "S-", N - 1, "S+", 1;
-			ampo += J * -8 * 0.25, "S+", N - 1, "Sz", N, "S-", 1;
-			ampo += J * -8 * 0.25, "S-", N - 1, "Sz", N, "S+", 1;
-			cout << "PBC; sites (" << N - 1 << " " << 1 << "), ";
-
-			// term (N,1,2)
-			ampo += J * 4 * 0.25, "S+", N, "S-", 2;
-			ampo += J * 4 * 0.25, "S-", N, "S+", 2;
-			ampo += J * -8 * 0.25, "S+", N, "Sz", 1, "S-", 2;
-			ampo += J * -8 * 0.25, "S-", N, "Sz", 1, "S+", 2;
-			cout << "(" << N << " " << 2 << ")" << endl;
-
-			cout << "H = 3site is periodic" << endl;
-		}
-
 	}
 };
 
@@ -246,8 +232,9 @@ public:
 
 	void TimeGates(const int begin, const int end, const complex<double> tau,
 			const SiteSet &sites, const ThreeSiteParam &param) {
-		const int step = 6;
+		const int step = 3;
 		const double J = param.val("J");
+		cout << "Gates starts from " << begin << endl;
 		for (int j = begin; j < end - 2; j += step) {
 			cout << "j = (" << j << ", " << j + 1 << ", " << j + 2 << ")"
 					<< endl;
@@ -353,7 +340,7 @@ int main(int argc, char *argv[]) {
 
 		MyDMRGObserver obs(psi, param.val("energy"));
 
-		tie(energy, psi ) = dmrg(H0, psi, sweeps, obs, "Quiet");
+		tie(energy, psi) = dmrg(H0, psi, sweeps, obs, "Quiet");
 
 		cout << "After DMRG" << endl;
 
@@ -385,30 +372,34 @@ int main(int argc, char *argv[]) {
 
 //--------------------------------------------------------------
 
-
+	//Hamiltonian for the dynamics
+	ThreeSiteHamiltonian Ham(sites, param);
+	const int dot = Ham.dot;
+	auto H = toMPO(Ham.ampo);
+	cout << "H constructed" << endl;
 
 // Output and observables
 // _______
-	ofstream ent, spec, eprof, sz, h_spec, h_spec0, entr_states, energy_prof; //here I'm defining output
-	ios_base::openmode mode;
-	mode = std::ofstream::out; //Erase previous file (if present)
+	ofstream ent, spec, eprof, sz, sz_avrg, energy_beta, energy_prof,
+				q1minus_prof, q2prof; //here I'm defining output streams == files
+		ios_base::openmode mode;
+		mode = std::ofstream::out; //Erase previous file (if present)
 
 	double dt = param.val("Entropy");
 	if (dt != 0) { //Entropy in the center of the chain
 		ent.open("Entropy_center.dat", mode);
 		ent.precision(15);
-		ent
-				<< "#time\tEntropy(dot)\tEntropy_SQRT_p_i(dot)\tEntr_labda_1_state\tBondDim(dot)\tMaxBondDim\n";
+		ent << "#time \t Entropy(dot) \t BondDim(dot) \t MaxBondDim\n";
 	}
-//---------------------
+	//---------------------
 	dt = param.val("SVD_spec");
 	if (dt > 0) { //SVD Spectrum on central bond
 		spec.open("SVD_spec.dat", mode);
 		spec.precision(15);
 		spec << "#Position=" << dot << "\t<SVD_spectrum>\t\ttime\n";
 	}
-//---------------------
 
+	//---------------------
 	dt = param.val("Eprof");
 	if (dt > 0) { //Full entropy profile
 		eprof.open("Entropy_profile.dat", mode);
@@ -417,50 +408,46 @@ int main(int argc, char *argv[]) {
 				<< setw(16)
 				<< "\t Entropy_sqrt \t Entropy_state1 \t time \t\t Bond.Dim(i)\n";
 	}
-//---------------------
-
+	//---------------------
 	dt = param.val("Sz");
 	if (dt > 0) { //Full magnetization profile
 		sz.open("Sz_profile.dat", mode);
 		sz.precision(15);
-		sz << "#Position=i-" << "\t<Sz_i>\t" << dot << "\t\ttime\n";
+		sz << "#Position=i-" << "\t<Sz_i>\t" << "\t(-1)^i<Sz_i>\t"
+				<< "\t\ttime\n";
+
+		sz_avrg.open("Sz_average_profile.dat", mode);
+		sz_avrg.precision(15);
+		sz_avrg << "#Position=i-" << "\t0.5<Sz_2+1i> + 0.5<Sz_2+1i>\t"
+				<< "\t\ttime\n";
 
 	}
-//---------------------
-	dt = param.val("H_spec");
-	if (dt > 0) { //Hamiltonian spectum
-		h_spec.open("H_spec.dat", mode);
-		h_spec.precision(15);
-		h_spec << "#Position=" << dot << "\t<H_spec>\t\ttime\n";
-
-		h_spec0.open("h_spec0.dat", mode);
-		h_spec0.precision(15);
-		h_spec0 << "time and " << "\t<H_spec>\n";
-	}
-//---------------------
+	//---------------------
 	dt = param.val("EnergyProf");
 	if (dt > 0) { //Energy profile
 		energy_prof.open("Energy_profile.dat", mode);
 		energy_prof.precision(15);
 		energy_prof << "#Position=i-" << "\t<Ham_i>\t" << dot
 				<< "\t\ttime(or beta)\n";
-	}
-//---------------------
-	dt = param.val("Entr_states");
-	if (dt > 0) { //Entr of the first largest states
-		entr_states.open("Entropy_states.dat", mode);
-		entr_states.precision(15);
-		entr_states
-				<< "#time\t Entr_1 \t BondDim_1 \t Entr_2 \t BondDim_2 \t  Entr_3 \t BondDim_3 \n";
+
+		//Q1minus profile is initialized simultaniously with energy profile
+		q1minus_prof.open("Q1minus_profile.dat", mode);
+		q1minus_prof.precision(15);
+		q1minus_prof << "#Position=i-" << "\t<Q1minus_i>\t" << dot
+				<< "\t\ttime(or beta)\n";
 
 	}
+	//---------------------
+	dt = param.val("Q2Prof");
+	if (dt > 0) { //Full entropy profile
+		q2prof.open("Q2_profile.dat", mode);
+		q2prof.precision(15);
+		q2prof << "#Position=i-" << dot << setw(16) << "\t Entropy(i)"
+				<< setw(16) << "\t Q2plus \t Q2minus \t time \t \n";
+	}
 
-	//Hamiltonian and exp(Ham) for the dynamics
-	ThreeSiteHamiltonian Ham(sites, param);
-	const int dot = Ham.dot;
-	auto H = toMPO(Ham.ampo);
-	cout << "H constructed" << endl;
 
+	//exp(Ham) for the dynamics
 	auto args = Args("Method=", "DensityMatrix", "Cutoff", param.val("trunc"),
 			"MaxDim", param.longval("max_bond"), "Normalize", true); // for FitApplyMPO RENAME
 
@@ -530,17 +517,36 @@ int main(int argc, char *argv[]) {
 				}
 			}
 		// ------- Energy profile -------
-		if (param.val("EnergyProf") > 0) {
+		// ------- Energy profile -------
+		if (param.val("EnergyProf") > 0 ) {
 			if (n % int(param.val("EnergyProf") / tau) == 0) {
 				energy_prof << "\"t=" << time << "\"" << endl;
-				for (int i = 1; i <= N - 2; ++i) {
-					const double en = Energy(psi, sites, i);
-					energy_prof << i - dot + 1 << "\t" << en << "\t" << time
-							<< endl;
+				q1minus_prof << "\"t=" << time << "\"" << endl;
+				for (int i = 1; i <= N - 5; i += 2) {
+					const complex<double> q1 = Q1(psi, sites, i);
+					const double en = real(q1);
+					energy_prof << i / 2 - dot / 2 + 1 << "\t" << en << "\t"
+							<< time << endl;
+					const double q1minus = imag(q1);
+					q1minus_prof << i / 2 - dot / 2 + 1 << "\t" << q1minus
+							<< "\t" << time << endl;
 				}
-				//I need this part to separate time steps in *.dat files (for gnuplot)
-				if (n <= n_steps)
-					energy_prof << "\n\n";
+				energy_prof << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
+				q1minus_prof << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
+			}
+		}
+		// ------- Q2 profile -------
+		if (param.val("Q2Prof") > 0 ) {
+			if (n % int(param.val("EnergyProf") / tau) == 0) {
+				q2prof << "\"t=" << time << "\"" << endl;
+				for (int i = 1; i <= N - 9; i += 2) {
+					const complex<double> q2 = Q2(psi, sites, i);
+					const double q2plus =  real(q2);
+					const double q2minus = imag(q2);
+					q2prof << i / 2 - dot / 2 + 1 << "\t" << q2plus << "\t"
+							<< q2minus << "\t" << time << endl;
+				}
+				q2prof << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
 			}
 		}
 
@@ -551,13 +557,10 @@ int main(int argc, char *argv[]) {
 			psi.orthogonalize(args);
 
 			cout << "max bond dim = " << maxLinkDim(psi) << endl;
-			cout << "U = 1+H. Norm = " << real(innerC(psi, psi)) << endl;
-			cout << "U = 1+H. Energy = " << real(innerC(psi, H, psi)) << endl;
+			cout << "Norm = " << real(innerC(psi, psi)) << endl;
+			cout << "Energy = " << real(innerC(psi, H, psi)) << endl;
 
 		}
-
-		cout << "overlap <psi|psi0> = " << (innerC(psi, psi0)) << endl;
-
 	}
 	cout << "\nTime evolution complete.\n";
 	println("Done !");
