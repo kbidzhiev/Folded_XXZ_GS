@@ -97,29 +97,26 @@ public:
 		operator[]("mu") = 1.0;
 		operator[]("tau") = 0.1;  //time step for the unitary evolution
 		operator[]("T") = 2;  //Total (final) time
-		operator[]("Entropy") = 0; //entanglement entropy p*log*p between left and right parts of system
-		operator[]("Eprof") = 0; // Entropy profile - parameter 0 -> nothing, dt>0 each second=integer parameter
-		operator[]("EnergyProf") = 0;
 		operator[]("Sz") = 0;
-		operator[]("Entr_states") = 0;
 		operator[]("SVD_spec") = 0; //SVD spectrum
-		operator[]("H_spec") = 0; //Ham spectrum
 		operator[]("max_bond") = 4000;  //maximum bond dimension
 		operator[]("trunc") = 1e-10;  //maximum truncation error
 		operator[]("energy") = 1e-10;  //convergence criterium on the energy
 		operator[]("sweeps") = 999;  //maximum number of sweeps in the DMRG
 		operator[]("TrotterOrder") = 2;
-		operator[]("GS") = 1;
-		operator[]("antal") = 0;
-		operator[]("rnd_state") = 0;
+		operator[]("GroundState") = 0;
+		operator[]("DomainWall") = 0;
+		operator[]("RandomState") = 0;
 		operator[]("begin") = 1;
 		operator[]("end") = 10;
-		operator[]("T") = 0;  //Total (final) time
-		operator[]("hL") = 0; //alternating chemical potential or staggered magnetization
+		operator[]("hL") = 0; //chemical potential
 		operator[]("hR") = 0;
-		operator[]("Q2Prof") = 0;
-		operator[]("CurrentProf") = 0;
+		operator[]("Q2Profile") = 0;
+		operator[]("CurrentProfile") = 0;
 		operator[]("Current") = 0;
+		operator[]("Entropy") = 0; //entanglement entropy p*log*p between left and right parts of system
+		operator[]("EntropyProfile") = 0; // Entropy Profile- parameter 0 -> nothing, dt>0 each second=integer parameter
+		operator[]("EnergyProfile") = 0;
 	}
 
 };
@@ -148,19 +145,19 @@ private:
 		//cout << "The dot is on site #" << dot << endl;
 		//if ((2*N)<=3) cout<<"Error, N="<<N<<" is too small.\n",exit(0);
 
-		for (int j = 2; j < N; ++j) {
+		for (int j = 1; j < N-1; ++j) {
 			//Strange coefficients are needed to match with
 			// spin Pauli matrices instead of Sx Sy
-			ampo += J * 4 * 0.25, "S+", j - 1, "S-", j + 1; // 0.5 (SpSm+ SmSp) = SxSx + SySy
-			ampo += J * 4 * 0.25, "S-", j - 1, "S+", j + 1;
-			ampo += J * -8 * 0.25, "S+", j - 1, "Sz", j, "S-", j + 1;
-			ampo += J * -8 * 0.25, "S-", j - 1, "Sz", j, "S+", j + 1;
+			ampo += J * 4 * 0.25, "S+", j, "S-", j + 2; // 0.5 (SpSm+ SmSp) = SxSx + SySy
+			ampo += J * 4 * 0.25, "S-", j, "S+", j + 2;
+			ampo += J * -8 * 0.25, "S+", j, "Sz", j, "S-", j + 2;
+			ampo += J * -8 * 0.25, "S-", j, "Sz", j, "S+", j + 2;
 			//cout << "j = "<< j << "/ " << N-3 << endl;
-			cout << "site (" << j - 1 << ", " << j << ", " << j + 1 << ")"
+			cout << "site (" << j << ", " << j + 1 << ", " << j + 2 << ")"
 					<< endl;
 			ampo += mu, "Sz", j;
 		}
-		ampo += mu, "Sz", 1;
+		ampo += mu, "Sz", N-1;
 		ampo += mu, "Sz", N;
 		cout << "H = 3site is construcnted" << endl;
 	}
@@ -323,7 +320,7 @@ int main(int argc, char *argv[]) {
 	auto H0 = toMPO(Init_H.ampo);
 	double energy = 0;
 
-	if (param.longval("GS") == 1) {
+	if (param.longval("GroundState") == 1) {
 		// GS of the initial Hamiltonian
 		cout << "initial state is GS" << endl;
 		auto sweeps = Sweeps(999); //number of sweeps is 5
@@ -346,7 +343,7 @@ int main(int argc, char *argv[]) {
 
 		//psi0 = psi; //we create to states. Psi for my time evolution, psi0 for standard one
 
-	} else if (param.longval("antal") == 1) {
+	} else if (param.longval("DomainWall") == 1) {
 		// Initial state: |+- +- +- >
 		cout << "initil state is ++++----" << endl;
 		auto initState = InitState(sites);
@@ -359,11 +356,14 @@ int main(int argc, char *argv[]) {
 		cout << "Initial energy=" << energy << endl;
 
 		psi0 = psi;
-	} else if (param.longval("rnd_state") == 1) {
+	} else if (param.longval("RandomState") == 1) {
 		// Random state
 		cout << "initial state  is random state" << endl;
 		psi = randomMPS(sites);
-
+		psi.normalize();
+	} else {
+		cout << "Choose: GroundState 1 or DomainWall 1 or RandomState 1" << endl;
+		return 1;
 	}
 	//cout << "PSI = " << psi << endl;
 
@@ -380,8 +380,8 @@ int main(int argc, char *argv[]) {
 
 // Output and observables
 // _______
-	ofstream ent, spec, eprof, sz, sz_avrg, energy_beta, energy_prof,
-				q1minus_prof, q2prof; //here I'm defining output streams == files
+	ofstream ent, spec, entropy_profile, sz, sz_avrg, energy_beta, energy_profile,
+				q1minus_profile, q2_profile; //here I'm defining output streams == files
 		ios_base::openmode mode;
 		mode = std::ofstream::out; //Erase previous file (if present)
 
@@ -400,17 +400,17 @@ int main(int argc, char *argv[]) {
 	}
 
 	//---------------------
-	dt = param.val("Eprof");
-	if (dt > 0) { //Full entropy profile
-		eprof.open("Entropy_profile.dat", mode);
-		eprof.precision(15);
-		eprof << "#Position=i-" << dot << setw(16) << "\t Entropy(i)"
+	dt = param.val("EntropyProfile");
+	if (dt > 0) { //Full entropy Profile
+		entropy_profile.open("Entropy_profile.dat", mode);
+		entropy_profile.precision(15);
+		entropy_profile << "#Position=i-" << dot << setw(16) << "\t Entropy(i)"
 				<< setw(16)
 				<< "\t Entropy_sqrt \t Entropy_state1 \t time \t\t Bond.Dim(i)\n";
 	}
 	//---------------------
 	dt = param.val("Sz");
-	if (dt > 0) { //Full magnetization profile
+	if (dt > 0) { //Full magnetization Profile
 		sz.open("Sz_profile.dat", mode);
 		sz.precision(15);
 		sz << "#Position=i-" << "\t<Sz_i>\t" << "\t(-1)^i<Sz_i>\t"
@@ -423,26 +423,26 @@ int main(int argc, char *argv[]) {
 
 	}
 	//---------------------
-	dt = param.val("EnergyProf");
-	if (dt > 0) { //Energy profile
-		energy_prof.open("Energy_profile.dat", mode);
-		energy_prof.precision(15);
-		energy_prof << "#Position=i-" << "\t<Ham_i>\t" << dot
+	dt = param.val("EnergyProfile");
+	if (dt > 0) { //Energy Profile
+		energy_profile.open("Energy_profile.dat", mode);
+		energy_profile.precision(15);
+		energy_profile << "#Position=i-" << "\t<Ham_i>\t" << dot
 				<< "\t\ttime(or beta)\n";
 
-		//Q1minus profile is initialized simultaniously with energy profile
-		q1minus_prof.open("Q1minus_profile.dat", mode);
-		q1minus_prof.precision(15);
-		q1minus_prof << "#Position=i-" << "\t<Q1minus_i>\t" << dot
+		//Q1minus Profile is initialized simultaniously with energy Profile
+		q1minus_profile.open("Q1minus_profile.dat", mode);
+		q1minus_profile.precision(15);
+		q1minus_profile << "#Position=i-" << "\t<Q1minus_i>\t" << dot
 				<< "\t\ttime(or beta)\n";
 
 	}
 	//---------------------
-	dt = param.val("Q2Prof");
-	if (dt > 0) { //Full entropy profile
-		q2prof.open("Q2_profile.dat", mode);
-		q2prof.precision(15);
-		q2prof << "#Position=i-" << dot << setw(16) << "\t Entropy(i)"
+	dt = param.val("Q2Profile");
+	if (dt > 0) { //Full entropy Profileile
+		q2_profile.open("Q2_profile.dat", mode);
+		q2_profile.precision(15);
+		q2_profile << "#Position=i-" << dot << setw(16) << "\t Entropy(i)"
 				<< setw(16) << "\t Q2plus \t Q2minus \t time \t \n";
 	}
 
@@ -485,22 +485,22 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		// ------- entanglement Entropy profile -----
-		if (param.val("Eprof") > 0)
-			if (n % int(param.val("Eprof") / tau) == 0) {
-				eprof << "\"t=" << time << "\"" << endl;
+		// ------- entanglement Entropy Profile -----
+		if (param.val("EntropyProfile") > 0)
+			if (n % int(param.val("EntropyProfile") / tau) == 0) {
+				entropy_profile << "\"t=" << time << "\"" << endl;
 				for (int i = 1; i < N; i++) {
 					double entr_std = Entropy(psi, i, Myspec, 1); // p log p
-					eprof << i + 0.5 - dot << "\t" << setw(16) << setfill('0')
+					entropy_profile << i + 0.5 - dot << "\t" << setw(16) << setfill('0')
 							<< entr_std << "\t" << setw(16) << setfill('0')
 							<< BondDim(psi, i) << "\t" << time << endl;
 				}
 				if (n < n_steps)
-					eprof << endl << endl;
+					entropy_profile << endl << endl;
 			}
 
-		// ------- Sz profile -------
-		if (param.val("Sz") > 0)
+		// ------- Sz Profile -------
+		if (param.val("Sz") > 0){
 			if (n % int(param.val("Sz") / tau) == 0) {
 				sz << "\"t=" << time << "\"" << endl;
 				double sz_tot = 0, sz_left = 0, sz_right = 0, sz_dot = 0;
@@ -515,38 +515,40 @@ int main(int argc, char *argv[]) {
 						sz_dot += s;
 					sz << i - dot << "\t" << s << "\t" << time << endl;
 				}
-			}
-		// ------- Energy profile -------
-		// ------- Energy profile -------
-		if (param.val("EnergyProf") > 0 ) {
-			if (n % int(param.val("EnergyProf") / tau) == 0) {
-				energy_prof << "\"t=" << time << "\"" << endl;
-				q1minus_prof << "\"t=" << time << "\"" << endl;
-				for (int i = 1; i <= N - 5; i += 2) {
-					const complex<double> q1 = Q1(psi, sites, i);
-					const double en = real(q1);
-					energy_prof << i / 2 - dot / 2 + 1 << "\t" << en << "\t"
-							<< time << endl;
-					const double q1minus = imag(q1);
-					q1minus_prof << i / 2 - dot / 2 + 1 << "\t" << q1minus
-							<< "\t" << time << endl;
-				}
-				energy_prof << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
-				q1minus_prof << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
+				sz << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
 			}
 		}
-		// ------- Q2 profile -------
-		if (param.val("Q2Prof") > 0 ) {
-			if (n % int(param.val("EnergyProf") / tau) == 0) {
-				q2prof << "\"t=" << time << "\"" << endl;
-				for (int i = 1; i <= N - 9; i += 2) {
-					const complex<double> q2 = Q2(psi, sites, i);
-					const double q2plus =  real(q2);
-					const double q2minus = imag(q2);
-					q2prof << i / 2 - dot / 2 + 1 << "\t" << q2plus << "\t"
-							<< q2minus << "\t" << time << endl;
+		// ------- Energy Profile -------
+		// ------- Energy Profile -------
+		if (param.val("EnergyProfile") > 0 ) {
+			if (n % int(param.val("EnergyProfile") / tau) == 0) {
+				energy_profile << "\"t=" << time << "\"" << endl;
+				q1minus_profile << "\"t=" << time << "\"" << endl;
+				for (int i = 1; i <= N - 3; i++) {
+					const complex<double> q1 = Q1(psi, sites, i);
+					const double en = real(q1);
+					energy_profile << i - dot + 1 << "\t" << en << "\t"
+							<< time << endl;
+					const double q1minus = imag(q1);
+					q1minus_profile << i - dot + 1 << "\t" << q1minus
+							<< "\t" << time << endl;
 				}
-				q2prof << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
+				energy_profile << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
+				q1minus_profile << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
+			}
+		}
+		// ------- Q2 Profile -------
+		if (param.val("Q2Profile") > 0 ) {
+			if (n % int(param.val("EnergyProfile") / tau) == 0) {
+				q2_profile << "\"t=" << time << "\"" << endl;
+				for (int i = 1; i <= N - 5; i++) {
+					const complex<double> q2 = Q2(psi, sites, i);
+					const double q2_plus =  real(q2);
+					const double q2_minus = imag(q2);
+					q2_profile << i - dot + 1 << "\t" << q2_plus << "\t"
+							<< q2_minus << "\t" << time << endl;
+				}
+				q2_profile << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
 			}
 		}
 
