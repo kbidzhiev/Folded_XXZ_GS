@@ -501,13 +501,14 @@ int main(int argc, char *argv[]) {
 					entropy_profile << endl << endl;
 			}
 
-		// ------- Sz Profile -------
-		if (param.val("Sz") > 0){
+		// ------- Sz profile -------
+		if (param.val("Sz") > 0 && beta_steps_max <= n) {
 			if (n % int(param.val("Sz") / tau) == 0) {
 				sz << "\"t=" << time << "\"" << endl;
 				double sz_tot = 0, sz_left = 0, sz_right = 0, sz_dot = 0;
-				for (int i = 1; i <= N; i++) {
-					const double s = Sz(psi, sites, i);
+				double sz_odd = 0;
+				for (int i = 1; i <= N; i ++) {
+					double s = Sz(psi, sites, i);
 					sz_tot += s;
 					if (i < dot)
 						sz_left += s;
@@ -515,9 +516,24 @@ int main(int argc, char *argv[]) {
 						sz_right += s;
 					if (i == dot)
 						sz_dot += s;
-					sz << i - dot << "\t" << s << "\t" << time << endl;
+					sz << i - dot + 1 << "\t" << s << "\t"
+							<< pow(-1, i ) * s << "\t" << time << endl;
+
+					if ( i % 2 == 1) { //odd site
+						sz_odd = s;
+					} else {
+						sz_avrg << i - dot + 1 << "\t"
+								<< 0.5 * (s + sz_odd) << "\t" << time << endl;
+					}
 				}
-				sz << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
+
+				{ //I need this part to separate time steps in *.dat files (for gnuplot)
+					sz << "\n\n";
+					sz_avrg << "\n\n";
+				}
+				cout << "\n<Sz_left>=" << sz_left << "\t" << "<Sz_right>="
+						<< sz_right << "\t" << "<Sz_DOT>=" << sz_dot << "\t"
+						<< "<Sz_tot>=" << sz_tot << endl;
 			}
 		}
 		// ------- Energy Profile -------
