@@ -578,7 +578,7 @@ int main(int argc, char *argv[]) {
 			cout << "max bond dim = " << maxLinkDim(psi) << endl;
 			cout << "Norm = " << real(innerC(psi, psi)) << endl;
 			cout << "Energy = " << energy << endl;
-			cout << "dE/E = " << (energy - energy_initial)/energy_initial << endl;
+			//cout << "dE/E = " << (energy - energy_initial)/energy_initial << endl;
 
 		}
 	}
