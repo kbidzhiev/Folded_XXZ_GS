@@ -150,8 +150,8 @@ private:
 			// spin Pauli matrices instead of Sx Sy
 			ampo += J * 4 * 0.25, "S+", j, "S-", j + 2; // 0.5 (SpSm+ SmSp) = SxSx + SySy
 			ampo += J * 4 * 0.25, "S-", j, "S+", j + 2;
-			ampo += J * -8 * 0.25, "S+", j, "Sz", j, "S-", j + 2;
-			ampo += J * -8 * 0.25, "S-", j, "Sz", j, "S+", j + 2;
+			ampo += J * -8 * 0.25, "S+", j, "Sz", j + 1, "S-", j + 2;
+			ampo += J * -8 * 0.25, "S-", j, "Sz", j + 1, "S+", j + 2;
 			//cout << "j = "<< j << "/ " << N-3 << endl;
 			cout << "site (" << j << ", " << j + 1 << ", " << j + 2 << ")"
 					<< endl;
