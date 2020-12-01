@@ -514,7 +514,7 @@ int main(int argc, char *argv[]) {
 						sz_right += s;
 					if (i == dot)
 						sz_dot += s;
-					sz << i - dot + 1 << "\t" << s << "\t"
+					sz << i - dot  << "\t" << s << "\t"
 							<< pow(-1, i ) * s << "\t" << time << endl;
 
 					if ( i % 2 == 1) { //odd site
@@ -543,10 +543,10 @@ int main(int argc, char *argv[]) {
 				for (int i = 1; i <= N - 3; i++) {
 					const complex<double> q1 = Q1(psi, sites, i);
 					const double en = real(q1);
-					energy_profile << i - dot + 1 << "\t" << en << "\t"
+					energy_profile << i - dot  << "\t" << en << "\t"
 							<< time << endl;
 					const double q1minus = imag(q1);
-					q1minus_profile << i - dot + 1 << "\t" << q1minus
+					q1minus_profile << i - dot << "\t" << q1minus
 							<< "\t" << time << endl;
 				}
 				energy_profile << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
@@ -561,7 +561,7 @@ int main(int argc, char *argv[]) {
 					const complex<double> q2 = Q2(psi, sites, i);
 					const double q2_plus =  real(q2);
 					const double q2_minus = imag(q2);
-					q2_profile << i - dot + 1 << "\t" << q2_plus << "\t"
+					q2_profile << i - dot << "\t" << q2_plus << "\t"
 							<< q2_minus << "\t" << time << endl;
 				}
 				q2_profile << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
