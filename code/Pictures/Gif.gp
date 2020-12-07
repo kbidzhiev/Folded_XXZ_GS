@@ -17,6 +17,20 @@ do for [i=1:int(STATS_blocks)] {
 
 
 
+set terminal gif animate delay 1
+set output 'Sz_profile2.gif'
+stats 'Sz_profile.dat' nooutput
+set xrange [-0.6:1]
+set yrange [-0.6:0.6]
+set ylabel "Sz"
+set xlabel "x/t"
+percentile="P5 P10 P20 P25 P50 P75"
+cir=7;
+
+f(x) = x;
+do for [i=1:int(STATS_blocks)] {
+    plot "Sz_profile.dat" index (i) u ($1/(f(i))):($2) w lp pt cir ps 1.5 lt rgb "red" title columnheader
+}
 
 
 
