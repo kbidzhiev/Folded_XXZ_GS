@@ -106,6 +106,7 @@ public:
 		operator[]("GroundState") = 0;
 		operator[]("DomainWall") = 0;
 		operator[]("RandomState") = 0;
+		operator[]("Neel") = 0;
 		operator[]("begin") = 1;
 		//operator[]("end") = 10;
 		operator[]("hL") = 0; //chemical potential
@@ -346,7 +347,6 @@ int main(int argc, char *argv[]) {
 		//psi0 = psi; //we create to states. Psi for my time evolution, psi0 for standard one
 
 	} else if (param.longval("DomainWall") == 1) {
-		// Initial state: |+- +- +- >
 		cout << "initil state is ++++----" << endl;
 		auto initState = InitState(sites);
 		for (int i = 1; i <= N / 2; ++i)
@@ -355,14 +355,35 @@ int main(int argc, char *argv[]) {
 			initState.set(i, "Dn");
 		psi = MPS(initState);
 
-		//psi0 = psi;
+	} else if (param.longval("Neel") == 1) {
+		// Initial state: |+- +- +- >
+		cout << "initil state is {++++} {--} {Neel}" << endl;
+		auto initState = InitState(sites);
+		for (int i = 1; i <= N / 2; ++i){
+			initState.set(i, "Up");
+		}
+		initState.set(N/2 + 1, "Dn");
+		initState.set(N/2 + 2, "Dn");
+
+		bool flag_up_spin = true;
+		for (int i = N / 2 + 3; i <= N; ++i){
+			if (flag_up_spin){
+				initState.set(i, "Up");
+				flag_up_spin = false;
+			} else{
+				initState.set(i, "Dn");
+				flag_up_spin = true;
+			}
+		}
+		psi = MPS(initState);
+
 	} else if (param.longval("RandomState") == 1) {
 		// Random state
 		cout << "initial state  is random state" << endl;
 		psi = randomMPS(sites);
 		psi.normalize();
 	} else {
-		cout << "Choose: GroundState 1 or DomainWall 1 or RandomState 1" << endl;
+		cout << "Choose: GroundState 1 or Neel 1 or DomainWall 1 or RandomState 1" << endl;
 		return 1;
 	}
 	//cout << "PSI = " << psi << endl;
