@@ -9,6 +9,7 @@
 #include <math.h>
 #include <chrono>
 #include <cmath>
+#include <random>
 #include "observables_GS.h"
 
 using namespace itensor;
@@ -322,6 +323,7 @@ int main(int argc, char *argv[]) {
 	ThreeSiteHamiltonian Init_H(sites, param);
 	auto H0 = toMPO(Init_H.ampo);
 	double energy_initial = 0;
+	mt19937 random_gen;
 
 	if (param.longval("GroundState") == 1) {
 		// GS of the initial Hamiltonian
@@ -378,10 +380,30 @@ int main(int argc, char *argv[]) {
 		psi = MPS(initState);
 
 	} else if (param.longval("RandomState") == 1) {
-		// Random state
-		cout << "initial state  is random state" << endl;
-		psi = randomMPS(sites);
-		psi.normalize();
+		cout << "initil state is {RND and ---}" << endl;
+		auto initState = InitState(sites);
+
+		for (int i = 1; i <= N / 2 ; ){
+			if (random_gen() % 2 == 0){
+				initState.set(i, "Up");
+				i+=1;
+			}else{
+				initState.set(i, "Up");
+				i+=1;
+				initState.set(i, "Dn");
+				i+=1;
+			}
+		}
+		for (int i = N / 2 + 1; i <= N; ++i){
+			initState.set(i, "Dn");
+		}
+		psi = MPS(initState);
+
+
+//		// Random state
+//		cout << "initial state  is random state" << endl;
+//		psi = randomMPS(sites);
+//		psi.normalize();
 	} else {
 		cout << "Choose: GroundState 1 or Neel 1 or DomainWall 1 or RandomState 1" << endl;
 		return 1;
