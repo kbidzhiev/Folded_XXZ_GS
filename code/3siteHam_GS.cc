@@ -524,6 +524,7 @@ int main(int argc, char *argv[]) {
 		if (param.val("Sz") > 0) {
 			if (n % int(param.val("Sz") / tau) == 0) {
 				sz << "\"t=" << time << "\"" << endl;
+				sz_avrg << "\"t=" << time << "\"" << endl;
 				double sz_tot = 0, sz_left = 0, sz_right = 0, sz_dot = 0;
 				double sz_odd = 0;
 				for (int i = 1; i <= N; i ++) {
