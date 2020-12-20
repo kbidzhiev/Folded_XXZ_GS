@@ -9,7 +9,8 @@
 #include <math.h>
 #include <chrono>
 #include <cmath>
-#include <random>
+
+#include <cstdlib>
 #include "observables_GS.h"
 
 using namespace itensor;
@@ -323,7 +324,7 @@ int main(int argc, char *argv[]) {
 	ThreeSiteHamiltonian Init_H(sites, param);
 	auto H0 = toMPO(Init_H.ampo);
 	double energy_initial = 0;
-	mt19937 random_gen;
+
 
 	if (param.longval("GroundState") == 1) {
 		// GS of the initial Hamiltonian
@@ -382,9 +383,11 @@ int main(int argc, char *argv[]) {
 	} else if (param.longval("RandomState") == 1) {
 		cout << "initil state is {RND and ---}" << endl;
 		auto initState = InitState(sites);
-
+		std::srand(std::time(0));
 		for (int i = 1; i <= N / 2 ; ){
-			if (random_gen() % 2 == 0){
+
+			int rnd = rand();
+			if (rnd % 2 == 0){
 				initState.set(i, "Up");
 				i+=1;
 			}else{
