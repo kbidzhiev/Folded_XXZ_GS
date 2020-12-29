@@ -109,6 +109,7 @@ public:
 		operator[]("DomainWall") = 0;
 		operator[]("RandomState") = 0;
 		operator[]("Neel") = 0;
+		operator[]("Up") = 0;
 		operator[]("begin") = 1;
 		//operator[]("end") = 10;
 		operator[]("hL") = 0; //chemical potential
@@ -381,7 +382,7 @@ int main(int argc, char *argv[]) {
 		psi = MPS(initState);
 
 	} else if (param.longval("RandomState") == 1) {
-		cout << "initil state is {RND and ---}" << endl;
+		cout << "initial state is {RND and ---}" << endl;
 		auto initState = InitState(sites);
 		std::srand(std::time(0));
 		for (int i = 1; i <= N / 2 ; ){
@@ -407,8 +408,21 @@ int main(int argc, char *argv[]) {
 //		cout << "initial state  is random state" << endl;
 //		psi = randomMPS(sites);
 //		psi.normalize();
+	} else if ( param.longval("Up") > 0) {
+		int up = param.longval("Up");
+		cout << "initial state is --"<< string (up, '+') << "----" << endl;
+		auto initState = InitState(sites);
+		for (int i = 1; i <= N; ++i){
+			if (i >= N/4 && i < (N/4 + up)){
+				initState.set(i, "Up");
+			} else{
+				initState.set(i, "Dn");
+			}
+		}
+
+		psi = MPS(initState);
 	} else {
-		cout << "Choose: GroundState 1 or Neel 1 or DomainWall 1 or RandomState 1" << endl;
+		cout << "Choose: GroundState 1 or Neel 1 or DomainWall 1 or RandomState 1 or Up > 0" << endl;
 		return 1;
 	}
 	//cout << "PSI = " << psi << endl;
