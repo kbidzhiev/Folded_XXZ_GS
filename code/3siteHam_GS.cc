@@ -381,24 +381,25 @@ int main(int argc, char *argv[]) {
 		}
 		psi = MPS(initState);
 
-	} else if (param.longval("RandomState") == 1) {
+	} else if (param.longval("RandomState") >= 1) {
+		int m = param.longval("RandomState");
 		cout << "initial state is {RND and ---}" << endl;
 		auto initState = InitState(sites);
 		std::srand(std::time(0));
-		for (int i = 1; i <= N / 2 ; ){
+		for (int i = 1; i <= m ; i++){
 
 			int rnd = rand();
 			if (rnd % 2 == 0){
 				initState.set(i, "Up");
-				i+=1;
+
 			}else{
 				initState.set(i, "Up");
 				i+=1;
 				initState.set(i, "Dn");
-				i+=1;
+
 			}
 		}
-		for (int i = N / 2 + 1; i <= N; ++i){
+		for (int i = m + 1; i <= N; ++i){
 			initState.set(i, "Dn");
 		}
 		psi = MPS(initState);
@@ -422,7 +423,7 @@ int main(int argc, char *argv[]) {
 
 		psi = MPS(initState);
 	} else {
-		cout << "Choose: GroundState 1 or Neel 1 or DomainWall 1 or RandomState 1 or Up > 0" << endl;
+		cout << "Choose: GroundState 1 or Neel 1 or DomainWall 1 or RandomState >1 or Up > 0" << endl;
 		return 1;
 	}
 	//cout << "PSI = " << psi << endl;
