@@ -381,8 +381,12 @@ int main(int argc, char *argv[]) {
 		}
 		psi = MPS(initState);
 
-	} else if (param.longval("RandomState") >= 1) {
+	} else if (param.longval("RandomState") >= 1 ) {
 		int m = param.longval("RandomState");
+		if (m > N ){
+			cout << "RandomState position should be < system size N" << endl;
+			return 1;
+		}
 		cout << "initial state is {RND and ---}" << endl;
 		auto initState = InitState(sites);
 		std::srand(std::time(0));
