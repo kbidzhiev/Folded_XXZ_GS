@@ -521,8 +521,7 @@ int main(int argc, char *argv[]) {
 	TrotterExp expH(sites, param, -Cplx_i * tau);
 
 // Time evolution
-	bool go_on = true;
-	for (int n = 0; n <= n_steps && go_on; ++n) {
+	for (int n = 0; n <= n_steps ; ++n) {
 		const double time = n * tau; //+param.val("time_shift");
 		cout << "Time step #" << n << "/" << n_steps << "\ttime=" << time
 				<< endl;
