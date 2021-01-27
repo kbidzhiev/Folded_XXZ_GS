@@ -109,6 +109,7 @@ public:
 		operator[]("DomainWall") = 0;
 		operator[]("RandomState") = 0;
 		operator[]("Neel") = 0;
+		operator[]("Impurity") = 0;
 		operator[]("Up") = 0;
 		operator[]("begin") = 1;
 		//operator[]("end") = 10;
@@ -359,6 +360,31 @@ int main(int argc, char *argv[]) {
 			initState.set(i, "Dn");
 		psi = MPS(initState);
 
+	}else if (param.longval("Impurity") == 1) {
+		cout << "initil state is {RND} {--} {RND}" << endl;
+		auto initState = InitState(sites);
+		std::srand(std::time(0));
+		for (int i = 1; i <= N; i++) {
+
+
+
+			int rnd = rand();
+			if (rnd % 2 == 0 || i == N) {
+				initState.set(i, "Up");
+
+			} else {
+				initState.set(i, "Up");
+				i += 1;
+				initState.set(i, "Dn");
+
+			}
+		}
+		initState.set(N/2 - 1, "Dn");
+		initState.set(N/2, "Dn");
+		initState.set(N/2 + 1, "Dn");
+		initState.set(N/2 + 2, "Dn");
+		psi = MPS(initState);
+
 	} else if (param.longval("Neel") == 1) {
 		// Initial state: |+- +- +- >
 		cout << "initil state is {++++} {--} {Neel}" << endl;
@@ -427,7 +453,7 @@ int main(int argc, char *argv[]) {
 
 		psi = MPS(initState);
 	} else {
-		cout << "Choose: GroundState 1 or Neel 1 or DomainWall 1 or RandomState >1 or Up > 0" << endl;
+		cout << "Choose: GroundState 1 or Neel 1 or DomainWall 1 or Impurity 1 or RandomState >1 or Up > 0" << endl;
 		return 1;
 	}
 	//cout << "PSI = " << psi << endl;
