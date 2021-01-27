@@ -360,7 +360,7 @@ int main(int argc, char *argv[]) {
 			initState.set(i, "Dn");
 		psi = MPS(initState);
 
-	}else if (param.longval("Impurity") == 1) {
+	}else if (param.longval("Impurity") == 2 || param.longval("Impurity") == 4) {
 		cout << "initil state is {RND} {--} {RND}" << endl;
 		auto initState = InitState(sites);
 		std::srand(std::time(0));
@@ -379,10 +379,16 @@ int main(int argc, char *argv[]) {
 
 			}
 		}
-		initState.set(N/2 - 1, "Dn");
-		initState.set(N/2, "Dn");
-		initState.set(N/2 + 1, "Dn");
-		initState.set(N/2 + 2, "Dn");
+		if (param.longval("Impurity") == 2) {
+			initState.set(N / 2, "Dn");
+			initState.set(N / 2 + 1, "Dn");
+		} else if (param.longval("Impurity") == 4){
+			initState.set(N / 2 - 1, "Dn");
+			initState.set(N / 2, "Dn");
+			initState.set(N / 2 + 1, "Dn");
+			initState.set(N / 2 + 2, "Dn");
+		}
+
 		psi = MPS(initState);
 
 	} else if (param.longval("Neel") == 1) {
