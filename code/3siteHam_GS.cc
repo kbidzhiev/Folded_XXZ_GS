@@ -467,7 +467,6 @@ int main(int argc, char *argv[]) {
 		psi = MPS(initState);
 
 	} else if ( param.longval("Jammed") > 0) {
-		int up = param.longval("Up");
 		cout << "initial state is  | Up Left Up Right >" << endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |+++-> = |+ left + right>
@@ -492,7 +491,8 @@ int main(int argc, char *argv[]) {
 				psi.setA(i, psi.A(i) * Had);
 			}
 		}
-		psi.mapprime(1, 0, Site); //noPrime();
+		//psi.mapPrime(1, 0, Site); //noPrime();
+		psi.noPrime();
 
 	}else {
 		cout << "Choose: GroundState, Neel, DomainWall,Impurity, UpRND, Jammed = 1, or RandomState >1 or Up > 0" << endl;
