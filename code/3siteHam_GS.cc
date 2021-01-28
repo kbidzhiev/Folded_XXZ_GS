@@ -395,14 +395,14 @@ int main(int argc, char *argv[]) {
 		// Initial state: |+- +- +- >
 		cout << "initil state is {++++} {--} {Neel}" << endl;
 		auto initState = InitState(sites);
-		for (int i = 1; i <= N / 2 - 1; ++i){
+		for (int i = 1; i < N / 2 ; ++i){
 			initState.set(i, "Up");
 		}
 		initState.set(N/2 , "Dn");
 		initState.set(N/2 + 1, "Dn");
 
 
-		for (int i = N / 2 + 2; i <= N; i += 2){
+		for (int i = N / 2 + 2; i < N-1; i += 2){
 				initState.set(i, "Up");
 				initState.set(i + 1, "Dn");
 
