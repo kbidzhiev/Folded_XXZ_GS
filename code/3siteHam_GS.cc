@@ -112,6 +112,7 @@ public:
 		operator[]("Impurity") = 0;
 		operator[]("Up") = 0;
 		operator[]("UpRND") = 0;
+		operator[]("Jammed") = 0;
 		operator[]("begin") = 1;
 		//operator[]("end") = 10;
 		operator[]("hL") = 0; //chemical potential
@@ -463,10 +464,38 @@ int main(int argc, char *argv[]) {
 				initState.set(i, "Up");
 			}
 		}
-
 		psi = MPS(initState);
-	} else {
-		cout << "Choose: GroundState, Neel, DomainWall,Impurity, UpRND = 1, or RandomState >1 or Up > 0" << endl;
+
+	} else if ( param.longval("Jammed") > 0) {
+		int up = param.longval("Up");
+		cout << "initial state is  | Up Left Up Right >" << endl;
+		auto initState = InitState(sites);
+		// Hadamar_2 Hadamar_4 |+++-> = |+ left + right>
+		for (int i = 1; i <= N; ++i){
+			if (i % 4 == 0){
+				initState.set(i, "Dn");
+			} else {
+				initState.set(i, "Up");
+			}
+		}
+		psi = MPS(initState);
+
+		for (int i = 1; i <= N; ++i) {
+			if (i % 2 == 0) {
+				auto ind = sites(i);
+				auto indP = prime(sites(i));
+				auto Had = ITensor(ind, indP);
+				Had.set(ind(1), indP(1), ISqrt2);
+				Had.set(ind(1), indP(2), ISqrt2);
+				Had.set(ind(2), indP(1), ISqrt2);
+				Had.set(ind(2), indP(2), -ISqrt2);
+				psi.setA(i, psi.A(i) * Had);
+			}
+		}
+		psi.mapprime(1, 0, Site); //noPrime();
+
+	}else {
+		cout << "Choose: GroundState, Neel, DomainWall,Impurity, UpRND, Jammed = 1, or RandomState >1 or Up > 0" << endl;
 		return 1;
 	}
 	//cout << "PSI = " << psi << endl;
