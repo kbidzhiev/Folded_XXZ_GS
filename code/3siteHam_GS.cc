@@ -670,7 +670,7 @@ int main(int argc, char *argv[]) {
 						sz_dot += s;
 					sz << i - dot  << "\t" << s << "\t"
 							<< pow(-1, i ) * s << "\t" << time << endl;
-					sz << i - dot  << "\t" << sx << "\t"
+					sx << i - dot  << "\t" << sx << "\t"
 							<< sxsx1 << "\t" << sxsx2 << "\t" << time << endl;
 					if ( i % 2 == 1) { //odd site
 						sz_odd = s;
