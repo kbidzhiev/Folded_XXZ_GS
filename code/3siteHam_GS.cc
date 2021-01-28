@@ -549,8 +549,8 @@ int main(int argc, char *argv[]) {
 	if (dt > 0) { //Full magnetization Profile
 		sz.open("Sz_profile.dat", mode);
 		sz_avrg.open("Sz_average_profile.dat", mode);
-		sx.open("Sz_profile.dat", mode);
-		sx_avrg.open("Sz_average_profile.dat", mode);
+		sx.open("Sx_profile.dat", mode);
+		sx_avrg.open("Sx_average_profile.dat", mode);
 
 		sz.precision(15);
 		sz_avrg.precision(15);
