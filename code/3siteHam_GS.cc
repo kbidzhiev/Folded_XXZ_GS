@@ -403,13 +403,13 @@ int main(int argc, char *argv[]) {
 		psi = MPS(initState);
 	} else if (param.longval("UpRND") == 1 ) {
 
-		cout << "initial state is {RND and ---}" << endl;
+		cout << "initial state is {+++ and RND}" << endl;
 		auto initState = InitState(sites);
-		for (int i = 1; i < N/2; ++i){
+		for (int i = 1; i < N/2 - 1; ++i){
 			initState.set(i, "Up");
 		}
-		initState.set(N/2, "Dn");
-		initState.set(N/2 + 1, "Dn");
+		initState.set(N/2 - 1, "Dn");
+		initState.set(N/2 , "Dn");
 
 		std::srand(std::time(0));
 		for (int i = N/2 + 1; i < N  ; i++){
