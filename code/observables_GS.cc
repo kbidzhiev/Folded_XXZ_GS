@@ -56,6 +56,26 @@ double Sz(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, c
 	return sz;
 }
 
+double Sx(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){ //<psi|Sz|psi> at site i
+	psi.position(i);
+	ITensor ket = psi(i); // read only access
+	//ITensor bra = dag(prime(ket, "Site"));
+	auto Sx = op(sites,"Sx", i);
+	ket *= Sx;
+	ket *= dag(prime(psi(i), "Site")); //multipuing by bra
+	//ITensor B = ket * bra;
+	double sx = real(eltC(ket)); // 2 here is "sigma_z = 2* s_z"
+	return sx;
+}
+
+double SxSx1(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){ //<psi|Sz|psi> at site i
+	return Correlation(psi, sites, "Sx", "Sx", i, i + 1);
+}
+double SxSx2(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){ //<psi|Sz|psi> at site i
+	return Correlation(psi, sites, "Sx", "Sx", i, i + 2);
+}
+
+
 //< Sp_i Sm_i+4 >
 complex<double> Correlation(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const string op_name1, const string op_name2, const int i, const int j) {	
 	ITensor ket = psi(i);
