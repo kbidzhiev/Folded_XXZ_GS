@@ -447,13 +447,13 @@ int main(int argc, char *argv[]) {
 //		psi.normalize();
 	} else if ( param.longval("Up") > 0) {
 		int up = param.longval("Up");
-		cout << "initial state is --"<< string (up, '+') << "----" << endl;
+		cout << "initial state is ...+++"<< string (up, '-') << "+++..." << endl;
 		auto initState = InitState(sites);
 		for (int i = 1; i <= N; ++i){
-			if (i >= N/4 && i < (N/4 + up)){
-				initState.set(i, "Up");
-			} else{
+			if (i >= (N/2 -up/2) && i < (N/2 + up/2)){
 				initState.set(i, "Dn");
+			} else{
+				initState.set(i, "Up");
 			}
 		}
 
