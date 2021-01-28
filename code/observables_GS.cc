@@ -74,6 +74,10 @@ double SxSx1(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites
 double SxSx2(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){ //<psi|Sz|psi> at site i
 	return real(Correlation(psi, sites, "Sx", "Sx", i, i + 2));
 }
+double SxSz(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){ //<psi|Sz|psi> at site i
+	return real(Correlation(psi, sites, "Sx", "Sz", i, i + 1));
+}
+
 
 
 //< Sp_i Sm_i+4 >

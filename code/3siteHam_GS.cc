@@ -548,22 +548,25 @@ int main(int argc, char *argv[]) {
 	dt = param.val("Sz");
 	if (dt > 0) { //Full magnetization Profile
 		sz.open("Sz_profile.dat", mode);
-		sz_avrg.open("Sz_average_profile.dat", mode);
 		sx.open("Sx_profile.dat", mode);
+
+		sz_avrg.open("Sz_average_profile.dat", mode);
 		sx_avrg.open("Sx_average_profile.dat", mode);
 
 		sz.precision(15);
-		sz_avrg.precision(15);
 		sx.precision(15);
+
+		sz_avrg.precision(15);
 		sx_avrg.precision(15);
 
 		sz << "#Position=i-" << "\t<Sz_i>\t" << "\t(-1)^i<Sz_i>\t"
 				<< "\t\ttime\n";
-		sz_avrg << "#Position=i-" << "\t0.5<Sz_2next sitel+>>\t"
-				<< "\t\ttime\n";
 		sx << "#Position=i-" << "\t<Sx_i>\t" << "\t <Sx_i Sx_{i+1}>\t" << "\t <Sx_i Sx_{i+2}>\t"
 					<< "\t\ttime\n";
+
 		sx_avrg << "#Position=i-" << "\t<Sx_i>\t" << "\t <Sx_i Sx_{i+1} + nex sit >/2\t" << "\t <Sx_i Sx_{i+2} + next site>/2 \t"
+				<< "\t\ttime\n";
+		sz_avrg << "#Position=i-" << "\t0.5<Sz_2next sitel+>>\t"
 				<< "\t\ttime\n";
 	}
 	//---------------------
@@ -656,11 +659,13 @@ int main(int argc, char *argv[]) {
 				double sx_odd = 0;
 				double sxsx1_odd = 0;
 				double sxsx2_odd = 0;
+				double sxsz_odd = 0;
 				for (int i = 1; i <= N-2; i ++) {
 					double s = Sz(psi, sites, i);
 					double sx1 = Sx(psi, sites, i);
 					double sxsx1 = SxSx1(psi, sites, i);
 					double sxsx2 = SxSx2(psi, sites, i);
+					double sxsz = SxSz(psi, sites, i);
 					sz_tot += s;
 					if (i < dot)
 						sz_left += s;
@@ -669,7 +674,8 @@ int main(int argc, char *argv[]) {
 					if (i == dot)
 						sz_dot += s;
 					sz << i - dot  << "\t" << s << "\t"
-							<< pow(-1, i ) * s << "\t" << time << endl;
+							<< pow(-1, i ) * s << "\t"
+							<<  sxsz << "\t"<< time << endl;
 					sx << i - dot  << "\t" << sx1 << "\t"
 							<< sxsx1 << "\t" << sxsx2 << "\t" << time << endl;
 					if ( i % 2 == 1) { //odd site
@@ -677,9 +683,12 @@ int main(int argc, char *argv[]) {
 						sx_odd = sx1;
 						sxsx1_odd = sxsx1;
 						sxsx2_odd = sxsx2;
+						sxsz_odd = sxsz;
 					} else {
 						sz_avrg << i - dot + 1 << "\t"
-								<< 0.5 * (s + sz_odd) << "\t" << time << endl;
+								<< 0.5 * (s + sz_odd) << "\t"
+								<< 0.5 * (sxsz + sxsz_odd) << "\t"
+								<< time << endl;
 						sx_avrg << i - dot + 1 << "\t"
 								<< 0.5 * (sx1 + sx_odd) << "\t"
 								<< 0.5 * (sxsx1 + sxsx1_odd) << "\t"
