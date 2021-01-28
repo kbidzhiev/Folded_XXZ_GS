@@ -656,7 +656,7 @@ int main(int argc, char *argv[]) {
 				double sx_odd = 0;
 				double sxsx1_odd = 0;
 				double sxsx2_odd = 0;
-				for (int i = 1; i <= N; i ++) {
+				for (int i = 1; i <= N-2; i ++) {
 					double s = Sz(psi, sites, i);
 					double sx = Sx(psi, sites, i);
 					double sxsx1 = SxSx1(psi, sites, i);
