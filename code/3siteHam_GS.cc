@@ -111,6 +111,7 @@ public:
 		operator[]("Neel") = 0;
 		operator[]("Impurity") = 0;
 		operator[]("Up") = 0;
+		operator[]("UpRND") = 0;
 		operator[]("begin") = 1;
 		//operator[]("end") = 10;
 		operator[]("hL") = 0; //chemical potential
@@ -365,18 +366,13 @@ int main(int argc, char *argv[]) {
 		auto initState = InitState(sites);
 		std::srand(std::time(0));
 		for (int i = 1; i <= N; i++) {
-
-
-
 			int rnd = rand();
 			if (rnd % 2 == 0 || i == N) {
 				initState.set(i, "Up");
-
 			} else {
 				initState.set(i, "Up");
 				i += 1;
 				initState.set(i, "Dn");
-
 			}
 		}
 		if (param.longval("Impurity") == 2) {
@@ -388,11 +384,10 @@ int main(int argc, char *argv[]) {
 			initState.set(N / 2 + 1, "Dn");
 			initState.set(N / 2 + 2, "Dn");
 		}
-
 		psi = MPS(initState);
 
 	} else if (param.longval("Neel") == 1) {
-		// Initial state: |+- +- +- >
+		// Neel state: |+- +- +- >
 		cout << "initil state is {++++} {--} {Neel}" << endl;
 		auto initState = InitState(sites);
 		for (int i = 1; i < N / 2 ; ++i){
@@ -400,13 +395,34 @@ int main(int argc, char *argv[]) {
 		}
 		initState.set(N/2 , "Dn");
 		initState.set(N/2 + 1, "Dn");
-
-
 		for (int i = N / 2 + 2; i < N-1; i += 2){
 				initState.set(i, "Up");
 				initState.set(i + 1, "Dn");
 
 		}
+		psi = MPS(initState);
+	} else if (param.longval("UpRND") == 1 ) {
+
+		cout << "initial state is {RND and ---}" << endl;
+		auto initState = InitState(sites);
+		for (int i = 1; i < N/2; ++i){
+			initState.set(i, "Up");
+		}
+		initState.set(N/2, "Dn");
+		initState.set(N/2 + 1, "Dn");
+
+		std::srand(std::time(0));
+		for (int i = N/2 + 1; i < N  ; i++){
+			int rnd = rand();
+			if (rnd % 2 == 0){
+				initState.set(i, "Up");
+			}else{
+				initState.set(i, "Up");
+				i+=1;
+				initState.set(i, "Dn");
+			}
+		}
+		initState.set(N, "Up");
 		psi = MPS(initState);
 
 	} else if (param.longval("RandomState") >= 1 ) {
@@ -419,24 +435,19 @@ int main(int argc, char *argv[]) {
 		auto initState = InitState(sites);
 		std::srand(std::time(0));
 		for (int i = 1; i <= m ; i++){
-
 			int rnd = rand();
 			if (rnd % 2 == 0){
 				initState.set(i, "Up");
-
 			}else{
 				initState.set(i, "Up");
 				i+=1;
 				initState.set(i, "Dn");
-
 			}
 		}
 		for (int i = m + 1; i <= N; ++i){
 			initState.set(i, "Dn");
 		}
 		psi = MPS(initState);
-
-
 //		// Random state
 //		cout << "initial state  is random state" << endl;
 //		psi = randomMPS(sites);
@@ -455,7 +466,7 @@ int main(int argc, char *argv[]) {
 
 		psi = MPS(initState);
 	} else {
-		cout << "Choose: GroundState 1 or Neel 1 or DomainWall 1 or Impurity 1 or RandomState >1 or Up > 0" << endl;
+		cout << "Choose: GroundState, Neel, DomainWall,Impurity, UpRND = 1, or RandomState >1 or Up > 0" << endl;
 		return 1;
 	}
 	//cout << "PSI = " << psi << endl;
