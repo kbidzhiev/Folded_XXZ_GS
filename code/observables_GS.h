@@ -17,6 +17,10 @@ int BondDim(const MPS& psi, const int i) ;
 // < Sz_i >
 double Sz(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i);
 
+double Sx(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i);
+double SxSx1(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i);
+double SxSx2(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i);
+
 //< Sp_i Sm_i+4 >
 complex<double> Correlation(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const string op_name1, const string op_name2, const int i, const int j);
 

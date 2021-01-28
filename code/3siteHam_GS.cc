@@ -466,7 +466,7 @@ int main(int argc, char *argv[]) {
 		}
 		psi = MPS(initState);
 
-	} else if ( param.longval("Jammed") > 0) {
+	} else if ( param.longval("Jammed") == 1) {
 		cout << "initial state is  | Up Left Up Right >  |--...-->" << endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |+++-> = |+ left + right>
@@ -517,7 +517,7 @@ int main(int argc, char *argv[]) {
 // Output and observables
 // _______
 	ofstream ent, spec, entropy_profile, sz, sz_avrg, energy_beta, energy_profile,
-				q1minus_profile, q2_profile; //here I'm defining output streams == files
+				q1minus_profile, q2_profile, sx, sx_avrg; //here I'm defining output streams == files
 		ios_base::openmode mode;
 		mode = std::ofstream::out; //Erase previous file (if present)
 
@@ -548,15 +548,23 @@ int main(int argc, char *argv[]) {
 	dt = param.val("Sz");
 	if (dt > 0) { //Full magnetization Profile
 		sz.open("Sz_profile.dat", mode);
+		sz_avrg.open("Sz_average_profile.dat", mode);
+		sx.open("Sz_profile.dat", mode);
+		sx_avrg.open("Sz_average_profile.dat", mode);
+
 		sz.precision(15);
+		sz_avrg.precision(15);
+		sx.precision(15);
+		sx_avrg.precision(15);
+
 		sz << "#Position=i-" << "\t<Sz_i>\t" << "\t(-1)^i<Sz_i>\t"
 				<< "\t\ttime\n";
-
-		sz_avrg.open("Sz_average_profile.dat", mode);
-		sz_avrg.precision(15);
-		sz_avrg << "#Position=i-" << "\t0.5<Sz_2+1i> + 0.5<Sz_2+1i>\t"
+		sz_avrg << "#Position=i-" << "\t0.5<Sz_2next sitel+>>\t"
 				<< "\t\ttime\n";
-
+		sx << "#Position=i-" << "\t<Sx_i>\t" << "\t <Sx_i Sx_{i+1}>\t" << "\t <Sx_i Sx_{i+2}>\t"
+					<< "\t\ttime\n";
+		sx_avrg << "#Position=i-" << "\t<Sx_i>\t" << "\t <Sx_i Sx_{i+1} + nex sit >/2\t" << "\t <Sx_i Sx_{i+2} + next site>/2 \t"
+				<< "\t\ttime\n";
 	}
 	//---------------------
 	dt = param.val("EnergyProfile");
@@ -639,10 +647,20 @@ int main(int argc, char *argv[]) {
 			if (n % int(param.val("Sz") / tau) == 0) {
 				sz << "\"t=" << time << "\"" << endl;
 				sz_avrg << "\"t=" << time << "\"" << endl;
+
+				sx << "\"t=" << time << "\"" << endl;
+				sx_avrg << "\"t=" << time << "\"" << endl;
 				double sz_tot = 0, sz_left = 0, sz_right = 0, sz_dot = 0;
 				double sz_odd = 0;
+
+				double sx_odd = 0;
+				double sxsx1_odd = 0;
+				double sxsx2_odd = 0;
 				for (int i = 1; i <= N; i ++) {
 					double s = Sz(psi, sites, i);
+					double sx = Sx(psi, sites, i);
+					double sxsx1 = SxSx1(psi, sites, i);
+					double sxsx2 = SxSx2(psi, sites, i);
 					sz_tot += s;
 					if (i < dot)
 						sz_left += s;
@@ -652,18 +670,30 @@ int main(int argc, char *argv[]) {
 						sz_dot += s;
 					sz << i - dot  << "\t" << s << "\t"
 							<< pow(-1, i ) * s << "\t" << time << endl;
-
+					sz << i - dot  << "\t" << sx << "\t"
+							<< sxsx1 << "\t" << sxsx2 << "\t" << time << endl;
 					if ( i % 2 == 1) { //odd site
 						sz_odd = s;
+						sx_odd = sx;
+						sxsx1_odd = sxsx1;
+						sxsx2_odd = sxsx2;
 					} else {
 						sz_avrg << i - dot + 1 << "\t"
 								<< 0.5 * (s + sz_odd) << "\t" << time << endl;
+						sx_avrg << i - dot + 1 << "\t"
+								<< 0.5 * (sx + sx_odd) << "\t"
+								<< 0.5 * (sxsx1 + sxsx1_odd) << "\t"
+								<< 0.5 * (sxsx2 + sxsx2_odd) << "\t"
+								<< time << endl;
 					}
 				}
 
 				{ //I need this part to separate time steps in *.dat files (for gnuplot)
 					sz << "\n\n";
 					sz_avrg << "\n\n";
+
+					sx << "\n\n";
+					sx_avrg << "\n\n";
 				}
 				cout << "\n<Sz_left>=" << sz_left << "\t" << "<Sz_right>="
 						<< sz_right << "\t" << "<Sz_DOT>=" << sz_dot << "\t"
