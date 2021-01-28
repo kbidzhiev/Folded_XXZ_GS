@@ -395,21 +395,17 @@ int main(int argc, char *argv[]) {
 		// Initial state: |+- +- +- >
 		cout << "initil state is {++++} {--} {Neel}" << endl;
 		auto initState = InitState(sites);
-		for (int i = 1; i <= N / 2; ++i){
+		for (int i = 1; i <= N / 2 - 1; ++i){
 			initState.set(i, "Up");
 		}
+		initState.set(N/2 , "Dn");
 		initState.set(N/2 + 1, "Dn");
-		initState.set(N/2 + 2, "Dn");
 
-		bool flag_up_spin = true;
-		for (int i = N / 2 + 3; i <= N; ++i){
-			if (flag_up_spin){
+
+		for (int i = N / 2 + 2; i <= N; i += 2){
 				initState.set(i, "Up");
-				flag_up_spin = false;
-			} else{
-				initState.set(i, "Dn");
-				flag_up_spin = true;
-			}
+				initState.set(i + 1, "Dn");
+
 		}
 		psi = MPS(initState);
 
