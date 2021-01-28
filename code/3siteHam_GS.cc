@@ -658,7 +658,7 @@ int main(int argc, char *argv[]) {
 				double sxsx2_odd = 0;
 				for (int i = 1; i <= N-2; i ++) {
 					double s = Sz(psi, sites, i);
-					double sx = Sx(psi, sites, i);
+					double sx1 = Sx(psi, sites, i);
 					double sxsx1 = SxSx1(psi, sites, i);
 					double sxsx2 = SxSx2(psi, sites, i);
 					sz_tot += s;
@@ -670,18 +670,18 @@ int main(int argc, char *argv[]) {
 						sz_dot += s;
 					sz << i - dot  << "\t" << s << "\t"
 							<< pow(-1, i ) * s << "\t" << time << endl;
-					sx << i - dot  << "\t" << sx << "\t"
+					sx << i - dot  << "\t" << sx1 << "\t"
 							<< sxsx1 << "\t" << sxsx2 << "\t" << time << endl;
 					if ( i % 2 == 1) { //odd site
 						sz_odd = s;
-						sx_odd = sx;
+						sx_odd = sx1;
 						sxsx1_odd = sxsx1;
 						sxsx2_odd = sxsx2;
 					} else {
 						sz_avrg << i - dot + 1 << "\t"
 								<< 0.5 * (s + sz_odd) << "\t" << time << endl;
 						sx_avrg << i - dot + 1 << "\t"
-								<< 0.5 * (sx + sx_odd) << "\t"
+								<< 0.5 * (sx1 + sx_odd) << "\t"
 								<< 0.5 * (sxsx1 + sxsx1_odd) << "\t"
 								<< 0.5 * (sxsx2 + sxsx2_odd) << "\t"
 								<< time << endl;
