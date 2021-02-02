@@ -113,6 +113,7 @@ public:
 		operator[]("Up") = 0;
 		operator[]("UpRND") = 0;
 		operator[]("Jammed") = 0;
+		operator[]("Flux") = 0;
 		operator[]("begin") = 1;
 		//operator[]("end") = 10;
 		operator[]("hL") = 0; //chemical potential
@@ -495,6 +496,38 @@ int main(int argc, char *argv[]) {
 //			}
 //		}
 //		psi.noPrime();
+
+
+	} else if (param.longval("Flux") == 1) {
+		cout << "initial state is  | Up Left Down Right > * |vac (= ----) >"
+				<< endl;
+		auto initState = InitState(sites);
+		// Hadamar_2 Hadamar_4 |+++-> = |+ left + right>
+		for (int i = 1; i < N / 2; ++i) {
+			if (i % 4 == 0 || i % 4 == 1) {
+				initState.set(i, "Dn");
+			} else {
+				initState.set(i, "Up");
+			}
+		}
+		for (int i = N / 2; i <= N; ++i) {
+			initState.set(i, "Dn");
+		}
+		psi = MPS(initState);
+
+		for (int i = 1; i < N /2; ++i) {
+			if (i % 2 == 0) {
+				auto ind = sites(i);
+				auto indP = prime(sites(i));
+				auto Had = ITensor(ind, indP);
+				Had.set(ind(1), indP(1), ISqrt2);
+				Had.set(ind(1), indP(2), ISqrt2);
+				Had.set(ind(2), indP(1), ISqrt2);
+				Had.set(ind(2), indP(2), -ISqrt2);
+				psi.setA(i, psi.A(i) * Had);
+			}
+		}
+		psi.noPrime();
 
 	}else {
 		cout << "Choose: GroundState, Neel, DomainWall,Impurity, UpRND, Jammed = 1, or RandomState >1 or Up > 0" << endl;
