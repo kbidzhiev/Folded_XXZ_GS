@@ -475,7 +475,7 @@ int main(int argc, char *argv[]) {
 			if (i % 4 == 1){
 				initState.set(i, "Up");
 			} else {
-				initState.set(i, "Down");
+				initState.set(i, "Dn");
 			}
 		}
 		for (int i = N/2; i <= N ; ++i){
@@ -483,19 +483,19 @@ int main(int argc, char *argv[]) {
 		}
 		psi = MPS(initState);
 
-//		for (int i = 1; i < N /2; ++i) {
-//			if (i % 2 == 0) {
-//				auto ind = sites(i);
-//				auto indP = prime(sites(i));
-//				auto Had = ITensor(ind, indP);
-//				Had.set(ind(1), indP(1), ISqrt2);
-//				Had.set(ind(1), indP(2), ISqrt2);
-//				Had.set(ind(2), indP(1), ISqrt2);
-//				Had.set(ind(2), indP(2), -ISqrt2);
-//				psi.setA(i, psi.A(i) * Had);
-//			}
-//		}
-//		psi.noPrime();
+		for (int i = 1; i < N /2; ++i) {
+			if (i % 2 == 0) {
+				auto ind = sites(i);
+				auto indP = prime(sites(i));
+				auto Had = ITensor(ind, indP);
+				Had.set(ind(1), indP(1), ISqrt2);
+				Had.set(ind(1), indP(2), ISqrt2);
+				Had.set(ind(2), indP(1), ISqrt2);
+				Had.set(ind(2), indP(2), -ISqrt2);
+				psi.setA(i, psi.A(i) * Had);
+			}
+		}
+		psi.noPrime();
 
 
 	} else if (param.longval("Flux") == 1) {
