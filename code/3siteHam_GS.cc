@@ -472,10 +472,10 @@ int main(int argc, char *argv[]) {
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |+++-> = |+ left + right>
 		for (int i = 1; i < N / 2; ++i){
-			if (i % 4 == 0){
-				initState.set(i, "Dn");
-			} else {
+			if (i % 4 == 1){
 				initState.set(i, "Up");
+			} else {
+				initState.set(i, "Down");
 			}
 		}
 		for (int i = N/2; i <= N ; ++i){
