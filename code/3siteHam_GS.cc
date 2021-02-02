@@ -467,7 +467,7 @@ int main(int argc, char *argv[]) {
 		psi = MPS(initState);
 
 	} else if ( param.longval("Jammed") == 1) {
-		cout << "initial state is  | Up Left Up Right >  |--...-->" << endl;
+		cout << "initial state is  | Up Left Up Right > * |vac (= ----) >" << endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |+++-> = |+ left + right>
 		for (int i = 1; i < N / 2; ++i){
@@ -482,20 +482,19 @@ int main(int argc, char *argv[]) {
 		}
 		psi = MPS(initState);
 
-		for (int i = 1; i < N /2; ++i) {
-			if (i % 2 == 0) {
-				auto ind = sites(i);
-				auto indP = prime(sites(i));
-				auto Had = ITensor(ind, indP);
-				Had.set(ind(1), indP(1), ISqrt2);
-				Had.set(ind(1), indP(2), ISqrt2);
-				Had.set(ind(2), indP(1), ISqrt2);
-				Had.set(ind(2), indP(2), -ISqrt2);
-				psi.setA(i, psi.A(i) * Had);
-			}
-		}
-		//psi.mapPrime(1, 0, Site); //noPrime();
-		psi.noPrime();
+//		for (int i = 1; i < N /2; ++i) {
+//			if (i % 2 == 0) {
+//				auto ind = sites(i);
+//				auto indP = prime(sites(i));
+//				auto Had = ITensor(ind, indP);
+//				Had.set(ind(1), indP(1), ISqrt2);
+//				Had.set(ind(1), indP(2), ISqrt2);
+//				Had.set(ind(2), indP(1), ISqrt2);
+//				Had.set(ind(2), indP(2), -ISqrt2);
+//				psi.setA(i, psi.A(i) * Had);
+//			}
+//		}
+//		psi.noPrime();
 
 	}else {
 		cout << "Choose: GroundState, Neel, DomainWall,Impurity, UpRND, Jammed = 1, or RandomState >1 or Up > 0" << endl;
