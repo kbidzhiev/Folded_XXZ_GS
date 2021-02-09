@@ -471,19 +471,19 @@ int main(int argc, char *argv[]) {
 		cout << "initial state is  | Up Left Up Right > * |vac (= ----) >" << endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-		for (int i = 1; i < N / 2; ++i){
+		for (int i = 1; i <= N; ++i){
 			if (i % 4 == 0){ // We start counting from 1 !
 				initState.set(i, "Up");
 			} else {
 				initState.set(i, "Dn");
 			}
 		}
-		for (int i = N/2; i <= N ; ++i){
-				initState.set(i, "Dn");
-		}
+//		for (int i = N/2; i <= N ; ++i){
+//				initState.set(i, "Dn");
+//		}
 		psi = MPS(initState);
 
-		for (int i = 1; i < N /2; ++i) {
+		for (int i = 1; i <= N ; ++i) {
 			if (i % 2 == 0) {
 				auto ind = sites(i);
 				auto indP = prime(sites(i));
