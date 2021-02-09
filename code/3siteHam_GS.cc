@@ -470,9 +470,9 @@ int main(int argc, char *argv[]) {
 	} else if ( param.longval("Jammed") == 1) {
 		cout << "initial state is  | Up Left Up Right > * |vac (= ----) >" << endl;
 		auto initState = InitState(sites);
-		// Hadamar_2 Hadamar_4 |+++-> = |+ left + right>
+		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
 		for (int i = 1; i < N / 2; ++i){
-			if (i % 4 == 1){
+			if (i % 4 == 0){ // We start counting from 1 !
 				initState.set(i, "Up");
 			} else {
 				initState.set(i, "Dn");
