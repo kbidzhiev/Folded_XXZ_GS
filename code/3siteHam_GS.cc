@@ -18,7 +18,7 @@ using namespace std;
 using namespace std::chrono;
 
 //------------------------------------------------------------------
-//The function below translate numbers (etc.) into charcter strings
+//The function below translate numbers (etc.) into character strings
 //the second parameter (optional) is the precision (digits)
 
 template<class T>
@@ -237,7 +237,6 @@ public:
 			 TimeGates(begin2, end, b1 * tau, sites, param); //B
 			 TimeGates(begin0, end, a1 * tau, sites, param); //A
 			 */
-
 		}
 	}
 
@@ -535,8 +534,7 @@ int main(int argc, char *argv[]) {
 	}
 	//cout << "PSI = " << psi << endl;
 
-	energy_initial = inner(psi, H0, psi); //<psi|H0|psi>
-	cout << "2. Initial energy psi =" << energy_initial << endl;
+
 
 //--------------------------------------------------------------
 
@@ -545,6 +543,9 @@ int main(int argc, char *argv[]) {
 	const int dot = Ham.dot;
 	auto H = toMPO(Ham.ampo);
 	cout << "H constructed" << endl;
+
+	energy_initial = inner(psi, H0, psi); //<psi|H0|psi>
+	cout << "2. Initial energy psi =" << energy_initial << endl;
 
 // Output and observables
 // _______
@@ -618,13 +619,12 @@ int main(int argc, char *argv[]) {
 	}
 	//---------------------
 	dt = param.val("Q2Profile");
-	if (dt > 0) { //Full entropy Profileile
+	if (dt > 0) { //Full Q2 Profile
 		q2_profile.open("Q2_profile.dat", mode);
 		q2_profile.precision(15);
 		q2_profile << "#Position=i-" << dot << setw(16) << "\t Entropy(i)"
 				<< setw(16) << "\t Q2plus \t Q2minus \t time \t \n";
 	}
-
 
 	//exp(Ham) for the dynamics
 	auto args = Args("Method=", "DensityMatrix", "Cutoff", param.val("trunc"),
@@ -635,7 +635,10 @@ int main(int argc, char *argv[]) {
 	TrotterExp expH(sites, param, -Cplx_i * tau);
 
 // Time evolution
+	double sz_total_initial = 9999;
+	double sz_tot = 999; // will be used in part with magnetization and then output to cout;
 	for (int n = 0; n <= n_steps ; ++n) {
+
 		const double time = n * tau; //+param.val("time_shift");
 		cout << "Time step #" << n << "/" << n_steps << "\ttime=" << time
 				<< endl;
@@ -678,6 +681,7 @@ int main(int argc, char *argv[]) {
 			}
 
 		// ------- Sz profile -------
+
 		if (param.val("Sz") > 0) {
 			if (n % int(param.val("Sz") / tau) == 0) {
 				sz << "\"t=" << time << "\"" << endl;
@@ -685,9 +689,10 @@ int main(int argc, char *argv[]) {
 
 				sx << "\"t=" << time << "\"" << endl;
 				sx_avrg << "\"t=" << time << "\"" << endl;
-				double sz_tot = 0, sz_left = 0, sz_right = 0, sz_dot = 0;
-				double sz_odd = 0;
+				double sz_left = 0, sz_right = 0, sz_dot = 0;
+				sz_tot = 0;
 
+				double sz_odd = 0;
 				double sx_odd = 0;
 				double sxsx1_odd = 0;
 				double sxsx2_odd = 0;
@@ -736,6 +741,8 @@ int main(int argc, char *argv[]) {
 					sx << "\n\n";
 					sx_avrg << "\n\n";
 				}
+				sz_tot += Sz(psi, sites, N-1) + Sz(psi, sites, N);
+				if (n == 0) sz_total_initial = sz_tot;
 				cout << "\n<Sz_left>=" << sz_left << "\t" << "<Sz_right>="
 						<< sz_right << "\t" << "<Sz_DOT>=" << sz_dot << "\t"
 						<< "<Sz_tot>=" << sz_tot << endl;
@@ -785,7 +792,8 @@ int main(int argc, char *argv[]) {
 			cout << "max bond dim = " << maxLinkDim(psi) << endl;
 			cout << "Norm = " << real(innerC(psi, psi)) << endl;
 			cout << "Energy = " << energy << endl;
-			//cout << "dE/E = " << (energy - energy_initial)/energy_initial << endl;
+			cout << "E(t) - E(0) = " << (energy - energy_initial) << endl;
+			cout << "Sz(t) -Sz(0) = " << (sz_tot - sz_total_initial) << endl;
 
 		}
 	}
