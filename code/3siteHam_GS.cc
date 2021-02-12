@@ -544,7 +544,7 @@ int main(int argc, char *argv[]) {
 	auto H = toMPO(Ham.ampo);
 	cout << "H constructed" << endl;
 
-	energy_initial = inner(psi, H0, psi); //<psi|H0|psi>
+	energy_initial = inner(psi, H, psi); //<psi|H0|psi>
 	cout << "2. Initial energy psi =" << energy_initial << endl;
 
 // Output and observables
