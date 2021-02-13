@@ -389,18 +389,17 @@ int main(int argc, char *argv[]) {
 
 	} else if (param.longval("Neel") == 1) {
 		// Neel state: |+- +- +- >
-		cout << "initil state is {++++} {--} {Neel}" << endl;
+		cout << "initil state is {Neel}{----}" << endl;
 		auto initState = InitState(sites);
-		for (int i = 1; i < N / 2 ; ++i){
+		for (int i = 1 ; i <= N/2; i += 2){
 			initState.set(i, "Up");
-		}
-		initState.set(N/2 , "Dn");
-		initState.set(N/2 + 1, "Dn");
-		for (int i = N / 2 + 2; i < N-1; i += 2){
-				initState.set(i, "Up");
-				initState.set(i + 1, "Dn");
+			initState.set(i + 1, "Dn");
 
 		}
+		for (int i = N/2+1; i <= N ; ++i){
+			initState.set(i, "Dn");
+		}
+
 		psi = MPS(initState);
 	} else if (param.longval("UpRND") == 1 ) {
 
