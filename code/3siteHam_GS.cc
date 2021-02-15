@@ -710,7 +710,7 @@ int main(int argc, char *argv[]) {
 					if (i == dot)
 						sz_dot += s;
 					sz << i - dot  << "\t" << s << "\t"
-							<< pow(-1, i ) * s << "\t"
+							//<< pow(-1, i ) * s << "\t"
 							<<  sxsz << "\t"<< time << endl;
 					sx << i - dot  << "\t" << sx1 << "\t"
 							<< sxsx1 << "\t" << sxsx2 << "\t" << time << endl;
@@ -732,7 +732,17 @@ int main(int argc, char *argv[]) {
 								<< time << endl;
 					}
 				}
-
+				{ // For above runs up to N-2, this part is Sz(Sx) for N-1 and N
+					sz << N - 1 - dot << "\t" << Sz(psi, sites, N - 1) << "\t"
+							<< 0 << "\t" << 0 << "\t" << time << endl;
+					sz << N - dot << "\t" << Sz(psi, sites, N) << "\t" << 0
+							<< "\t" << 0 << "\t" << time << endl;
+					sx << N - 1 - dot << "\t" << Sx(psi, sites, N - 1) << "\t"
+							<< SxSx1(psi, sites, N - 1) << "\t" << 0 << "\t"
+							<< time << endl;
+					sx << N - dot << "\t" << Sx(psi, sites, N) << "\t" << 0
+							<< "\t" << 0 << "\t" << time << endl;
+				}
 				{ //I need this part to separate time steps in *.dat files (for gnuplot)
 					sz << "\n\n";
 					sz_avrg << "\n\n";
