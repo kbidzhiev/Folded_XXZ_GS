@@ -771,7 +771,7 @@ int main(int argc, char *argv[]) {
 					if (i == dot)
 						sz_dot += s;
 					sz << i - dot  << "\t" << s << "\t"
-							//<< pow(-1, i ) * s << "\t"
+							<< pow(-1, i ) * s << "\t"
 							<<  sxsz << "\t"<< time << endl;
 					sx << i - dot  << "\t" << sx1 << "\t"
 							<< sxsx1 << "\t" << sxsx2 << "\t" << time << endl;
