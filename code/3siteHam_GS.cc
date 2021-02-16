@@ -863,7 +863,7 @@ int main(int argc, char *argv[]) {
 			cout << "Norm = " << real(innerC(psi, psi)) << endl;
 			cout << "Energy = " << energy << endl;
 			cout << "E(t) - E(0) = " << (energy - energy_initial) << endl;
-			cout << "Sz(t) -Sz(0) = " << (sz_tot - sz_total_initial) << endl;
+			cout << "Sz(t) - Sz(0) = " << (sz_tot - sz_total_initial) << endl;
 
 		}
 	}
