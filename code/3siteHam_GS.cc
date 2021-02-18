@@ -115,6 +115,7 @@ public:
 		operator[]("Jammed") = 0;
 		operator[]("JammedImpurity") = 0;
 		operator[]("JammedNeel") = 0;
+		operator[]("NeelImpurity") = 0;
 		operator[]("Flux") = 0;
 		operator[]("begin") = 1;
 		//operator[]("end") = 10;
@@ -571,8 +572,6 @@ int main(int argc, char *argv[]) {
 			initState.set(N/2+1,   "Dn");
 
 			psi = MPS(initState);
-
-
 
 	} else if (param.longval("Flux") == 1) {
 		cout << "initial state is  | Up Left Down Right > * |vac (= ----) >"
