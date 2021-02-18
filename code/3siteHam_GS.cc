@@ -685,33 +685,38 @@ int main(int argc, char *argv[]) {
 		sx_avrg.precision(15);
 
 
-		sz << "#Position=i-" << "\t<Sz_i>\t" << "\t(-1)^i<Sz_i>\t"
+		sz << "#Position=i-"
+				<< "\t<Sz_i>\t"
 				<< "\t<Sz_i Sz_{i+1}>\t"
 				<< "\t<Sz_i Sz_{i+2}>\t"
 				<< "\t<Sz_i Sz_{i+3}>\t"
 				<< "\t<Sz_i Sz_{i+4}>\t"
+				<< "\t(-1)^i<Sz_i>\t"
 				<< "\t\ttime\n";
 
-		sx << "#Position=i-" << "\t<Sx_i>\t"
-				<< "\t <Sx_i Sz_{i+1}>\t"
+		sx << "#Position=i-"
+				<< "\t<Sx_i>\t"
 				<< "\t <Sx_i Sx_{i+1}>\t"
 				<< "\t <Sx_i Sx_{i+2}>\t"
 				<< "\t <Sx_i Sx_{i+3}>\t"
 				<< "\t <Sx_i Sx_{i+4}>\t"
+				<< "\t <Sx_i Sz_{i+1}>\t"
 					<< "\t\ttime\n";
 
-		sz_avrg << "#Position=i-" << "\t0.5<Sz__i + next site >\t"
-				<< "\t <Sz_i Sz_{i+1} + next sit >/2\t"
-				<< "\t <Sz_i Sz_{i+2} + next sit >/2\t"
-				<< "\t <Sz_i Sz_{i+3} + next sit >/2\t"
-				<< "\t <Sz_i Sz_{i+4} + next sit >/2\t"
+		sz_avrg << "#Position=i-"
+				<< "\t 0.5 * <Sz_i + next site>\t"
+				<< "\t 0.5 * <Sz_i Sz_{i+1} + next site>/2\t"
+				<< "\t 0.5 * <Sz_i Sz_{i+2} + next site>/2\t"
+				<< "\t 0.5 * <Sz_i Sz_{i+3} + next site>/2\t"
+				<< "\t 0.5 * <Sz_i Sz_{i+4} + next site>/2\t"
 				<< "\t\ttime\n";
 
-		sx_avrg << "#Position=i-" << "\t0.5<Sx__i + next site >\t"
-				<< "\t <Sx_i Sx_{i+1} + next sit >/2\t"
-				<< "\t <Sx_i Sx_{i+2} + next site>/2 \t"
-				<< "\t <Sx_i Sx_{i+3} + next site>/2 \t"
-				<< "\t <Sx_i Sx_{i+4} + next site>/2 \t"
+		sx_avrg << "#Position=i-"
+				<< "\t 0.5 * <Sx_i + next site>\t"
+				<< "\t 0.5 * <Sx_i Sx_{i+1} + next site>/2\t"
+				<< "\t 0.5 * <Sx_i Sx_{i+2} + next site>/2 \t"
+				<< "\t 0.5 * <Sx_i Sx_{i+3} + next site>/2 \t"
+				<< "\t 0.5 * <Sx_i Sx_{i+4} + next site>/2 \t"
 				<< "\t\ttime\n";
 
 	}
@@ -834,22 +839,22 @@ int main(int argc, char *argv[]) {
 					double sxsz = 0;
 
 					if (i <= N - 1) {
-						sxsx1 = Correlation(psi, sites, "Sx", "Sx", i, i+1);
-						szsz1 = Correlation(psi, sites, "Sz", "Sz", i, i+1);
+						sxsx1 = real(Correlation(psi, sites, "Sx", "Sx", i, i+1));
+						szsz1 = real(Correlation(psi, sites, "Sz", "Sz", i, i+1));
 
-						sxsz = Correlation(psi, sites, "Sx", "Sz", i, i+1);
+						sxsz = real(Correlation(psi, sites, "Sx", "Sz", i, i+1));
 					}
 					if (i <= N - 2) {
-						sxsx2 = Correlation(psi, sites, "Sx", "Sx", i, i+2);
-						szsz2 = Correlation(psi, sites, "Sz", "Sz", i, i+2);
+						sxsx2 = real(Correlation(psi, sites, "Sx", "Sx", i, i+2));
+						szsz2 = real(Correlation(psi, sites, "Sz", "Sz", i, i+2));
 					}
 					if (i <= N - 3) {
-						sxsx3 = Correlation(psi, sites, "Sx", "Sx", i, i+3);
-						szsz3 = Correlation(psi, sites, "Sz", "Sz", i, i+3);
+						sxsx3 = real(Correlation(psi, sites, "Sx", "Sx", i, i+3));
+						szsz3 = real(Correlation(psi, sites, "Sz", "Sz", i, i+3));
 					}
 					if (i <= N - 4) {
-						sxsx4 = Correlation(psi, sites, "Sx", "Sx", i, i+4);
-						szsz4 = Correlation(psi, sites, "Sz", "Sz", i, i+4);
+						sxsx4 = real(Correlation(psi, sites, "Sx", "Sx", i, i+4));
+						szsz4 = real(Correlation(psi, sites, "Sz", "Sz", i, i+4));
 					}
 
 					sz_tot += s;
@@ -859,12 +864,13 @@ int main(int argc, char *argv[]) {
 						sz_right += s;
 					if (i == dot)
 						sz_dot += s;
-					sz << i - dot  << "\t" << s << "\t"
-							<< pow(-1, i ) * s << "\t"
+					sz << i - dot  << "\t"
+							<< s << "\t"
 							<< szsz1 << "\t"
 							<< szsz2 << "\t"
 							<< szsz3 << "\t"
 							<< szsz4 << "\t"
+							<< pow(-1, i ) * s << "\t"
 							 << "\t"<< time << endl;
 					sx << i - dot  << "\t"
 							<< sx1 << "\t"
