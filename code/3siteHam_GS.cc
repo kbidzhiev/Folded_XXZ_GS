@@ -684,15 +684,36 @@ int main(int argc, char *argv[]) {
 		sz_avrg.precision(15);
 		sx_avrg.precision(15);
 
+
 		sz << "#Position=i-" << "\t<Sz_i>\t" << "\t(-1)^i<Sz_i>\t"
+				<< "\t<Sz_i Sz_{i+1}>\t"
+				<< "\t<Sz_i Sz_{i+2}>\t"
+				<< "\t<Sz_i Sz_{i+3}>\t"
+				<< "\t<Sz_i Sz_{i+4}>\t"
 				<< "\t\ttime\n";
-		sx << "#Position=i-" << "\t<Sx_i>\t" << "\t <Sx_i Sx_{i+1}>\t" << "\t <Sx_i Sx_{i+2}>\t"
+
+		sx << "#Position=i-" << "\t<Sx_i>\t"
+				<< "\t <Sx_i Sz_{i+1}>\t"
+				<< "\t <Sx_i Sx_{i+1}>\t"
+				<< "\t <Sx_i Sx_{i+2}>\t"
+				<< "\t <Sx_i Sx_{i+3}>\t"
+				<< "\t <Sx_i Sx_{i+4}>\t"
 					<< "\t\ttime\n";
 
-		sx_avrg << "#Position=i-" << "\t<Sx_i>\t" << "\t <Sx_i Sx_{i+1} + nex sit >/2\t" << "\t <Sx_i Sx_{i+2} + next site>/2 \t"
+		sz_avrg << "#Position=i-" << "\t0.5<Sz__i + next site >\t"
+				<< "\t <Sz_i Sz_{i+1} + next sit >/2\t"
+				<< "\t <Sz_i Sz_{i+2} + next sit >/2\t"
+				<< "\t <Sz_i Sz_{i+3} + next sit >/2\t"
+				<< "\t <Sz_i Sz_{i+4} + next sit >/2\t"
 				<< "\t\ttime\n";
-		sz_avrg << "#Position=i-" << "\t0.5<Sz_2next sitel+>>\t"
+
+		sx_avrg << "#Position=i-" << "\t0.5<Sx__i + next site >\t"
+				<< "\t <Sx_i Sx_{i+1} + next sit >/2\t"
+				<< "\t <Sx_i Sx_{i+2} + next site>/2 \t"
+				<< "\t <Sx_i Sx_{i+3} + next site>/2 \t"
+				<< "\t <Sx_i Sx_{i+4} + next site>/2 \t"
 				<< "\t\ttime\n";
+
 	}
 	//---------------------
 	dt = param.val("EnergyProfile");
@@ -788,13 +809,49 @@ int main(int argc, char *argv[]) {
 				double sx_odd = 0;
 				double sxsx1_odd = 0;
 				double sxsx2_odd = 0;
+				double sxsx3_odd = 0;
+				double sxsx4_odd = 0;
+
+				double szsz1_odd = 0;
+				double szsz2_odd = 0;
+				double szsz3_odd = 0;
+				double szsz4_odd = 0;
+
 				double sxsz_odd = 0;
-				for (int i = 1; i <= N-2; i ++) {
+				for (int i = 1; i <= N; i ++) {
 					double s = Sz(psi, sites, i);
 					double sx1 = Sx(psi, sites, i);
-					double sxsx1 = SxSx1(psi, sites, i);
-					double sxsx2 = SxSx2(psi, sites, i);
-					double sxsz = SxSz(psi, sites, i);
+					double sxsx1 = 0;
+					double sxsx2 = 0;
+					double sxsx3 = 0;
+					double sxsx4 = 0;
+
+					double szsz1 = 0;
+					double szsz2 = 0;
+					double szsz3 = 0;
+					double szsz4 = 0;
+
+					double sxsz = 0;
+
+					if (i <= N - 1) {
+						sxsx1 = Correlation(psi, sites, "Sx", "Sx", i, i+1);
+						szsz1 = Correlation(psi, sites, "Sz", "Sz", i, i+1);
+
+						sxsz = Correlation(psi, sites, "Sx", "Sz", i, i+1);
+					}
+					if (i <= N - 2) {
+						sxsx2 = Correlation(psi, sites, "Sx", "Sx", i, i+2);
+						szsz2 = Correlation(psi, sites, "Sz", "Sz", i, i+2);
+					}
+					if (i <= N - 3) {
+						sxsx3 = Correlation(psi, sites, "Sx", "Sx", i, i+3);
+						szsz3 = Correlation(psi, sites, "Sz", "Sz", i, i+3);
+					}
+					if (i <= N - 4) {
+						sxsx4 = Correlation(psi, sites, "Sx", "Sx", i, i+4);
+						szsz4 = Correlation(psi, sites, "Sz", "Sz", i, i+4);
+					}
+
 					sz_tot += s;
 					if (i < dot)
 						sz_left += s;
@@ -804,38 +861,52 @@ int main(int argc, char *argv[]) {
 						sz_dot += s;
 					sz << i - dot  << "\t" << s << "\t"
 							<< pow(-1, i ) * s << "\t"
-							<<  sxsz << "\t"<< time << endl;
-					sx << i - dot  << "\t" << sx1 << "\t"
-							<< sxsx1 << "\t" << sxsx2 << "\t" << time << endl;
+							<< szsz1 << "\t"
+							<< szsz2 << "\t"
+							<< szsz3 << "\t"
+							<< szsz4 << "\t"
+							 << "\t"<< time << endl;
+					sx << i - dot  << "\t"
+							<< sx1 << "\t"
+							<< sxsx1 << "\t"
+							<< sxsx2 << "\t"
+							<< sxsx3 << "\t"
+							<< sxsx4 << "\t"
+							<< sxsz << "\t"
+							<< time << endl;
 					if ( i % 2 == 1) { //odd site
 						sz_odd = s;
 						sx_odd = sx1;
+						szsz1_odd = szsz1;
+						szsz2_odd = szsz2;
+						szsz3_odd = szsz3;
+						szsz4_odd = szsz4;
+
 						sxsx1_odd = sxsx1;
 						sxsx2_odd = sxsx2;
+						sxsx3_odd = sxsx3;
+						sxsx4_odd = sxsx4;
 						sxsz_odd = sxsz;
 					} else {
 						sz_avrg << i - dot + 1 << "\t"
 								<< 0.5 * (s + sz_odd) << "\t"
-								<< 0.5 * (sxsz + sxsz_odd) << "\t"
+								<< 0.5 * (szsz1 + szsz1_odd) << "\t"
+								<< 0.5 * (szsz2 + szsz2_odd) << "\t"
+								<< 0.5 * (szsz3 + szsz3_odd) << "\t"
+								<< 0.5 * (szsz4 + szsz4_odd) << "\t"
+
 								<< time << endl;
 						sx_avrg << i - dot + 1 << "\t"
 								<< 0.5 * (sx1 + sx_odd) << "\t"
 								<< 0.5 * (sxsx1 + sxsx1_odd) << "\t"
 								<< 0.5 * (sxsx2 + sxsx2_odd) << "\t"
+								<< 0.5 * (sxsx3 + sxsx3_odd) << "\t"
+								<< 0.5 * (sxsx4 + sxsx4_odd) << "\t"
+								<< 0.5 * (sxsz  + sxsz_odd) << "\t"
 								<< time << endl;
 					}
 				}
-				{ // For above runs up to N-2, this part is Sz(Sx) for N-1 and N
-					sz << N - 1 - dot << "\t" << Sz(psi, sites, N - 1) << "\t"
-							<< 0 << "\t" << 0 << "\t" << time << endl;
-					sz << N - dot << "\t" << Sz(psi, sites, N) << "\t" << 0
-							<< "\t" << 0 << "\t" << time << endl;
-					sx << N - 1 - dot << "\t" << Sx(psi, sites, N - 1) << "\t"
-							<< SxSx1(psi, sites, N - 1) << "\t" << 0 << "\t"
-							<< time << endl;
-					sx << N - dot << "\t" << Sx(psi, sites, N) << "\t" << 0
-							<< "\t" << 0 << "\t" << time << endl;
-				}
+
 				{ //I need this part to separate time steps in *.dat files (for gnuplot)
 					sz << "\n\n";
 					sz_avrg << "\n\n";
