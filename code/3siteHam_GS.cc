@@ -686,16 +686,16 @@ int main(int argc, char *argv[]) {
 
 
 		sz << "#Position=i-"
-				<< "\t<Sz_i>\t"
-				<< "\t<Sz_i Sz_{i+1}>\t"
-				<< "\t<Sz_i Sz_{i+2}>\t"
-				<< "\t<Sz_i Sz_{i+3}>\t"
-				<< "\t<Sz_i Sz_{i+4}>\t"
-				<< "\t(-1)^i<Sz_i>\t"
+				<< "\t <Sz_i>\t"
+				<< "\t <Sz_i Sz_{i+1}>\t"
+				<< "\t <Sz_i Sz_{i+2}>\t"
+				<< "\t <Sz_i Sz_{i+3}>\t"
+				<< "\t <Sz_i Sz_{i+4}>\t"
+				<< "\t (-1)^i<Sz_i>\t"
 				<< "\t\ttime\n";
 
 		sx << "#Position=i-"
-				<< "\t<Sx_i>\t"
+				<< "\t <Sx_i>\t"
 				<< "\t <Sx_i Sx_{i+1}>\t"
 				<< "\t <Sx_i Sx_{i+2}>\t"
 				<< "\t <Sx_i Sx_{i+3}>\t"
@@ -704,19 +704,19 @@ int main(int argc, char *argv[]) {
 					<< "\t\ttime\n";
 
 		sz_avrg << "#Position=i-"
-				<< "\t 0.5 * <Sz_i + next site>\t"
-				<< "\t 0.5 * <Sz_i Sz_{i+1} + next site>/2\t"
-				<< "\t 0.5 * <Sz_i Sz_{i+2} + next site>/2\t"
-				<< "\t 0.5 * <Sz_i Sz_{i+3} + next site>/2\t"
-				<< "\t 0.5 * <Sz_i Sz_{i+4} + next site>/2\t"
+				<< "\t 0.5*<Sz_i + next site>\t"
+				<< "\t 0.5*<Sz_i Sz_{i+1} + next site>\t"
+				<< "\t 0.5*<Sz_i Sz_{i+2} + next site>\t"
+				<< "\t 0.5*<Sz_i Sz_{i+3} + next site>\t"
+				<< "\t 0.5*<Sz_i Sz_{i+4} + next site>\t"
 				<< "\t\ttime\n";
 
 		sx_avrg << "#Position=i-"
-				<< "\t 0.5 * <Sx_i + next site>\t"
-				<< "\t 0.5 * <Sx_i Sx_{i+1} + next site>/2\t"
-				<< "\t 0.5 * <Sx_i Sx_{i+2} + next site>/2 \t"
-				<< "\t 0.5 * <Sx_i Sx_{i+3} + next site>/2 \t"
-				<< "\t 0.5 * <Sx_i Sx_{i+4} + next site>/2 \t"
+				<< "\t 0.5*<Sx_i + next site>\t"
+				<< "\t 0.5*<Sx_i Sx_{i+1} + next site>\t"
+				<< "\t 0.5*<Sx_i Sx_{i+2} + next site>\t"
+				<< "\t 0.5*<Sx_i Sx_{i+3} + next site>\t"
+				<< "\t 0.5*<Sx_i Sx_{i+4} + next site>\t"
 				<< "\t\ttime\n";
 
 	}
@@ -842,7 +842,7 @@ int main(int argc, char *argv[]) {
 						sxsx1 = real(Correlation(psi, sites, "Sx", "Sx", i, i+1));
 						szsz1 = real(Correlation(psi, sites, "Sz", "Sz", i, i+1));
 
-						sxsz = real(Correlation(psi, sites, "Sx", "Sz", i, i+1));
+						sxsz  = real(Correlation(psi, sites, "Sx", "Sz", i, i+1));
 					}
 					if (i <= N - 2) {
 						sxsx2 = real(Correlation(psi, sites, "Sx", "Sx", i, i+2));
