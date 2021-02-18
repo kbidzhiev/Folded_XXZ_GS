@@ -579,7 +579,7 @@ int main(int argc, char *argv[]) {
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
 		for (int i = 1; i <= N; ++i){
-			if (i % 2 == 4){ // We start counting from 1 !
+			if (i % 4 == 0){ // We start counting from 1 !
 				initState.set(i, "Up");
 			} else {
 				initState.set(i, "Dn");
