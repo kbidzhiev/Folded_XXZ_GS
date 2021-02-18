@@ -115,6 +115,7 @@ public:
 		operator[]("Jammed") = 0;
 		operator[]("JammedImpurity") = 0;
 		operator[]("JammedNeel") = 0;
+		operator[]("Saverio") = 0;
 		operator[]("NeelImpurity") = 0;
 		operator[]("Flux") = 0;
 		operator[]("begin") = 1;
@@ -573,7 +574,22 @@ int main(int argc, char *argv[]) {
 
 			psi = MPS(initState);
 
-	} else if (param.longval("Flux") == 1) {
+	} else if ( param.longval("Saverio") == 1) {
+		cout << "initial state is  Up Dn Dn Dn >" << endl;
+		auto initState = InitState(sites);
+		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+		for (int i = 1; i <= N; ++i){
+			if (i % 2 == 4){ // We start counting from 1 !
+				initState.set(i, "Up");
+			} else {
+				initState.set(i, "Dn");
+			}
+		}
+
+
+		psi = MPS(initState);
+
+	}	else if (param.longval("Flux") == 1) {
 		cout << "initial state is  | Up Left Down Right > * |vac (= ----) >"
 				<< endl;
 		auto initState = InitState(sites);
