@@ -585,9 +585,32 @@ int main(int argc, char *argv[]) {
 				initState.set(i, "Dn");
 			}
 		}
-
-
 		psi = MPS(initState);
+	} else if ( param.longval("Lenart") == 1) {
+		cout << "initial state is  | Down Left Down Right >" << endl;
+		auto initState = InitState(sites);
+		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+		for (int i = 1; i <= N; ++i){
+			if (i % 4 == 0){ // We start counting from 1 !
+				initState.set(i, "Up");
+			} else {
+				initState.set(i, "Dn");
+			}
+		}
+		psi = MPS(initState);
+		for (int i = 1; i <= N ; ++i) {
+			if (i % 2 == 0) {
+				auto ind = sites(i);
+				auto indP = prime(sites(i));
+				auto Had = ITensor(ind, indP);
+				Had.set(ind(1), indP(1), ISqrt2);
+				Had.set(ind(1), indP(2), ISqrt2);
+				Had.set(ind(2), indP(1), ISqrt2);
+				Had.set(ind(2), indP(2), -ISqrt2);
+				psi.setA(i, psi.A(i) * Had);
+			}
+		}
+		psi.noPrime();
 
 	}	else if (param.longval("Flux") == 1) {
 		cout << "initial state is  | Up Left Down Right > * |vac (= ----) >"
@@ -865,21 +888,21 @@ int main(int argc, char *argv[]) {
 					if (i == dot)
 						sz_dot += s;
 					sz << i - dot  << "\t"
-							<< s << "\t"
-							<< szsz1 << "\t"
-							<< szsz2 << "\t"
-							<< szsz3 << "\t"
-							<< szsz4 << "\t"
-							<< pow(-1, i ) * s << "\t"
-							 << "\t"<< time << endl;
+						<< s << "\t"				//2
+						<< szsz1 << "\t"			//3
+						<< szsz2 << "\t"			//4
+						<< szsz3 << "\t"			//5
+						<< szsz4 << "\t"			//6
+						<< pow(-1, i ) * s << "\t"	//7
+						 << "\t"<< time << endl;
 					sx << i - dot  << "\t"
-							<< sx1 << "\t"
-							<< sxsx1 << "\t"
-							<< sxsx2 << "\t"
-							<< sxsx3 << "\t"
-							<< sxsx4 << "\t"
-							<< sxsz << "\t"
-							<< time << endl;
+						<< sx1 << "\t"				//2
+						<< sxsx1 << "\t"			//3
+						<< sxsx2 << "\t"			//4
+						<< sxsx3 << "\t"			//5
+						<< sxsx4 << "\t"			//6
+						<< sxsz << "\t"				//7
+						<< time << endl;
 					if ( i % 2 == 1) { //odd site
 						sz_odd = s;
 						sx_odd = sx1;
