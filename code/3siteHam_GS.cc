@@ -116,6 +116,7 @@ public:
 		operator[]("JammedImpurity") = 0;
 		operator[]("JammedNeel") = 0;
 		operator[]("Saverio") = 0;
+		operator[]("Lenart") = 0;
 		operator[]("NeelImpurity") = 0;
 		operator[]("Flux") = 0;
 		operator[]("begin") = 1;
