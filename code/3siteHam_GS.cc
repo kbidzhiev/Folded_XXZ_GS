@@ -117,6 +117,7 @@ public:
 		operator[]("JammedImpurity") = 0;
 		operator[]("JammedNeel") = 0;
 		operator[]("JammedRnd") = 0;
+		operator[]("JammedShift") = 0;
 		operator[]("Saverio") = 0;
 		operator[]("Lenart") = 0;
 		operator[]("NeelImpurity") = 0;
@@ -336,6 +337,16 @@ int main(int argc, char *argv[]) {
 	auto H0 = toMPO(Init_H.ampo);
 	double energy_initial = 0;
 
+	auto HadamarGate = [&](int i) {
+		auto ind = sites(i);
+		auto indP = prime(sites(i));
+		auto Had = ITensor(ind, indP);
+		Had.set(ind(1), indP(1), ISqrt2);
+		Had.set(ind(1), indP(2), ISqrt2);
+		Had.set(ind(2), indP(1), ISqrt2);
+		Had.set(ind(2), indP(2), -ISqrt2);
+		psi.setA(i, psi.A(i) * Had);
+	};
 
 	if (param.longval("GroundState") == 1) {
 		// GS of the initial Hamiltonian
@@ -489,14 +500,7 @@ int main(int argc, char *argv[]) {
 		psi = MPS(initState);
 		for (int i = 1; i <= N/2 ; ++i) {
 			if (i % 2 == 0) {
-				auto ind = sites(i);
-				auto indP = prime(sites(i));
-				auto Had = ITensor(ind, indP);
-				Had.set(ind(1), indP(1), ISqrt2);
-				Had.set(ind(1), indP(2), ISqrt2);
-				Had.set(ind(2), indP(1), ISqrt2);
-				Had.set(ind(2), indP(2), -ISqrt2);
-				psi.setA(i, psi.A(i) * Had);
+				HadamarGate(i);
 			}
 		}
 		psi.noPrime();
@@ -521,14 +525,7 @@ int main(int argc, char *argv[]) {
 		psi = MPS(initState);
 		for (int i = 1; i <= N/2 ; ++i) {
 			if (i % 2 == 0) {
-				auto ind = sites(i);
-				auto indP = prime(sites(i));
-				auto Had = ITensor(ind, indP);
-				Had.set(ind(1), indP(1), ISqrt2);
-				Had.set(ind(1), indP(2), ISqrt2);
-				Had.set(ind(2), indP(1), ISqrt2);
-				Had.set(ind(2), indP(2), -ISqrt2);
-				psi.setA(i, psi.A(i) * Had);
+				HadamarGate(i);
 			}
 		}
 		psi.noPrime();
@@ -550,16 +547,37 @@ int main(int argc, char *argv[]) {
 		psi = MPS(initState);
 		for (int i = 1; i <= N ; ++i) {
 			if (i % 2 == 0 && i != N/2 && i != N/2 +1) {
-				auto ind = sites(i);
-				auto indP = prime(sites(i));
-				auto Had = ITensor(ind, indP);
-				Had.set(ind(1), indP(1), ISqrt2);
-				Had.set(ind(1), indP(2), ISqrt2);
-				Had.set(ind(2), indP(1), ISqrt2);
-				Had.set(ind(2), indP(2), -ISqrt2);
-				psi.setA(i, psi.A(i) * Had);
+				HadamarGate(i);
 			}
 		}
+		psi.noPrime();
+	} else if ( param.longval("JammedShift") == 1) {
+		cout << "initial state is  | Up Left Up Right > * | Left Up Right Up>" << endl;
+		auto initState = InitState(sites);
+		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+		for (int i = 1; i <= N/2; ++i){
+			if (i % 4 == 2){ // We start counting from 1 !
+				initState.set(i, "Dn");
+			} else {
+				initState.set(i, "Up");
+			}
+		}
+		for (int i = N/2+1; i <= N; ++i){
+			if (i % 4 == 1){ // We start counting from 1 !
+				initState.set(i, "Dn");
+			} else {
+				initState.set(i, "Up");
+			}
+		}
+
+		psi = MPS(initState);
+		for (int i = 1; i < N ; ++i) {
+			if ( (i % 2 == 0 && i <= N/2) ||
+				 (i % 2 == 1 && i > N/2) ) {
+				HadamarGate(i);
+			}
+		}
+
 		psi.noPrime();
 
 	} else if (param.longval("JammedRnd") == 1) {
@@ -574,44 +592,24 @@ int main(int argc, char *argv[]) {
 		for (int i = 1; i <= N-3; i += 4) {
 			int rnd0 = rand();
 			int rnd1 = rand();
+			initState.set(i, "Up");
+			initState.set(i + 1, "Up");
+			initState.set(i + 2, "Up");
+			initState.set(i + 3, "Up");
 			if (rnd0 % 2 == 0 && rnd1 % 2 == 0) { // We start counting from 1 !
 				initState.set(i, "Dn");
-				initState.set(i + 1, "Up");
-				initState.set(i + 2, "Up");
-				initState.set(i + 3, "Up");
 				spindownpos.push_back(1);
 			} else if (rnd0 % 2 == 0 && rnd1 % 2 == 1) {
-				initState.set(i, "Up");
 				initState.set(i + 1, "Dn");
-				initState.set(i + 2, "Up");
-				initState.set(i + 3, "Up");
 				spindownpos.push_back(2);
 			} else if (rnd0 % 2 == 1 && rnd1 % 2 == 0) {
-				initState.set(i, "Up");
-				initState.set(i + 1, "Up");
 				initState.set(i + 2, "Dn");
-				initState.set(i + 3, "Up");
 				spindownpos.push_back(3);
 			} else   {
-				initState.set(i, "Up");
-				initState.set(i + 1, "Up");
-				initState.set(i + 2, "Up");
 				initState.set(i + 3, "Dn");
 				spindownpos.push_back(0);
 			}
 		}
-
-		auto HadamarGate = [&](int i) {
-			auto ind = sites(i);
-			auto indP = prime(sites(i));
-			auto Had = ITensor(ind, indP);
-			Had.set(ind(1), indP(1), ISqrt2);
-			Had.set(ind(1), indP(2), ISqrt2);
-			Had.set(ind(2), indP(1), ISqrt2);
-			Had.set(ind(2), indP(2), -ISqrt2);
-			psi.setA(i, psi.A(i) * Had);
-		};
-
 		psi = MPS(initState);
 		int spinsiteindex= 0;
 		for (int elem : spindownpos){
@@ -669,14 +667,7 @@ int main(int argc, char *argv[]) {
 		psi = MPS(initState);
 		for (int i = 1; i <= N ; ++i) {
 			if (i % 2 == 0) {
-				auto ind = sites(i);
-				auto indP = prime(sites(i));
-				auto Had = ITensor(ind, indP);
-				Had.set(ind(1), indP(1), ISqrt2);
-				Had.set(ind(1), indP(2), ISqrt2);
-				Had.set(ind(2), indP(1), ISqrt2);
-				Had.set(ind(2), indP(2), -ISqrt2);
-				psi.setA(i, psi.A(i) * Had);
+				HadamarGate(i);
 			}
 		}
 		psi.noPrime();
