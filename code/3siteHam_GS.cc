@@ -10,6 +10,7 @@
 #include <chrono>
 #include <cmath>
 
+
 #include <cstdlib>
 #include "observables_GS.h"
 
@@ -115,6 +116,7 @@ public:
 		operator[]("Jammed") = 0;
 		operator[]("JammedImpurity") = 0;
 		operator[]("JammedNeel") = 0;
+		operator[]("JammedRnd") = 0;
 		operator[]("Saverio") = 0;
 		operator[]("Lenart") = 0;
 		operator[]("NeelImpurity") = 0;
@@ -559,7 +561,73 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		psi.noPrime();
-	} else if ( param.longval("NeelImpurity") == 1) {
+
+	} else if (param.longval("JammedRnd") == 1) {
+		cout << "initial state is  suffled | Up Left Up Right > in random order>" << endl;
+		auto initState = InitState(sites);
+
+		vector<int> spindownpos;
+		spindownpos.reserve(N/4);
+		std::srand(std::time(0));
+
+		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+		for (int i = 1; i <= N-3; i += 4) {
+			int rnd0 = rand();
+			int rnd1 = rand();
+			if (rnd0 % 2 == 0 && rnd1 % 2 == 0) { // We start counting from 1 !
+				initState.set(i, "Dn");
+				initState.set(i + 1, "Up");
+				initState.set(i + 2, "Up");
+				initState.set(i + 3, "Up");
+				spindownpos.push_back(1);
+			} else if (rnd0 % 2 == 0 && rnd1 % 2 == 1) {
+				initState.set(i, "Up");
+				initState.set(i + 1, "Dn");
+				initState.set(i + 2, "Up");
+				initState.set(i + 3, "Up");
+				spindownpos.push_back(2);
+			} else if (rnd0 % 2 == 1 && rnd1 % 2 == 0) {
+				initState.set(i, "Up");
+				initState.set(i + 1, "Up");
+				initState.set(i + 2, "Dn");
+				initState.set(i + 3, "Up");
+				spindownpos.push_back(3);
+			} else   {
+				initState.set(i, "Up");
+				initState.set(i + 1, "Up");
+				initState.set(i + 2, "Up");
+				initState.set(i + 3, "Dn");
+				spindownpos.push_back(0);
+			}
+		}
+
+		auto HadamarGate = [&](int i) {
+			auto ind = sites(i);
+			auto indP = prime(sites(i));
+			auto Had = ITensor(ind, indP);
+			Had.set(ind(1), indP(1), ISqrt2);
+			Had.set(ind(1), indP(2), ISqrt2);
+			Had.set(ind(2), indP(1), ISqrt2);
+			Had.set(ind(2), indP(2), -ISqrt2);
+			psi.setA(i, psi.A(i) * Had);
+		};
+
+		psi = MPS(initState);
+		int spinsiteindex= 0;
+		for (int elem : spindownpos){
+			if (elem == 1 || elem == 3){
+				HadamarGate(spinsiteindex + 1);
+				HadamarGate(spinsiteindex + 3);
+			} else {
+				HadamarGate(spinsiteindex + 2);
+				HadamarGate(spinsiteindex + 4);
+			}
+			spinsiteindex += 4;
+		}
+
+		psi.noPrime();
+
+	} else if (param.longval("NeelImpurity") == 1) {
 			cout << "initial state is  | Up Left Up Right > * |vac (= ----) >" << endl;
 			auto initState = InitState(sites);
 			// Hadamar_2 Hadamar_4 |---+> = |- left - right>
