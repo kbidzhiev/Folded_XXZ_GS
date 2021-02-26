@@ -661,10 +661,12 @@ int main(int argc, char *argv[]) {
 					initState.set(i, "Up");
 				}
 			}
-			initState.set(N/2, "Dn");
-			initState.set(N/2+1,   "Dn");
 
-			psi = MPS(initState);
+
+		psi = MPS(initState);
+		HadamarGate(N / 2 + 1);
+		HadamarGate(N / 2 - 1);
+		psi.noPrime();
 
 	} else if ( param.longval("Saverio") == 1) {
 		cout << "initial state is  Up Dn Dn Dn >" << endl;
