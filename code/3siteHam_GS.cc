@@ -97,12 +97,12 @@ public:
 		//and their default values
 		operator[]("N") = 10; //Length of the chain
 		operator[]("J") = 1.0;
-		operator[]("tau") = 0.1;  //time step for the unitary evolution
+		operator[]("tau") = 0.2;  //time step for the unitary evolution
 		operator[]("T") = 2;  //Total (final) time
-		operator[]("Sz") = 0;
+		operator[]("Sz") = 0.1;
 		operator[]("SVD_spec") = 0; //SVD spectrum
 		operator[]("max_bond") = 4000;  //maximum bond dimension
-		operator[]("trunc") = 1e-10;  //maximum truncation error
+		operator[]("trunc") = 1e-8;  //maximum truncation error
 		operator[]("energy") = 1e-10;  //convergence criterium on the energy
 		operator[]("sweeps") = 999;  //maximum number of sweeps in the DMRG
 		operator[]("TrotterOrder") = 2;
@@ -531,6 +531,30 @@ int main(int argc, char *argv[]) {
 		psi.noPrime();
 
 	} else if ( param.longval("JammedImpurity") == 1) {
+//		cout << "initial state is  | Up Left Up Right > * |vac (= ----) >" << endl;
+//		auto initState = InitState(sites);
+//		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+//		for (int i = 1; i <= N; ++i){
+//			if (i % 4 == 0){ // We start counting from 1 !
+//				initState.set(i, "Dn");
+//			} else {
+//				initState.set(i, "Up");
+//			}
+//		}
+//		initState.set(N/2-2, "Dn");
+//		initState.set(N/2-1,   "Dn");
+//		initState.set(N/2, "Dn");
+//		initState.set(N/2+1,   "Dn");
+//
+//		psi = MPS(initState);
+//		for (int i = 1; i <= N ; ++i) {
+//			if (i % 2 == 0 && i != N/2 -2 && i != N/2 - 1
+//					&& i != N/2 && i != N/2 +1) {
+//				HadamarGate(i);
+//			}
+//		}
+//		psi.noPrime();
+
 		cout << "initial state is  | Up Left Up Right > * |vac (= ----) >" << endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
@@ -541,19 +565,17 @@ int main(int argc, char *argv[]) {
 				initState.set(i, "Up");
 			}
 		}
-		initState.set(N/2-2, "Dn");
-		initState.set(N/2-1,   "Dn");
-		initState.set(N/2, "Dn");
-		initState.set(N/2+1,   "Dn");
 
 		psi = MPS(initState);
-		for (int i = 1; i <= N ; ++i) {
-			if (i % 2 == 0 && i != N/2 -2 && i != N/2 - 1
-					&& i != N/2 && i != N/2 +1) {
+		for (int i = 1; i <= N; ++i) {
+			if (i % 2 == 0
+					|| i == N/2 -1
+					|| i == N/2 + 1 ) {
 				HadamarGate(i);
 			}
 		}
 		psi.noPrime();
+
 	} else if ( param.longval("JammedShift") == 1) {
 		cout << "initial state is  | Up Left Up Right > * | Left Up Right Up>" << endl;
 		auto initState = InitState(sites);
