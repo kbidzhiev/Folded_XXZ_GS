@@ -541,12 +541,15 @@ int main(int argc, char *argv[]) {
 				initState.set(i, "Up");
 			}
 		}
+		initState.set(N/2-2, "Dn");
+		initState.set(N/2-1,   "Dn");
 		initState.set(N/2, "Dn");
 		initState.set(N/2+1,   "Dn");
 
 		psi = MPS(initState);
 		for (int i = 1; i <= N ; ++i) {
-			if (i % 2 == 0 && i != N/2 && i != N/2 +1) {
+			if (i % 2 == 0 && i != N/2 -2 && i != N/2 - 1
+					&& i != N/2 && i != N/2 +1) {
 				HadamarGate(i);
 			}
 		}
