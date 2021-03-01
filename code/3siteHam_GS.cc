@@ -332,7 +332,7 @@ int main(int argc, char *argv[]) {
 	SpinHalf sites(N, { "ConserveQNs=", false }); // Creating a Hilbert space
 	MPS psi, psi0;
 	auto args = Args("Method=", "DensityMatrix", "Cutoff", param.val("trunc"),
-			"MaxDim", param.longval("max_bond"), "Normalize", false); // for FitApplyMPO RENAME
+			"MaxDim", param.longval("max_bond"), "Normalize", true); // for FitApplyMPO RENAME
 
 
 // Making an initial state
@@ -581,7 +581,7 @@ int main(int argc, char *argv[]) {
 
 
 		psi.noPrime();
-		psi = Measure(psi, sites, "Staggered_Sz", N/2-1, args);
+		psi = Measure(psi, sites, "Sz", N/2-1, args);
 		psi.noPrime();
 
 
