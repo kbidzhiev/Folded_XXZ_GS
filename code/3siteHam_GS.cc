@@ -581,7 +581,7 @@ int main(int argc, char *argv[]) {
 
 
 		psi.noPrime();
-		psi = Measure(psi, sites, "Sz", N/2-1, args);
+		psi = Measure(psi, sites, "Staggered_Sz", N/2-1, args);
 		psi.noPrime();
 
 
