@@ -27,8 +27,8 @@ LIBGFLAGS=-L$(ITENSOR_LIBDIR) $(ITENSOR_LIBGFLAGS)
 
 #Targets -----------------
 
-3siteHam_GS.exe: 3siteHam_GS.cc observables_GS.cc trotter_evolution.cc $(ITENSOR_LIBS) $(TENSOR_HEADERS)
-	$(CCCOM) $(CCFLAGS) 3siteHam_GS.cc observables_GS.cc trotter_evolution.cc -o $@ $(LIBFLAGS)
+3siteHam_GS.exe: 3siteHam_GS.cc observables_GS.cc quantum_measurement.cc $(ITENSOR_LIBS) $(TENSOR_HEADERS)
+	$(CCCOM) $(CCFLAGS) 3siteHam_GS.cc observables_GS.cc quantum_measurement.cc -o $@ $(LIBFLAGS)
 
 
 all: 3siteHam_GS.exe
