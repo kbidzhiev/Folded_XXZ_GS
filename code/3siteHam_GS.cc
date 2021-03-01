@@ -13,6 +13,7 @@
 
 #include <cstdlib>
 #include "observables_GS.h"
+#include "quantum_measurement.h"
 
 using namespace itensor;
 using namespace std;
@@ -330,6 +331,9 @@ int main(int argc, char *argv[]) {
 
 	SpinHalf sites(N, { "ConserveQNs=", false }); // Creating a Hilbert space
 	MPS psi, psi0;
+	auto args = Args("Method=", "DensityMatrix", "Cutoff", param.val("trunc"),
+			"MaxDim", param.longval("max_bond"), "Normalize", false); // for FitApplyMPO RENAME
+
 
 // Making an initial state
 
@@ -568,13 +572,18 @@ int main(int argc, char *argv[]) {
 
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
-			if (i % 2 == 0
-					|| i == N/2 -1
-					|| i == N/2 + 1 ) {
+			if (i % 2 == 0) {
+				//					|| i == N/2 -1
+				//					|| i == N/2 + 1
 				HadamarGate(i);
 			}
 		}
+
+
 		psi.noPrime();
+		psi = Measure(psi, sites, "Staggered_Sz", N/2-1, args);
+		psi.noPrime();
+
 
 	} else if ( param.longval("JammedShift") == 1) {
 		cout << "initial state is  | Up Left Up Right > * | Left Up Right Up>" << endl;
@@ -747,7 +756,10 @@ int main(int argc, char *argv[]) {
 	cout << "H constructed" << endl;
 
 	energy_initial = inner(psi, H, psi); //<psi|H0|psi>
-	cout << "2. Initial energy psi =" << energy_initial << endl;
+	cout << "2. Initial Energy psi =" << energy_initial << endl;
+
+	double norm_initial = inner(psi, psi); //<psi|H0|psi>
+	cout << "2. Initial NORM psi =" << norm_initial << endl;
 
 // Output and observables
 // _______
@@ -855,8 +867,6 @@ int main(int argc, char *argv[]) {
 	}
 
 	//exp(Ham) for the dynamics
-	auto args = Args("Method=", "DensityMatrix", "Cutoff", param.val("trunc"),
-			"MaxDim", param.longval("max_bond"), "Normalize", true); // for FitApplyMPO RENAME
 
 	double tau = param.val("tau");
 	const long int n_steps = param.val("T") / param.val("tau");
