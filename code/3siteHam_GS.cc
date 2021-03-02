@@ -570,9 +570,17 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
+		initState.set(N/2-2, "Dn");
+		initState.set(N/2-1, "Dn");
+		initState.set(N/2,   "Up");
+		initState.set(N/2+1, "Up");
+
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
-			if (i % 2 == 0) {
+			if (i % 2 == 0
+					|| i == N/2 -1
+					|| i == N/2 + 1
+					) {
 				//					|| i == N/2 -1
 				//					|| i == N/2 + 1
 				HadamarGate(i);
@@ -581,8 +589,8 @@ int main(int argc, char *argv[]) {
 
 
 		psi.noPrime();
-		psi = Measure(psi, sites, "Staggered_Sz", N/2-1, args);
-		psi.noPrime();
+		//psi = Measure(psi, sites, "Staggered_Sz", N/2-1, args);
+		//psi.noPrime();
 
 
 	} else if ( param.longval("JammedShift") == 1) {
