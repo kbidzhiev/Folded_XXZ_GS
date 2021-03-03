@@ -128,7 +128,6 @@ public:
 		operator[]("hL") = 0; //chemical potential
 		operator[]("hR") = 0;
 		operator[]("Q2Profile") = 0;
-		operator[]("CurrentProfile") = 0;
 		operator[]("Current") = 0;
 		operator[]("Entropy") = 0; //entanglement entropy p*log*p between left and right parts of system
 		operator[]("EntropyProfile") = 0; // Entropy Profile- parameter 0 -> nothing, dt>0 each second=integer parameter
@@ -814,7 +813,6 @@ int main(int argc, char *argv[]) {
 		sz_avrg.precision(15);
 		sx_avrg.precision(15);
 
-
 		sz << "#Position=i-"
 				<< "\t <Sz_i>\t"
 				<< "\t <Sz_i Sz_{i+1}>\t"
@@ -831,7 +829,7 @@ int main(int argc, char *argv[]) {
 				<< "\t <Sx_i Sx_{i+3}>\t"
 				<< "\t <Sx_i Sx_{i+4}>\t"
 				<< "\t <Sx_i Sz_{i+1}>\t"
-					<< "\t\ttime\n";
+				<< "\t\ttime\n";
 
 		sz_avrg << "#Position=i-"
 				<< "\t 0.5*<Sz_i + next site>\t"
@@ -848,7 +846,6 @@ int main(int argc, char *argv[]) {
 				<< "\t 0.5*<Sx_i Sx_{i+3} + next site>\t"
 				<< "\t 0.5*<Sx_i Sx_{i+4} + next site>\t"
 				<< "\t\ttime\n";
-
 	}
 	//---------------------
 	dt = param.val("EnergyProfile");
@@ -925,7 +922,6 @@ int main(int argc, char *argv[]) {
 				if (n < n_steps)
 					entropy_profile << endl << endl;
 			}
-
 		// ------- Sz profile -------
 
 		if (param.val("Sz") > 0) {
@@ -1028,7 +1024,6 @@ int main(int argc, char *argv[]) {
 								<< 0.5 * (szsz2 + szsz2_odd) << "\t"
 								<< 0.5 * (szsz3 + szsz3_odd) << "\t"
 								<< 0.5 * (szsz4 + szsz4_odd) << "\t"
-
 								<< time << endl;
 						sx_avrg << i - dot + 1 << "\t"
 								<< 0.5 * (sx1 + sx_odd) << "\t"
@@ -1076,7 +1071,7 @@ int main(int argc, char *argv[]) {
 		}
 		// ------- Q2 Profile -------
 		if (param.val("Q2Profile") > 0 ) {
-			if (n % int(param.val("EnergyProfile") / tau) == 0) {
+			if (n % int(param.val("Q2Profile") / tau) == 0) {
 				q2_profile << "\"t=" << time << "\"" << endl;
 				for (int i = 1; i <= N - 5; i++) {
 					const complex<double> q2 = Q2(psi, sites, i);

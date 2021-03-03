@@ -191,7 +191,7 @@ complex<double> KKDD(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite
 	ITensor ket = psi(i+1);
 	ket *= Sp1;
 	auto ir = commonIndex(psi(i+1),psi(i+2),"Link"); // this link exist
-	ket *= dag(prime(prime(psi(i+2), "Site"), ir));
+	ket *= dag(prime(prime(psi(i+1), "Site"), ir));
 	ket *= psi(i+2);
 	ket *= Sp2;
 	ket *= dag(prime(prime(psi(i+2),"Site"),"Link"));
