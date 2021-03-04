@@ -535,35 +535,11 @@ int main(int argc, char *argv[]) {
 		psi.noPrime();
 
 	} else if ( param.longval("JammedImpurity") == 1) {
-//		cout << "initial state is  | Up Left Up Right > * |vac (= ----) >" << endl;
-//		auto initState = InitState(sites);
-//		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-//		for (int i = 1; i <= N; ++i){
-//			if (i % 4 == 0){ // We start counting from 1 !
-//				initState.set(i, "Dn");
-//			} else {
-//				initState.set(i, "Up");
-//			}
-//		}
-//		initState.set(N/2-2, "Dn");
-//		initState.set(N/2-1,   "Dn");
-//		initState.set(N/2, "Dn");
-//		initState.set(N/2+1,   "Dn");
-//
-//		psi = MPS(initState);
-//		for (int i = 1; i <= N ; ++i) {
-//			if (i % 2 == 0 && i != N/2 -2 && i != N/2 - 1
-//					&& i != N/2 && i != N/2 +1) {
-//				HadamarGate(i);
-//			}
-//		}
-//		psi.noPrime();
-
 		cout << "initial state is  | Up Left Up Right > * |vac (= ----) >" << endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
 		for (int i = 1; i <= N; ++i){
-			if (i % 4 == 0){ // We start counting from 1 !
+			if (i % 4 == 0){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
 				initState.set(i, "Dn");
 			} else {
 				initState.set(i, "Up");
@@ -578,8 +554,8 @@ int main(int argc, char *argv[]) {
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
 			if (i % 2 == 0
-		//			|| i == N/2 -1
-		//			|| i == N/2 + 1
+					|| i == N/2 -1
+					|| i == N/2 + 1
 					) {
 				HadamarGate(i);
 			}
