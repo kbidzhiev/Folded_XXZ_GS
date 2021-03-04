@@ -1036,7 +1036,7 @@ int main(int argc, char *argv[]) {
 					sx << "\n\n";
 					sx_avrg << "\n\n";
 				}
-				sz_tot += Sz(psi, sites, N-1) + Sz(psi, sites, N);
+				//sz_tot += Sz(psi, sites, N-1) + Sz(psi, sites, N);
 				if (n == 0) sz_total_initial = sz_tot;
 				cout << "\n<Sz_left>=" << sz_left << "\t" << "<Sz_right>="
 						<< sz_right << "\t" << "<Sz_DOT>=" << sz_dot << "\t"
