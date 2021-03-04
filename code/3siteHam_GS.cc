@@ -108,6 +108,7 @@ public:
 		operator[]("sweeps") = 999;  //maximum number of sweeps in the DMRG
 		operator[]("TrotterOrder") = 2;
 		operator[]("GroundState") = 0;
+		operator[]("LadderState") = 0;
 		operator[]("DomainWall") = 0;
 		operator[]("RandomState") = 0;
 		operator[]("Neel") = 0;
@@ -151,9 +152,6 @@ public:
 		init(param);   // initializing the Hamiltonian
 		cout << "A Hamiltonian with " << N << " sites was constructed." << endl;
 	}
-
-
-
 private:
 	int N;
 	void init(const ThreeSiteParam &param) {    //.init (param)
@@ -198,7 +196,6 @@ public:
 		init(param);   // initializing the Hamiltonian
 		cout << "A LADDER Hamiltonian with " << N << " sites was constructed." << endl;
 	}
-
 private:
 	int N;
 	void init(const ThreeSiteParam &param) {    //.init (param)
@@ -218,10 +215,7 @@ private:
 		ampo += -J * 2, "Sz", N-1;
 		ampo += -J * 2 * (0.5 + pow(-1, N/2) * 0.3), "Sz" , N;
 		cout << "H = 3site is construcnted" << endl;
-
-
-
-
+	}
 };
 
 
@@ -413,6 +407,29 @@ int main(int argc, char *argv[]) {
 
 		//psi0 = psi; //we create to states. Psi for my time evolution, psi0 for standard one
 
+	} else if (param.longval("LadderState") == 1) {
+		// GS of the LADDER Hamiltonian
+		cout << "initial state is LADDER" << endl;
+		ThreeSiteHamiltonian Init_H_Ladder(sites, param);
+		auto H_Ladder = toMPO(Init_H.ampo);
+
+
+		auto sweeps = Sweeps(999); //number of sweeps is 5
+		sweeps.maxdim() = 10, 20, 50, 50, 100, 300, 4000;
+		sweeps.cutoff() = 1E-10;
+
+		psi = randomMPS(sites);
+
+		cout << "Before DMRG" << endl;
+
+		cout << "Norm is = " << inner(psi, psi) << endl;
+		energy_initial = inner(psi, H_Ladder, psi); //<psi|H0|psi>
+
+		MyDMRGObserver obs(psi, param.val("energy"));
+
+		tie(energy_initial, psi) = dmrg(H_Ladder, psi, sweeps, obs, "Quiet");
+
+		cout << "After DMRG" << endl;
 	} else if (param.longval("DomainWall") == 1) {
 		cout << "initil state is ++++----" << endl;
 		auto initState = InitState(sites);
@@ -454,12 +471,10 @@ int main(int argc, char *argv[]) {
 		for (int i = 1 ; i <= N/2; i += 2){
 			initState.set(i, "Up");
 			initState.set(i + 1, "Dn");
-
 		}
 		for (int i = N/2+1; i <= N ; ++i){
 			initState.set(i, "Dn");
 		}
-
 		psi = MPS(initState);
 	} else if (param.longval("UpRND") == 1 ) {
 
