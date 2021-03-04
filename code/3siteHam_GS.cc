@@ -127,11 +127,12 @@ public:
 		//operator[]("end") = 10;
 		operator[]("hL") = 0; //chemical potential
 		operator[]("hR") = 0;
+		operator[]("Q1Profile") = 0; // energy and current profile
 		operator[]("Q2Profile") = 0;
 		operator[]("Current") = 0;
 		operator[]("Entropy") = 0; //entanglement entropy p*log*p between left and right parts of system
 		operator[]("EntropyProfile") = 0; // Entropy Profile- parameter 0 -> nothing, dt>0 each second=integer parameter
-		operator[]("EnergyProfile") = 0;
+
 	}
 
 };
@@ -569,19 +570,17 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		initState.set(N/2-2, "Dn");
-		initState.set(N/2-1, "Dn");
-		initState.set(N/2,   "Up");
-		initState.set(N/2+1, "Up");
+		initState.set(N/2 - 1,"Dn");
+		initState.set(N/2,    "Dn");
+		initState.set(N/2 + 1,"Up");
+		initState.set(N/2 + 2,"Up");
 
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
 			if (i % 2 == 0
-					|| i == N/2 -1
-					|| i == N/2 + 1
+		//			|| i == N/2 -1
+		//			|| i == N/2 + 1
 					) {
-				//					|| i == N/2 -1
-				//					|| i == N/2 + 1
 				HadamarGate(i);
 			}
 		}
@@ -770,8 +769,8 @@ int main(int argc, char *argv[]) {
 
 // Output and observables
 // _______
-	ofstream ent, spec, entropy_profile, sz, sz_avrg, energy_beta, energy_profile,
-				q1minus_profile, q2_profile, sx, sx_avrg; //here I'm defining output streams == files
+	ofstream ent, spec, entropy_profile, sz, sz_avrg, energy_beta,
+				q1_profile, q2_profile, sx, sx_avrg; //here I'm defining output streams == files
 		ios_base::openmode mode;
 		mode = std::ofstream::out; //Erase previous file (if present)
 
@@ -848,17 +847,11 @@ int main(int argc, char *argv[]) {
 				<< "\t\ttime\n";
 	}
 	//---------------------
-	dt = param.val("EnergyProfile");
-	if (dt > 0) { //Energy Profile
-		energy_profile.open("Energy_profile.dat", mode);
-		energy_profile.precision(15);
-		energy_profile << "#Position=i-" << "\t<Ham_i>\t" << dot
-				<< "\t\ttime(or beta)\n";
-
-		//Q1minus Profile is initialized simultaniously with energy Profile
-		q1minus_profile.open("Q1minus_profile.dat", mode);
-		q1minus_profile.precision(15);
-		q1minus_profile << "#Position=i-" << "\t<Q1minus_i>\t" << dot
+	dt = param.val("Q1Profile");
+	if (dt > 0) { //Energy Profile and Current profile
+		q1_profile.open("Q1_profile.dat", mode);
+		q1_profile.precision(15);
+		q1_profile << "#Position=i-" << "\t<Q1minus_i>\t" << dot
 				<< "\t\ttime(or beta)\n";
 
 	}
@@ -1051,22 +1044,19 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		// ------- Energy Profile -------
-		// ------- Energy Profile -------
-		if (param.val("EnergyProfile") > 0 ) {
-			if (n % int(param.val("EnergyProfile") / tau) == 0) {
-				energy_profile << "\"t=" << time << "\"" << endl;
-				q1minus_profile << "\"t=" << time << "\"" << endl;
+		if (param.val("Q1Profile") > 0 ) {
+			if (n % int(param.val("Q1Profile") / tau) == 0) {
+				q1_profile << "\"t=" << time << "\"" << endl;
 				for (int i = 1; i <= N - 3; i++) {
 					const complex<double> q1 = Q1(psi, sites, i);
 					const double en = real(q1);
-					energy_profile << i - dot  << "\t" << en << "\t"
-							<< time << endl;
 					const double q1minus = imag(q1);
-					q1minus_profile << i - dot << "\t" << q1minus
+					q1_profile << i - dot
+							<< "\t" << en
+							<< "\t" << q1minus
 							<< "\t" << time << endl;
 				}
-				energy_profile << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
-				q1minus_profile << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
+				q1_profile << "\n\n"; //I need this part to separate time steps in *.dat files (for gnuplot)
 			}
 		}
 		// ------- Q2 Profile -------
