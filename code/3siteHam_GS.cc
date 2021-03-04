@@ -205,11 +205,11 @@ private:
 		const double hR = param.val("hR");
 		dot = N / 2;  //Position of the "dot"
 
-		for (int j = 1; j < N/2-1; ++j) {
+		for (int j = 1; j < N/2; ++j) {
 			//Strange coefficients are needed to match with
 			// spin Pauli matrices instead of Sx Sy
 			ampo += -J * 2, "Sz", 2*j-1;
-			ampo += -J * 4, "Sx", 2*j, "Sx", 2*j+2
+			ampo += -J * 4, "Sx", 2*j, "Sx", 2*j+2;
 			ampo += -J * 2 * (0.5 + pow(-1,j) * 0.3), "Sz" , 2 * j;
 		}
 		ampo += -J * 2, "Sz", N-1;
@@ -410,7 +410,7 @@ int main(int argc, char *argv[]) {
 	} else if (param.longval("LadderState") == 1) {
 		// GS of the LADDER Hamiltonian
 		cout << "initial state is LADDER" << endl;
-		ThreeSiteHamiltonian Init_H_Ladder(sites, param);
+		LadderHamiltonian Init_H_Ladder(sites, param);
 		auto H_Ladder = toMPO(Init_H.ampo);
 
 
