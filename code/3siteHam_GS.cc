@@ -114,7 +114,7 @@ public:
 		operator[]("Impurity") = 0;
 		operator[]("Up") = 0;
 		operator[]("UpRND") = 0;
-		operator[]("Jammed") = 0;
+		operator[]("JammedVac") = 0;
 		operator[]("JammedImpurity") = 0;
 		operator[]("JammedNeel") = 0;
 		operator[]("JammedRnd") = 0;
@@ -487,7 +487,7 @@ int main(int argc, char *argv[]) {
 		}
 		psi = MPS(initState);
 
-	} else if ( param.longval("Jammed") == 1) {
+	} else if ( param.longval("JammedVac") == 1) {
 		cout << "initial state is  | Up Left Up Right > * |vac (= ----) >" << endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
