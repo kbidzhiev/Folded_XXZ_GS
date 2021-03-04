@@ -152,6 +152,8 @@ public:
 		cout << "A Hamiltonian with " << N << " sites was constructed." << endl;
 	}
 
+
+
 private:
 	int N;
 	void init(const ThreeSiteParam &param) {    //.init (param)
@@ -159,10 +161,9 @@ private:
 		double mu = 0;
 		const double hL = param.val("hL");
 		const double hR = param.val("hR");
-		dot = (N) / 2;  //Position of the "dot"
+		dot = N / 2;  //Position of the "dot"
 		//cout << "The dot is on site #" << dot << endl;
 		//if ((2*N)<=3) cout<<"Error, N="<<N<<" is too small.\n",exit(0);
-
 		for (int j = 1; j < N-1; ++j) {
 			//Strange coefficients are needed to match with
 			// spin Pauli matrices instead of Sx Sy
@@ -184,10 +185,47 @@ private:
 		ampo += mu, "Sz", N;
 		cout << "H = 3site is construcnted" << endl;
 	}
+
 };
 
-//Trotter Gates
+class LadderHamiltonian {
+public:
+	int dot;
+	AutoMPO ampo;
+	//Define a constructor for this class 'LadderHamiltonian'
+	LadderHamiltonian(const SiteSet &sites, const ThreeSiteParam &param) :
+			ampo(sites), N(length(sites)) {
+		init(param);   // initializing the Hamiltonian
+		cout << "A LADDER Hamiltonian with " << N << " sites was constructed." << endl;
+	}
 
+private:
+	int N;
+	void init(const ThreeSiteParam &param) {    //.init (param)
+		const double J = param.val("J");
+		double mu = 0;
+		const double hL = param.val("hL");
+		const double hR = param.val("hR");
+		dot = N / 2;  //Position of the "dot"
+
+		for (int j = 1; j < N/2-1; ++j) {
+			//Strange coefficients are needed to match with
+			// spin Pauli matrices instead of Sx Sy
+			ampo += -J * 2, "Sz", 2*j-1;
+			ampo += -J * 4, "Sx", 2*j, "Sx", 2*j+2
+			ampo += -J * 2 * (0.5 + pow(-1,j) * 0.3), "Sz" , 2 * j;
+		}
+		ampo += -J * 2, "Sz", N-1;
+		ampo += -J * 2 * (0.5 + pow(-1, N/2) * 0.3), "Sz" , N;
+		cout << "H = 3site is construcnted" << endl;
+
+
+
+
+};
+
+
+//Trotter Gates
 class TrotterExp {
 public:
 	struct TGate {
@@ -548,14 +586,17 @@ int main(int argc, char *argv[]) {
 
 		initState.set(N/2 - 1,"Dn");
 		initState.set(N/2,    "Dn");
-		initState.set(N/2 + 1,"Up");
-		initState.set(N/2 + 2,"Up");
+		//initState.set(N/2 + 1,"Up");
+		//initState.set(N/2 + 2,"Up");
+
+		initState.set(N/2 + 1,"Dn");
+		initState.set(N/2 + 2,"Dn");
 
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
 			if (i % 2 == 0
-					|| i == N/2 -1
-					|| i == N/2 + 1
+		//			|| i == N/2 -1
+		//			|| i == N/2 + 1
 					) {
 				HadamarGate(i);
 			}
@@ -638,22 +679,18 @@ int main(int argc, char *argv[]) {
 			}
 			spinsiteindex += 4;
 		}
-
 		psi.noPrime();
-
 	} else if (param.longval("NeelImpurity") == 1) {
-			cout << "initial state is  | Up Left Up Right > * |vac (= ----) >" << endl;
-			auto initState = InitState(sites);
-			// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-			for (int i = 1; i <= N; ++i){
-				if (i % 2 == 0){ // We start counting from 1 !
-					initState.set(i, "Dn");
-				} else {
-					initState.set(i, "Up");
-				}
+		cout << "initial state is  | Up Left Up Right > * |vac (= ----) >"<< endl;
+		auto initState = InitState(sites);
+		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+		for (int i = 1; i <= N; ++i) {
+			if (i % 2 == 0) { // We start counting from 1 !
+				initState.set(i, "Dn");
+			} else {
+				initState.set(i, "Up");
 			}
-
-
+		}
 		psi = MPS(initState);
 		HadamarGate(N / 2 + 1);
 		HadamarGate(N / 2 - 1);
