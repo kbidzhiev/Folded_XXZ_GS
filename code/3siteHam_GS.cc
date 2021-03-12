@@ -9,6 +9,7 @@
 #include <math.h>
 #include <chrono>
 #include <cmath>
+#include <stdexcept>
 
 
 #include <cstdlib>
@@ -104,7 +105,7 @@ public:
 		operator[]("SVD_spec") = 0; //SVD spectrum
 		operator[]("max_bond") = 4000;  //maximum bond dimension
 		operator[]("trunc") = 1e-8;  //maximum truncation error
-		operator[]("energy") = 1e-10;  //convergence criterium on the energy
+		operator[]("energy") = 1e-13;  //convergence criterium on the energy
 		operator[]("sweeps") = 999;  //maximum number of sweeps in the DMRG
 		operator[]("TrotterOrder") = 2;
 		operator[]("GroundState") = 0;
@@ -128,6 +129,8 @@ public:
 		//operator[]("end") = 10;
 		operator[]("hL") = 0; //chemical potential
 		operator[]("hR") = 0;
+		operator[]("h") = 2.0;
+		operator[]("rho") = 0;
 		operator[]("Q1Profile") = 0; // energy and current profile
 		operator[]("Q2Profile") = 0;
 		operator[]("Current") = 0;
@@ -170,8 +173,8 @@ private:
 			ampo += J * -8 * 0.25, "S+", j, "Sz", j + 1, "S-", j + 2;
 			ampo += J * -8 * 0.25, "S-", j, "Sz", j + 1, "S+", j + 2;
 			//cout << "j = "<< j << "/ " << N-3 << endl;
-			cout << "site (" << j << ", " << j + 1 << ", " << j + 2 << ")"
-					<< endl;
+			//cout << "site (" << j << ", " << j + 1 << ", " << j + 2 << ")"
+			//		<< endl;
 			if(j <= dot){
 				mu = hL;
 			}else{
@@ -181,7 +184,6 @@ private:
 		}
 		ampo += mu, "Sz", N-1;
 		ampo += mu, "Sz", N;
-		cout << "H = 3site is construcnted" << endl;
 	}
 
 };
@@ -190,31 +192,57 @@ class LadderHamiltonian {
 public:
 	int dot;
 	AutoMPO ampo;
+
 	//Define a constructor for this class 'LadderHamiltonian'
-	LadderHamiltonian(const SiteSet &sites, const ThreeSiteParam &param) :
-			ampo(sites), N(length(sites)) {
+	LadderHamiltonian(const SiteSet &sites, const ThreeSiteParam &param, const string ham_type_)
+		: ampo(sites)
+		, N(length(sites))
+		, ham_type(ham_type_){
 		init(param);   // initializing the Hamiltonian
 		cout << "A LADDER Hamiltonian with " << N << " sites was constructed." << endl;
 	}
 private:
 	int N;
+	string ham_type;
 	void init(const ThreeSiteParam &param) {    //.init (param)
 		const double J = param.val("J");
-		double mu = 0;
-		const double hL = param.val("hL");
-		const double hR = param.val("hR");
-		dot = N / 2;  //Position of the "dot"
+		const double h = param.val("h");
+		const double rho = param.val("rho");
 
-		for (int j = 1; j < N/2; ++j) {
-			//Strange coefficients are needed to match with
-			// spin Pauli matrices instead of Sx Sy
-			ampo += -J * 2, "Sz", 2*j-1;
-			ampo += -J * 4, "Sx", 2*j, "Sx", 2*j+2;
-			ampo += -J * 2 * (0.5 + pow(-1,j) * 0.3), "Sz" , 2 * j;
+		double m = 2.0;
+
+
+		dot = N / 2;  //Position of the central spin
+
+		if (ham_type == "Ladder") {
+			for (int j = 1; j <= N - 3; j += 2) {
+				// The coefficients are needed to match with
+				// spin Pauli matrices instead of Sx Sy
+				ampo += -J * m * 2, "Sz", j;
+
+				ampo += -J * 4, "Sx", j + 1, "Sx", j + 3;
+				ampo += -J * (h + pow(-1, (j + 1) / 2) * rho) * 2, "Sz", j + 1;
+
+				cout << "Sz : " << j << "\t SxSx : (" << j + 1 << ", " << j + 3
+						<< ")" << "\t h term ("
+						<< (h + pow(-1, (j + 1) / 2) * rho) << "): " << j + 1
+						<< endl;
+			}
+			cout << "Sz : " << N - 1 << "\t \t \t \t h term ("
+					<< (h + pow(-1, N / 2) * rho) << "): " << N << endl;
+			ampo += -J * m * 2, "Sz", N - 1;
+			ampo += -J * (h + pow(-1, N / 2) * rho) * 2, "Sz", N;
+		} else if (ham_type == "Ising"){
+			for (int j = 1; j < N; j++){
+				ampo += -J * 4, "Sx", j, "Sx", j+1;
+				ampo += -J * m * 2, "Sz", j;
+			}
+			ampo += -J * m * 2, "Sz", N;
+
+		} else {
+			throw invalid_argument("One should choose Ladder or Ising in the LadderHamiltonian initialization");
 		}
-		ampo += -J * 2, "Sz", N-1;
-		ampo += -J * 2 * (0.5 + pow(-1, N/2) * 0.3), "Sz" , N;
-		cout << "H = 3site is construcnted" << endl;
+
 	}
 };
 
@@ -264,7 +292,7 @@ public:
 			cout << "Time evolutions " << endl;
 			TimeGates(begin0, end, 0.5 * tau, sites, param); //A
 			TimeGates(begin2, end, 0.5 * tau, sites, param); //B
-			TimeGates(begin4, end, tau, sites, param); 	 //C
+			TimeGates(begin4, end,       tau, sites, param); //C
 			TimeGates(begin2, end, 0.5 * tau, sites, param); //B
 			TimeGates(begin0, end, 0.5 * tau, sites, param); //A
 			/*
@@ -285,10 +313,10 @@ public:
 			const SiteSet &sites, const ThreeSiteParam &param) {
 		const int step = 3;
 		const double J = param.val("J");
-		cout << "Gates starts from " << begin << endl;
+		//cout << "Gates starts from " << begin << endl;
 		for (int j = begin; j < end - 1; j += step) {
-			cout << "j = (" << j << ", " << j + 1 << ", " << j + 2 << ")"
-					<< endl;
+			//cout << "j = (" << j << ", " << j + 1 << ", " << j + 2 << ")"
+			//		<< endl;
 			//this part act on real sites
 			auto hh = J * 4 * 0.25 * op(sites, "Sp", j) * op(sites, "Id", j + 1)
 					* op(sites, "Sm", j + 2);
@@ -410,26 +438,58 @@ int main(int argc, char *argv[]) {
 	} else if (param.longval("LadderState") == 1) {
 		// GS of the LADDER Hamiltonian
 		cout << "initial state is LADDER" << endl;
-		LadderHamiltonian Init_H_Ladder(sites, param);
-		auto H_Ladder = toMPO(Init_H.ampo);
 
+		LadderHamiltonian Init_H_Ising(sites, param, "Ising");
+		auto H_Ising = toMPO(Init_H_Ising.ampo);
 
 		auto sweeps = Sweeps(999); //number of sweeps is 5
-		sweeps.maxdim() = 10, 20, 50, 50, 100, 300, 4000;
+		sweeps.maxdim() = 20, 50, 50, 100, 300, 4000;
 		sweeps.cutoff() = 1E-10;
+
+//		auto psi0 = randomMPS(sites);
 
 		psi = randomMPS(sites);
 
-		cout << "Before DMRG" << endl;
-
-		cout << "Norm is = " << inner(psi, psi) << endl;
-		energy_initial = inner(psi, H_Ladder, psi); //<psi|H0|psi>
-
+	    energy_initial = inner(psi, H_Ising, psi); //<psi|H0|psi>
 		MyDMRGObserver obs(psi, param.val("energy"));
 
-		tie(energy_initial, psi) = dmrg(H_Ladder, psi, sweeps, obs, "Quiet");
+		tie(energy_initial, psi) = dmrg(H_Ising, psi, sweeps, obs, "Quiet");
 
-		cout << "After DMRG" << endl;
+		cout << "First step is DONE. Ising Ham is ready" << endl;
+
+		LadderHamiltonian Init_H_Ladder(sites, param, "Ladder");
+		auto H_Ladder = toMPO(Init_H_Ladder.ampo);
+
+//		auto sweeps = Sweeps(999); //number of sweeps is 5
+//		sweeps.maxdim() = 20, 50, 50, 100, 300, 4000;
+//		sweeps.cutoff() = 1E-10;
+
+//	    auto state = InitState(sites);
+//	    for(int i = 1; i <= N; ++i) {
+//	    	state.set(i,"Up");
+//	    	//if(i%2 == 1) state.set(i,"Up")
+//	        //else         state.set(i,"Dn");
+//	    }
+//	    auto psi0 = MPS(state);
+
+		energy_initial = inner(psi, H_Ladder, psi); //<psi|H0|psi>
+		//MyDMRGObserver obs(psi, param.val("energy"));
+
+		tie(energy_initial, psi) = dmrg(H_Ladder, psi, sweeps, obs, "Quiet");
+		cout << "Second step is DONE. Ladder Ham is ready" << endl;
+
+		cout << "Norm (before unitary gates )is = " << inner(psi, psi) << endl;
+		energy_initial = inner(psi, H_Ladder, psi); //<psi|H0|psi>
+
+		HadamarGate(N/2 - 1);
+		HadamarGate(N/2    );
+		HadamarGate(N/2 + 1);
+		HadamarGate(N/2 + 2);
+
+
+		psi.noPrime();
+		cout << "Norm (after unitary gates )is = " << inner(psi, psi) << endl;
+
 	} else if (param.longval("DomainWall") == 1) {
 		cout << "initil state is ++++----" << endl;
 		auto initState = InitState(sites);
@@ -901,6 +961,7 @@ int main(int argc, char *argv[]) {
 // Time evolution
 	double sz_total_initial = 9999;
 	double sz_tot = 999; // will be used in part with magnetization and then output to cout;
+	double sx_tot = 999; // will be used in part with magnetization and then output to cout;
 	for (int n = 0; n <= n_steps ; ++n) {
 
 		const double time = n * tau; //+param.val("time_shift");
@@ -954,6 +1015,7 @@ int main(int argc, char *argv[]) {
 				sx_avrg << "\"t=" << time << "\"" << endl;
 				double sz_left = 0, sz_right = 0, sz_dot = 0;
 				sz_tot = 0;
+				sx_tot = 0;
 
 				double sz_odd = 0;
 				double sx_odd = 0;
@@ -1003,6 +1065,7 @@ int main(int argc, char *argv[]) {
 					}
 
 					sz_tot += s;
+					sx_tot += sx1;
 					if (i < dot)
 						sz_left += s;
 					if (i > dot)
@@ -1065,10 +1128,15 @@ int main(int argc, char *argv[]) {
 					sx_avrg << "\n\n";
 				}
 				//sz_tot += Sz(psi, sites, N-1) + Sz(psi, sites, N);
-				if (n == 0) sz_total_initial = sz_tot;
+				if (n == 0) {
+					sz_total_initial = sz_tot;
+				}
 				cout << "\n<Sz_left>=" << sz_left << "\t" << "<Sz_right>="
 						<< sz_right << "\t" << "<Sz_DOT>=" << sz_dot << "\t"
-						<< "<Sz_tot>=" << sz_tot << endl;
+						<< "<Sz_tot>=" << sz_tot << "\t"
+						<< "<Sx_tot>=" << sx_tot << "\n"
+						<< "<Sz_tot> + <Sx_tot>=" << sz_tot + sx_tot
+						<<endl;
 			}
 		}
 		// ------- Energy Profile -------
