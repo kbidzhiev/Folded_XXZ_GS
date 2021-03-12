@@ -209,7 +209,7 @@ private:
 		const double h = param.val("h");
 		const double rho = param.val("rho");
 
-		double m = 2.0;
+		double m = 1.0;
 
 
 		dot = N / 2;  //Position of the central spin
@@ -235,9 +235,11 @@ private:
 		} else if (ham_type == "Ising"){
 			for (int j = 1; j < N; j++){
 				ampo += -J * 4, "Sx", j, "Sx", j+1;
-				ampo += -J * m * 2, "Sz", j;
+				//ampo += -J * (h + pow(-1, j) * rho) * 2, "Sz", j;
+				ampo += -J * (m + 0.5) * 2, "Sz", j;
 			}
-			ampo += -J * m * 2, "Sz", N;
+			//ampo += -J * (h + pow(-1, N) * rho) * 2, "Sz", N;
+			ampo += -J * (m + 0.5) * 2, "Sz", N;
 
 		} else {
 			throw invalid_argument("One should choose Ladder or Ising in the LadderHamiltonian initialization");
@@ -447,39 +449,21 @@ int main(int argc, char *argv[]) {
 		sweeps.cutoff() = 1E-10;
 
 //		auto psi0 = randomMPS(sites);
-
 		psi = randomMPS(sites);
 
 	    energy_initial = inner(psi, H_Ising, psi); //<psi|H0|psi>
 		MyDMRGObserver obs(psi, param.val("energy"));
-
 		tie(energy_initial, psi) = dmrg(H_Ising, psi, sweeps, obs, "Quiet");
-
 		cout << "First step is DONE. Ising Ham is ready" << endl;
 
 		LadderHamiltonian Init_H_Ladder(sites, param, "Ladder");
 		auto H_Ladder = toMPO(Init_H_Ladder.ampo);
-
-//		auto sweeps = Sweeps(999); //number of sweeps is 5
-//		sweeps.maxdim() = 20, 50, 50, 100, 300, 4000;
-//		sweeps.cutoff() = 1E-10;
-
-//	    auto state = InitState(sites);
-//	    for(int i = 1; i <= N; ++i) {
-//	    	state.set(i,"Up");
-//	    	//if(i%2 == 1) state.set(i,"Up")
-//	        //else         state.set(i,"Dn");
-//	    }
-//	    auto psi0 = MPS(state);
-
 		energy_initial = inner(psi, H_Ladder, psi); //<psi|H0|psi>
 		//MyDMRGObserver obs(psi, param.val("energy"));
-
 		tie(energy_initial, psi) = dmrg(H_Ladder, psi, sweeps, obs, "Quiet");
 		cout << "Second step is DONE. Ladder Ham is ready" << endl;
 
 		cout << "Norm (before unitary gates )is = " << inner(psi, psi) << endl;
-		energy_initial = inner(psi, H_Ladder, psi); //<psi|H0|psi>
 
 		HadamarGate(N/2 - 1);
 		HadamarGate(N/2    );
