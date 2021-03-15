@@ -235,11 +235,11 @@ private:
 		} else if (ham_type == "Ising"){
 			for (int j = 1; j < N; j++){
 				ampo += -J * 4, "Sx", j, "Sx", j+1;
-				//ampo += -J * (h + pow(-1, j) * rho) * 2, "Sz", j;
-				ampo += -J * (m + 0.5) * 2, "Sz", j;
+				ampo += -J * (h + pow(-1, j) * rho) * 2, "Sz", j;
+				//ampo += -J * (m + 0.5) * 2, "Sz", j;
 			}
-			//ampo += -J * (h + pow(-1, N) * rho) * 2, "Sz", N;
-			ampo += -J * (m + 0.5) * 2, "Sz", N;
+			ampo += -J * (h + pow(-1, N) * rho) * 2, "Sz", N;
+			//ampo += -J * (m + 0.5) * 2, "Sz", N;
 
 		} else {
 			throw invalid_argument("One should choose Ladder or Ising in the LadderHamiltonian initialization");
@@ -456,19 +456,19 @@ int main(int argc, char *argv[]) {
 		tie(energy_initial, psi) = dmrg(H_Ising, psi, sweeps, obs, "Quiet");
 		cout << "First step is DONE. Ising Ham is ready" << endl;
 
-		LadderHamiltonian Init_H_Ladder(sites, param, "Ladder");
-		auto H_Ladder = toMPO(Init_H_Ladder.ampo);
-		energy_initial = inner(psi, H_Ladder, psi); //<psi|H0|psi>
-		//MyDMRGObserver obs(psi, param.val("energy"));
-		tie(energy_initial, psi) = dmrg(H_Ladder, psi, sweeps, obs, "Quiet");
+//		LadderHamiltonian Init_H_Ladder(sites, param, "Ladder");
+//		auto H_Ladder = toMPO(Init_H_Ladder.ampo);
+//		energy_initial = inner(psi, H_Ladder, psi); //<psi|H0|psi>
+//		//MyDMRGObserver obs(psi, param.val("energy"));
+//		tie(energy_initial, psi) = dmrg(H_Ladder, psi, sweeps, obs, "Quiet");
 		cout << "Second step is DONE. Ladder Ham is ready" << endl;
 
 		cout << "Norm (before unitary gates )is = " << inner(psi, psi) << endl;
 
-		HadamarGate(N/2 - 1);
-		HadamarGate(N/2    );
-		HadamarGate(N/2 + 1);
-		HadamarGate(N/2 + 2);
+//		HadamarGate(N/2 - 1);
+//		HadamarGate(N/2    );
+//		HadamarGate(N/2 + 1);
+//		HadamarGate(N/2 + 2);
 
 
 		psi.noPrime();
@@ -645,17 +645,17 @@ int main(int argc, char *argv[]) {
 
 		initState.set(N/2 - 1,"Dn");
 		initState.set(N/2,    "Dn");
-		//initState.set(N/2 + 1,"Up");
-		//initState.set(N/2 + 2,"Up");
+		initState.set(N/2 + 1,"Up");
+		initState.set(N/2 + 2,"Up");
 
-		initState.set(N/2 + 1,"Dn");
-		initState.set(N/2 + 2,"Dn");
+		//initState.set(N/2 + 1,"Dn");
+		//initState.set(N/2 + 2,"Dn");
 
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
 			if (i % 2 == 0
-		//			|| i == N/2 -1
-		//			|| i == N/2 + 1
+					|| i == N/2 -1
+					|| i == N/2 + 1
 					) {
 				HadamarGate(i);
 			}
