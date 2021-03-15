@@ -643,10 +643,10 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		initState.set(N/2 - 1,"Dn");
-		initState.set(N/2,    "Dn");
-		initState.set(N/2 + 1,"Up");
-		initState.set(N/2 + 2,"Up");
+		//initState.set(N/2 - 1,"Dn");
+		//initState.set(N/2,    "Dn");
+		//initState.set(N/2 + 1,"Up");
+		//initState.set(N/2 + 2,"Up");
 
 		//initState.set(N/2 + 1,"Dn");
 		//initState.set(N/2 + 2,"Dn");
