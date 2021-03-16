@@ -671,16 +671,17 @@ int main(int argc, char *argv[]) {
 
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
-			if(i< N/2-1 || i> N/2 +2){
-				if (i % 2 == 0) {
-					HadamarGate(i);
-				}
-			}else {
-				const double alpha = param.val("alpha");
-				UnitaryGate(i,alpha);
-				//HadamarGate(i);
+			if (i % 2 == 0) {
+				HadamarGate(i);
 			}
 		}
+
+		const double alpha = param.val("alpha");
+		UnitaryGate(N/2 - 1,alpha);
+		UnitaryGate(N/2    ,alpha);
+		UnitaryGate(N/2 + 1,alpha);
+		UnitaryGate(N/2 + 2,alpha);
+
 
 
 		psi.noPrime();
