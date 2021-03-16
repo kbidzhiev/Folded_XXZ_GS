@@ -137,7 +137,7 @@ public:
 		operator[]("Current") = 0;
 		operator[]("Entropy") = 0; //entanglement entropy p*log*p between left and right parts of system
 		operator[]("EntropyProfile") = 0; // Entropy Profile- parameter 0 -> nothing, dt>0 each second=integer parameter
-
+		operator[]("Loschmidt") = 0; // loschmidt echo <psi(t)|psi(0)>
 	}
 
 };
@@ -848,7 +848,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 	//cout << "PSI = " << psi << endl;
-
+	psi0 = psi;
 
 
 //--------------------------------------------------------------
@@ -868,11 +868,19 @@ int main(int argc, char *argv[]) {
 // Output and observables
 // _______
 	ofstream ent, spec, entropy_profile, sz, sz_avrg, energy_beta,
-				q1_profile, q2_profile, sx, sx_avrg; //here I'm defining output streams == files
+				q1_profile, q2_profile, sx, sx_avrg, loschmidt; //here I'm defining output streams == files
 		ios_base::openmode mode;
 		mode = std::ofstream::out; //Erase previous file (if present)
 
-	double dt = param.val("Entropy");
+
+	double dt = param.val("Loschmidt");
+	if (dt != 0) { //Loschmidt echo
+		loschmidt.open("Loschmidt.dat", mode);
+		loschmidt.precision(15);
+		loschmidt << "#time \t  re<psi(t)|psi(0)> \t re<psi(t)|psi(0)> \n";
+	}
+	//---------------------
+	dt = param.val("Entropy");
 	if (dt != 0) { //Entropy in the center of the chain
 		ent.open("Entropy_center.dat", mode);
 		ent.precision(15);
@@ -1001,6 +1009,16 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
+
+		// ------- Loschmidt echo -----
+		if (param.val("Loschmidt") > 0)
+			if (n % int(param.val("Loschmidt") / tau) == 0) {
+				complex<double> echo = innerC(psi0,psi);
+				loschmidt << time << "\t" << setw(16) << setfill('0')
+						<< real(echo) << "\t" << imag(echo)
+						<< endl;
+			}
+
 		// ------- entanglement Entropy Profile -----
 		if (param.val("EntropyProfile") > 0)
 			if (n % int(param.val("EntropyProfile") / tau) == 0) {
@@ -1082,7 +1100,7 @@ int main(int argc, char *argv[]) {
 						sz_right += s;
 					if (i == dot)
 						sz_dot += s;
-					sz << i - dot  << "\t"
+					sz << i - dot  << "\t"			//column ID below
 						<< s << "\t"				//2
 						<< szsz1 << "\t"			//3
 						<< szsz2 << "\t"			//4
@@ -1090,7 +1108,7 @@ int main(int argc, char *argv[]) {
 						<< szsz4 << "\t"			//6
 						<< pow(-1, i ) * s << "\t"	//7
 						 << "\t"<< time << endl;
-					sx << i - dot  << "\t"
+					sx << i - dot  << "\t"			//column ID below
 						<< sx1 << "\t"				//2
 						<< sxsx1 << "\t"			//3
 						<< sxsx2 << "\t"			//4
