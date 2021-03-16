@@ -1185,14 +1185,15 @@ int main(int argc, char *argv[]) {
 			expH.Evolve(psi, args);
 			psi.orthogonalize(args);
 
-			if(n * param.val("tau") == 5){
-				cout << "TIME IS 5. I ACT WITH HADAMAR GATES" << endl;
-				HadamarGate(N/2-1);
-				HadamarGate(N/2  );
-				HadamarGate(N/2+1);
-				HadamarGate(N/2+2);
-				psi.noPrime();
-			}
+//			// Hadamar gates act at time == 5
+//			if(n * param.val("tau") == 5){
+//				cout << "TIME IS 5. I ACT WITH HADAMAR GATES" << endl;
+//				HadamarGate(N/2-1);
+//				HadamarGate(N/2  );
+//				HadamarGate(N/2+1);
+//				HadamarGate(N/2+2);
+//				psi.noPrime();
+//			}
 
 			double energy = real(innerC(psi, H, psi));
 			cout << "max bond dim = " << maxLinkDim(psi) << endl;
