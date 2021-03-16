@@ -1191,6 +1191,7 @@ int main(int argc, char *argv[]) {
 				HadamarGate(N/2  );
 				HadamarGate(N/2+1);
 				HadamarGate(N/2+2);
+				psi.noPrime();
 			}
 
 			double energy = real(innerC(psi, H, psi));
