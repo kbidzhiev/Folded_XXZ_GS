@@ -1139,8 +1139,7 @@ int main(int argc, char *argv[]) {
 				cout << "\n<Sz_left>=" << sz_left << "\t" << "<Sz_right>="
 						<< sz_right << "\t" << "<Sz_DOT>=" << sz_dot << "\t"
 						<< "<Sz_tot>=" << sz_tot << "\t"
-						<< "<Sx_tot>=" << sx_tot << "\n"
-						<< "<Sz_tot> + <Sx_tot>=" << sz_tot + sx_tot
+						<< "<Sx_tot>=" << sx_tot
 						<<endl;
 			}
 		}
