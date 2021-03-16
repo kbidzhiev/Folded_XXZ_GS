@@ -677,9 +677,9 @@ int main(int argc, char *argv[]) {
 		}
 
 		HadamarGate(N/2-1);
-		HadamarGate(N/2  );
+		//HadamarGate(N/2  );
 		HadamarGate(N/2+1);
-		HadamarGate(N/2+2);
+		//HadamarGate(N/2+2);
 //		const double alpha = param.val("alpha");
 //		UnitaryGate(N/2 - 1,alpha);
 //		UnitaryGate(N/2    ,alpha);
@@ -1186,6 +1186,7 @@ int main(int argc, char *argv[]) {
 			psi.orthogonalize(args);
 
 			if(n_steps == 5 * param.val("tau")){
+				cout << "TIME IS 5. I ACT WITH HADAMAR GATES" << endl;
 				HadamarGate(N/2-1);
 				HadamarGate(N/2  );
 				HadamarGate(N/2+1);
