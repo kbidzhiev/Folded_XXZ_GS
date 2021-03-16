@@ -1185,7 +1185,7 @@ int main(int argc, char *argv[]) {
 			expH.Evolve(psi, args);
 			psi.orthogonalize(args);
 
-			if(n_steps == 5 * param.val("tau")){
+			if(n_steps * param.val("tau") == 5){
 				cout << "TIME IS 5. I ACT WITH HADAMAR GATES" << endl;
 				HadamarGate(N/2-1);
 				HadamarGate(N/2  );
