@@ -1181,6 +1181,13 @@ int main(int argc, char *argv[]) {
 			expH.Evolve(psi, args);
 			psi.orthogonalize(args);
 
+			if(n_steps == 5 * param.val("tau")){
+				HadamarGate(N/2-1);
+				HadamarGate(N/2  );
+				HadamarGate(N/2+1);
+				HadamarGate(N/2+2);
+			}
+
 			double energy = real(innerC(psi, H, psi));
 			cout << "max bond dim = " << maxLinkDim(psi) << endl;
 			cout << "Norm = " << real(innerC(psi, psi)) << endl;
