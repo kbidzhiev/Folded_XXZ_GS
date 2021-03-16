@@ -12,4 +12,6 @@ this_dir.mk
 # code output
 *.dat
 *.gif
+*.eps
+*.gp
 
