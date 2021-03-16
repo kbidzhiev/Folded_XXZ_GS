@@ -118,6 +118,7 @@ public:
 		operator[]("UpRND") = 0;
 		operator[]("JammedVac") = 0;
 		operator[]("JammedImpurity") = 0;
+		operator[]("alpha") = 0; // U = exp[ i alpha  n*\sigma]
 		operator[]("JammedNeel") = 0;
 		operator[]("JammedRnd") = 0;
 		operator[]("JammedShift") = 0;
@@ -414,6 +415,23 @@ int main(int argc, char *argv[]) {
 		psi.setA(i, psi.A(i) * Had);
 	};
 
+	auto UnitaryGate = [&](int i, const double alpha) {
+		// U = exp[i alpha (n*s)]; |n|^2==1, s = {sx,sy,sz}
+		// n = {1,1,1}/sqrt(3);
+		const double nx = 1./sqrt(3.0);
+		const double ny = nx;
+		const double nz = nx;
+		auto ind = sites(i);
+		auto indP = prime(sites(i));
+		auto Had = ITensor(ind, indP);
+		Had.set(ind(1), indP(1),  cos(alpha) + Cplx_i * nz * sin(alpha));
+		Had.set(ind(1), indP(2), ( ny + Cplx_i * nx) * sin(alpha));
+		Had.set(ind(2), indP(1), (-ny + Cplx_i * nx) * sin(alpha));
+		Had.set(ind(2), indP(2),  cos(alpha) - Cplx_i * nz * sin(alpha));
+		psi.setA(i, psi.A(i) * Had);
+	};
+
+
 	if (param.longval("GroundState") == 1) {
 		// GS of the initial Hamiltonian
 		cout << "initial state is GS" << endl;
@@ -425,8 +443,8 @@ int main(int argc, char *argv[]) {
 
 		cout << "Before DMRG" << endl;
 
-		cout << "Norm is = " << inner(psi, psi) << endl;
-		energy_initial = inner(psi, H0, psi); //<psi|H0|psi>
+		cout << "Norm is = " << real(innerC(psi, psi)) << endl;
+		energy_initial = real(innerC(psi, H0, psi)); //<psi|H0|psi>
 		cout << "1. Initial energy=" << energy_initial << endl;
 
 		MyDMRGObserver obs(psi, param.val("energy"));
@@ -451,7 +469,7 @@ int main(int argc, char *argv[]) {
 //		auto psi0 = randomMPS(sites);
 		psi = randomMPS(sites);
 
-	    energy_initial = inner(psi, H_Ising, psi); //<psi|H0|psi>
+	    energy_initial = real(innerC(psi, H_Ising, psi)); //<psi|H0|psi>
 		MyDMRGObserver obs(psi, param.val("energy"));
 		tie(energy_initial, psi) = dmrg(H_Ising, psi, sweeps, obs, "Quiet");
 		cout << "First step is DONE. Ising Ham is ready" << endl;
@@ -463,16 +481,16 @@ int main(int argc, char *argv[]) {
 //		tie(energy_initial, psi) = dmrg(H_Ladder, psi, sweeps, obs, "Quiet");
 		cout << "Second step is DONE. Ladder Ham is ready" << endl;
 
-		cout << "Norm (before unitary gates )is = " << inner(psi, psi) << endl;
+		cout << "Norm (before unitary gates )is = " << real(innerC(psi, psi)) << endl;
 
-//		HadamarGate(N/2 - 1);
-//		HadamarGate(N/2    );
-//		HadamarGate(N/2 + 1);
-//		HadamarGate(N/2 + 2);
+		HadamarGate(N/2 - 1);
+		HadamarGate(N/2    );
+		HadamarGate(N/2 + 1);
+		HadamarGate(N/2 + 2);
 
 
 		psi.noPrime();
-		cout << "Norm (after unitary gates )is = " << inner(psi, psi) << endl;
+		cout << "Norm (after unitary gates )is = " << real(innerC(psi, psi)) << endl;
 
 	} else if (param.longval("DomainWall") == 1) {
 		cout << "initil state is ++++----" << endl;
@@ -653,11 +671,14 @@ int main(int argc, char *argv[]) {
 
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
-			if (i % 2 == 0
-					|| i == N/2 -1
-					|| i == N/2 + 1
-					) {
-				HadamarGate(i);
+			if(i< N/2-1 || i> N/2 +2){
+				if (i % 2 == 0) {
+					HadamarGate(i);
+				}
+			}else {
+				const double alpha = param.val("alpha");
+				UnitaryGate(i,alpha);
+				//HadamarGate(i);
 			}
 		}
 
@@ -833,10 +854,10 @@ int main(int argc, char *argv[]) {
 	auto H = toMPO(Ham.ampo);
 	cout << "H constructed" << endl;
 
-	energy_initial = inner(psi, H, psi); //<psi|H0|psi>
+	energy_initial = real(innerC(psi, H, psi)); //<psi|H0|psi>
 	cout << "2. Initial Energy psi =" << energy_initial << endl;
 
-	double norm_initial = inner(psi, psi); //<psi|H0|psi>
+	double norm_initial = real(innerC(psi, psi)); //<psi|H0|psi>
 	cout << "2. Initial NORM psi =" << norm_initial << endl;
 
 // Output and observables
