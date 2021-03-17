@@ -671,7 +671,7 @@ int main(int argc, char *argv[]) {
 
 
 
-		initState.set(N/2-1, "Up");
+		initState.set(N/2-1, "Dn");
 
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
