@@ -670,9 +670,6 @@ int main(int argc, char *argv[]) {
 		//initState.set(N/2 + 2,"Dn");
 
 
-
-		initState.set(N/2-1, "Up");
-
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
 			if (i % 2 == 0) {
@@ -680,14 +677,14 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		HadamarGate(N/2-1);
+//		HadamarGate(N/2-1);
 //		HadamarGate(N/2+1);
 
-//		const double alpha = param.val("alpha");
-//		UnitaryGate(N/2 - 1,alpha);
-//		UnitaryGate(N/2    ,alpha);
-//		UnitaryGate(N/2 + 1,alpha);
-//		UnitaryGate(N/2 + 2,alpha);
+		const double alpha = param.val("alpha");
+		UnitaryGate(N/2 - 1,alpha);
+		UnitaryGate(N/2    ,alpha);
+		UnitaryGate(N/2 + 1,alpha);
+		UnitaryGate(N/2 + 2,alpha);
 
 
 
