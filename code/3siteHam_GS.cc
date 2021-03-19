@@ -208,7 +208,10 @@ private:
 	string ham_type;
 	void init(const ThreeSiteParam &param) {    //.init (param)
 		const double J = param.val("J");
-		const double h = param.val("h");
+		//const double h = param.val("h");
+		auto h = [&](double j){
+			return cos(j);
+		}
 		const double rho = param.val("rho");
 		double m = 1.0;
 
@@ -222,24 +225,24 @@ private:
 				ampo += -J * m * 2, "Sz", j;
 
 				ampo += -J * 4, "Sx", j + 1, "Sx", j + 3;
-				ampo += -J * (h + pow(-1, (j + 1) / 2) * rho) * 2, "Sz", j + 1;
+				ampo += -J * (h(j) + pow(-1, (j + 1) / 2) * rho) * 2, "Sz", j + 1;
 
 				cout << "Sz : " << j << "\t SxSx : (" << j + 1 << ", " << j + 3
 						<< ")" << "\t h term ("
-						<< (h + pow(-1, (j + 1) / 2) * rho) << "): " << j + 1
+						<< (h(j) + pow(-1, (j + 1) / 2) * rho) << "): " << j + 1
 						<< endl;
 			}
 			cout << "Sz : " << N - 1 << "\t \t \t \t h term ("
-					<< (h + pow(-1, N / 2) * rho) << "): " << N << endl;
+					<< (h(j) + pow(-1, N / 2) * rho) << "): " << N << endl;
 			ampo += -J * m * 2, "Sz", N - 1;
-			ampo += -J * (h + pow(-1, N / 2) * rho) * 2, "Sz", N;
+			ampo += -J * (h(j) + pow(-1, N / 2) * rho) * 2, "Sz", N;
 		} else if (ham_type == "Ising"){
 			for (int j = 1; j < N; j++){
 				ampo += -J * 4, "Sx", j, "Sx", j+1;
-				ampo += -J * (h + pow(-1, j) * rho) * 2, "Sz", j;
+				ampo += -J * (h(j) + pow(-1, j) * rho) * 2, "Sz", j;
 				//ampo += -J * (m + 0.5) * 2, "Sz", j;
 			}
-			ampo += -J * (h + pow(-1, N) * rho) * 2, "Sz", N;
+			ampo += -J * (h(j) + pow(-1, N) * rho) * 2, "Sz", N;
 			//ampo += -J * (m + 0.5) * 2, "Sz", N;
 
 		} else {
