@@ -138,6 +138,7 @@ public:
 		operator[]("Entropy") = 0; //entanglement entropy p*log*p between left and right parts of system
 		operator[]("EntropyProfile") = 0; // Entropy Profile- parameter 0 -> nothing, dt>0 each second=integer parameter
 		operator[]("Loschmidt") = 0; // loschmidt echo <psi(t)|psi(0)>
+		operator[]("Dhar") = 0; // Deepak Dhar term in hamiltonian (time evolution ONLY)
 	}
 
 };
@@ -316,6 +317,7 @@ public:
 			const SiteSet &sites, const ThreeSiteParam &param) {
 		const int step = 3;
 		const double J = param.val("J");
+		const int Dhar = param.val("J");
 		//cout << "Gates starts from " << begin << endl;
 		for (int j = begin; j < end - 1; j += step) {
 			//cout << "j = (" << j << ", " << j + 1 << ", " << j + 2 << ")"
@@ -332,15 +334,16 @@ public:
 
 
 			//Deepak Dhar term
-			hh += J * 4 * 0.5 * op(sites, "Sz", j) * op(sites, "Id", j + 1)
-					* op(sites, "Sz", j + 2);
-			hh += -J * 8 * 0.5 * op(sites, "Sz", j) * op(sites, "Sz", j + 1)
-					* op(sites, "Sz", j + 2);
-			hh += -J * 1 * 0.5 * op(sites, "Id", j) * op(sites, "Id", j + 1)
-					* op(sites, "Id", j + 2);
-			hh += J * 2 * 0.5 * op(sites, "Id", j) * op(sites, "Sz", j + 1)
-					* op(sites, "Id", j + 2);
-
+			if (Dhaar == 1) {
+				hh += J * 4 * 0.5 * op(sites, "Sz", j) * op(sites, "Id", j + 1)
+						* op(sites, "Sz", j + 2);
+				hh += -J * 8 * 0.5 * op(sites, "Sz", j) * op(sites, "Sz", j + 1)
+						* op(sites, "Sz", j + 2);
+				hh += -J * 1 * 0.5 * op(sites, "Id", j) * op(sites, "Id", j + 1)
+						* op(sites, "Id", j + 2);
+				hh += J * 2 * 0.5 * op(sites, "Id", j) * op(sites, "Sz", j + 1)
+						* op(sites, "Id", j + 2);
+			}
 
 
 			auto G = expHermitian(hh, tau);
