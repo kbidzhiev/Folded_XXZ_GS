@@ -210,7 +210,7 @@ private:
 		const double J = param.val("J");
 		const double h = param.val("h");
 		const double rho = param.val("rho");
-
+		const int Dhar = param.val("Dhar");
 		double m = 1.0;
 
 
@@ -317,7 +317,7 @@ public:
 			const SiteSet &sites, const ThreeSiteParam &param) {
 		const int step = 3;
 		const double J = param.val("J");
-		const int Dhar = param.val("J");
+		const int Dhar = param.val("Dhar");
 		//cout << "Gates starts from " << begin << endl;
 		for (int j = begin; j < end - 1; j += step) {
 			//cout << "j = (" << j << ", " << j + 1 << ", " << j + 2 << ")"
