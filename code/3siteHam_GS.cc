@@ -225,11 +225,11 @@ private:
 				ampo += -J * m * 2, "Sz", j;
 
 				ampo += -J * 4, "Sx", j + 1, "Sx", j + 3;
-				ampo += -J * (h(j) + pow(-1, (j + 1) / 2) * rho) * 2, "Sz", j + 1;
+				ampo += -J * (h(j+1) + pow(-1, (j + 1) / 2) * rho) * 2, "Sz", j + 1;
 
 				cout << "Sz : " << j << "\t SxSx : (" << j + 1 << ", " << j + 3
 						<< ")" << "\t h term ("
-						<< (h(j) + pow(-1, (j + 1) / 2) * rho) << "): " << j + 1
+						<< (h(j+1) + pow(-1, (j + 1) / 2) * rho) << "): " << j + 1
 						<< endl;
 			}
 			cout << "Sz : " << N - 1 << "\t \t \t \t h term ("
