@@ -211,7 +211,7 @@ private:
 		//const double h = param.val("h");
 		auto h = [&](double j){
 			return cos(j);
-		}
+		};
 		const double rho = param.val("rho");
 		double m = 1.0;
 
