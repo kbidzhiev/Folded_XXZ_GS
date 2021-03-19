@@ -329,6 +329,20 @@ public:
 					* op(sites, "Sm", j + 2);
 			hh += -J * 8 * 0.25 * op(sites, "Sm", j) * op(sites, "Sz", j + 1)
 					* op(sites, "Sp", j + 2);
+
+
+			//Deepak Dhar term
+			hh += J * 4 * 0.5 * op(sites, "Sz", j) * op(sites, "Id", j + 1)
+					* op(sites, "Sz", j + 2);
+			hh += -J * 8 * 0.5 * op(sites, "Sz", j) * op(sites, "Sz", j + 1)
+					* op(sites, "Sz", j + 2);
+			hh += -J * 1 * 0.5 * op(sites, "Id", j) * op(sites, "Id", j + 1)
+					* op(sites, "Id", j + 2);
+			hh += J * 2 * 0.5 * op(sites, "Id", j) * op(sites, "Sz", j + 1)
+					* op(sites, "Id", j + 2);
+
+
+
 			auto G = expHermitian(hh, tau);
 			gates.emplace_back(j, move(G));
 		}
@@ -661,7 +675,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		//initState.set(N/2 - 1,"Dn");
+		initState.set(N/2 - 1,"Dn");
 		//initState.set(N/2,    "Dn");
 		//initState.set(N/2 + 1,"Up");
 		//initState.set(N/2 + 2,"Up");
@@ -680,18 +694,18 @@ int main(int argc, char *argv[]) {
 //		HadamarGate(N/2-1);
 //		HadamarGate(N/2+1);
 
-		const double alpha = param.val("alpha");
-		UnitaryGate(N/2 - 1,alpha);
-		UnitaryGate(N/2    ,alpha);
-		UnitaryGate(N/2 + 1,alpha);
-		UnitaryGate(N/2 + 2,alpha);
+//		const double alpha = param.val("alpha");
+//		UnitaryGate(N/2 - 1,alpha);
+//		UnitaryGate(N/2    ,alpha);
+//		UnitaryGate(N/2 + 1,alpha);
+//		UnitaryGate(N/2 + 2,alpha);
 
 
 
 		psi.noPrime();
 		//psi = Measure(psi, sites, "Staggered_Sz", N/2-1, args);
 		//psi.noPrime();
-
+		//cout << psi << endl;
 
 	} else if ( param.longval("JammedShift") == 1) {
 		cout << "initial state is  | Up Left Up Right > * | Left Up Right Up>" << endl;
