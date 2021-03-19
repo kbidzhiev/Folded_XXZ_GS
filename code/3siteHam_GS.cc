@@ -335,6 +335,7 @@ public:
 
 			//Deepak Dhar term
 			if (Dhar == 1) {
+				cout << "Dhar term is included" << endl;
 				hh += J * 4 * 0.5 * op(sites, "Sz", j) * op(sites, "Id", j + 1)
 						* op(sites, "Sz", j + 2);
 				hh += -J * 8 * 0.5 * op(sites, "Sz", j) * op(sites, "Sz", j + 1)
