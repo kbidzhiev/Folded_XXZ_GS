@@ -334,7 +334,7 @@ public:
 
 
 			//Deepak Dhar term
-			if (Dhaar == 1) {
+			if (Dhar == 1) {
 				hh += J * 4 * 0.5 * op(sites, "Sz", j) * op(sites, "Id", j + 1)
 						* op(sites, "Sz", j + 2);
 				hh += -J * 8 * 0.5 * op(sites, "Sz", j) * op(sites, "Sz", j + 1)
