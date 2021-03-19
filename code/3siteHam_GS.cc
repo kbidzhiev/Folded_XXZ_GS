@@ -210,7 +210,6 @@ private:
 		const double J = param.val("J");
 		const double h = param.val("h");
 		const double rho = param.val("rho");
-		const int Dhar = param.val("Dhar");
 		double m = 1.0;
 
 
@@ -492,11 +491,12 @@ int main(int argc, char *argv[]) {
 		tie(energy_initial, psi) = dmrg(H_Ising, psi, sweeps, obs, "Quiet");
 		cout << "First step is DONE. Ising Ham is ready" << endl;
 
-//		LadderHamiltonian Init_H_Ladder(sites, param, "Ladder");
-//		auto H_Ladder = toMPO(Init_H_Ladder.ampo);
-//		energy_initial = inner(psi, H_Ladder, psi); //<psi|H0|psi>
-//		//MyDMRGObserver obs(psi, param.val("energy"));
-//		tie(energy_initial, psi) = dmrg(H_Ladder, psi, sweeps, obs, "Quiet");
+		LadderHamiltonian Init_H_Ladder(sites, param, "Ladder");
+		auto H_Ladder = toMPO(Init_H_Ladder.ampo);
+		energy_initial = inner(psi, H_Ladder, psi); //<psi|H0|psi>
+		//MyDMRGObserver obs(psi, param.val("energy"));
+		tie(energy_initial, psi) = dmrg(H_Ladder, psi, sweeps, obs, "Quiet");
+
 		cout << "Second step is DONE. Ladder Ham is ready" << endl;
 
 		cout << "Norm (before unitary gates )is = " << real(innerC(psi, psi)) << endl;
