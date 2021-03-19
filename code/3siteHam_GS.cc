@@ -233,16 +233,16 @@ private:
 						<< endl;
 			}
 			cout << "Sz : " << N - 1 << "\t \t \t \t h term ("
-					<< (h(j) + pow(-1, N / 2) * rho) << "): " << N << endl;
+					<< (h(N) + pow(-1, N / 2) * rho) << "): " << N << endl;
 			ampo += -J * m * 2, "Sz", N - 1;
-			ampo += -J * (h(j) + pow(-1, N / 2) * rho) * 2, "Sz", N;
+			ampo += -J * (h(N) + pow(-1, N / 2) * rho) * 2, "Sz", N;
 		} else if (ham_type == "Ising"){
 			for (int j = 1; j < N; j++){
 				ampo += -J * 4, "Sx", j, "Sx", j+1;
 				ampo += -J * (h(j) + pow(-1, j) * rho) * 2, "Sz", j;
 				//ampo += -J * (m + 0.5) * 2, "Sz", j;
 			}
-			ampo += -J * (h(j) + pow(-1, N) * rho) * 2, "Sz", N;
+			ampo += -J * (h(N) + pow(-1, N) * rho) * 2, "Sz", N;
 			//ampo += -J * (m + 0.5) * 2, "Sz", N;
 
 		} else {
