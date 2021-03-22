@@ -25,7 +25,7 @@ double SxSz (MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites
 double Sy   (MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i);
 double SySy1(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i);
 double SySy2(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i);
-double SнSz (MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i);
+double SySz (MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i);
 
 
 

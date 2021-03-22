@@ -1090,12 +1090,12 @@ int main(int argc, char *argv[]) {
 				sz_tot = 0;
 				sx_tot = 0;
 
-				double sx_odd = 0, sy_odd = 0, sz_odd = 0;
+				double sx_odd = 0,  sz_odd = 0;
 				double sxsx1_odd = 0, sxsx2_odd = 0, sxsx3_odd = 0, sxsx4_odd = 0;
-				double sysy1_odd = 0, sysy2_odd = 0, sysy3_odd = 0, sysy4_odd = 0;
+				//double sysy1_odd = 0, sysy2_odd = 0, sysy3_odd = 0, sysy4_odd = 0;
 				double szsz1_odd = 0, szsz2_odd = 0, szsz3_odd = 0, szsz4_odd = 0;
 
-				double sxsz_odd  = 0, sysz_odd  = 0;
+				double sxsz_odd  = 0; //sysz_odd  = 0;
 
 				for (int i = 1; i <= N; i ++) {
 					double s = Sz(psi, sites, i);
