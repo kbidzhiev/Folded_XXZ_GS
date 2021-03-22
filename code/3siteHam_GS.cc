@@ -683,7 +683,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		initState.set(N/2 - 1,"Dn");
+		//initState.set(N/2 - 1,"Dn");
 		//initState.set(N/2,    "Dn");
 		//initState.set(N/2 + 1,"Up");
 		//initState.set(N/2 + 2,"Up");
@@ -699,8 +699,14 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-//		HadamarGate(N/2-1);
-//		HadamarGate(N/2+1);
+
+		HadamarGate(N / 2 - 1);
+		HadamarGate(N / 2 	 );
+		HadamarGate(N / 2 + 1);
+		HadamarGate(N / 2 + 2);
+
+
+
 
 //		const double alpha = param.val("alpha");
 //		UnitaryGate(N/2 - 1,alpha);
