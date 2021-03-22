@@ -139,6 +139,7 @@ public:
 		operator[]("EntropyProfile") = 0; // Entropy Profile- parameter 0 -> nothing, dt>0 each second=integer parameter
 		operator[]("Loschmidt") = 0; // loschmidt echo <psi(t)|psi(0)>
 		operator[]("Dhar") = 0; // Deepak Dhar term in hamiltonian (time evolution ONLY)
+		operator[]("Measurement") = 0; // Deepak Dhar term in hamiltonian (time evolution ONLY)
 	}
 
 };
@@ -1224,15 +1225,16 @@ int main(int argc, char *argv[]) {
 			expH.Evolve(psi, args);
 			psi.orthogonalize(args);
 
-//			// Hadamar gates act at time == 5
-//			if(n * param.val("tau") == 5){
-//				cout << "TIME IS 5. I ACT WITH HADAMAR GATES" << endl;
-//				HadamarGate(N/2-1);
-//				HadamarGate(N/2  );
-//				HadamarGate(N/2+1);
-//				HadamarGate(N/2+2);
-//				psi.noPrime();
-//			}
+			// Hadamar gates act at time == 5
+			if(n * param.val("tau") == (int)param.val("Measurement")
+					&& param.val("Measurement") !=0 ){
+				cout << "TIME IS == \"Measurement\". I ACT WITH HADAMAR GATES" << endl;
+				HadamarGate(N/2-1);
+				HadamarGate(N/2  );
+				HadamarGate(N/2+1);
+				HadamarGate(N/2+2);
+				psi.noPrime();
+			}
 
 			double energy = real(innerC(psi, H, psi));
 			cout << "max bond dim = " << maxLinkDim(psi) << endl;
