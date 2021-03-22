@@ -99,7 +99,7 @@ public:
 		//and their default values
 		operator[]("N") = 10; //Length of the chain
 		operator[]("J") = 1.0;
-		operator[]("tau") = 0.2;  //time step for the unitary evolution
+		operator[]("tau") = 0.02;  //time step for the unitary evolution
 		operator[]("T") = 2;  //Total (final) time
 		operator[]("Sz") = 0.1;
 		operator[]("SVD_spec") = 0; //SVD spectrum
