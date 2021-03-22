@@ -68,16 +68,37 @@ double Sx(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, c
 	return sx;
 }
 
-double SxSx1(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){ //<psi|Sz|psi> at site i
+double Sy(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){ //<psi|Sz|psi> at site i
+	psi.position(i);
+	ITensor ket = psi(i); // read only access
+	//ITensor bra = dag(prime(ket, "Site"));
+	auto Sy = op(sites,"Sy", i);
+	ket *= Sy;
+	ket *= dag(prime(psi(i), "Site")); //multipuing by bra
+	//ITensor B = ket * bra;
+	double sy = real(eltC(ket)); // 2 here is "sigma_z = 2* s_z"
+	return sy;
+}
+
+double SxSx1(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){
 	return real(Correlation(psi, sites, "Sx", "Sx", i, i + 1));
 }
-double SxSx2(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){ //<psi|Sz|psi> at site i
+double SxSx2(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){
 	return real(Correlation(psi, sites, "Sx", "Sx", i, i + 2));
 }
-double SxSz(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){ //<psi|Sz|psi> at site i
+double SxSz(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){
 	return real(Correlation(psi, sites, "Sx", "Sz", i, i + 1));
 }
 
+double SySy1(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){
+	return real(Correlation(psi, sites, "Sy", "Sy", i, i + 1));
+}
+double SySy2(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){
+	return real(Correlation(psi, sites, "Sy", "Sy", i, i + 2));
+}
+double SySz(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){
+	return real(Correlation(psi, sites, "Sy", "Sz", i, i + 1));
+}
 
 
 //< Sp_i Sm_i+4 >

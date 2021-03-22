@@ -890,7 +890,7 @@ int main(int argc, char *argv[]) {
 // Output and observables
 // _______
 	ofstream ent, spec, entropy_profile, sz, sz_avrg, energy_beta,
-				q1_profile, q2_profile, sx, sx_avrg, loschmidt; //here I'm defining output streams == files
+				q1_profile, q2_profile, sx, sy, sxsysz,  sx_avrg, loschmidt; //here I'm defining output streams == files
 		ios_base::openmode mode;
 		mode = std::ofstream::out; //Erase previous file (if present)
 
@@ -928,18 +928,40 @@ int main(int argc, char *argv[]) {
 	//---------------------
 	dt = param.val("Sz");
 	if (dt > 0) { //Full magnetization Profile
-		sz.open("Sz_profile.dat", mode);
 		sx.open("Sx_profile.dat", mode);
+		sy.open("Sy_profile.dat", mode);
+		sz.open("Sz_profile.dat", mode);
+
+		sxsysz.open("SxSySz_profile.dat", mode);
 
 		sz_avrg.open("Sz_average_profile.dat", mode);
 		sx_avrg.open("Sx_average_profile.dat", mode);
 
-		sz.precision(15);
 		sx.precision(15);
+		sy.precision(15);
+		sz.precision(15);
+		sxsysz.precision(15);
+
 
 		sz_avrg.precision(15);
 		sx_avrg.precision(15);
 
+		sx << "#Position=i-"
+				<< "\t <Sx_i>\t"
+				<< "\t <Sx_i Sx_{i+1}>\t"
+				<< "\t <Sx_i Sx_{i+2}>\t"
+				<< "\t <Sx_i Sx_{i+3}>\t"
+				<< "\t <Sx_i Sx_{i+4}>\t"
+				<< "\t <Sx_i Sz_{i+1}>\t"
+				<< "\t\ttime\n";
+		sy << "#Position=i-"
+				<< "\t <Sy_i>\t"
+				<< "\t <Sy_i Sy_{i+1}>\t"
+				<< "\t <Sy_i Sy_{i+2}>\t"
+				<< "\t <Sy_i Sy_{i+3}>\t"
+				<< "\t <Sy_i Sy_{i+4}>\t"
+				<< "\t <Sy_i Sz_{i+1}>\t"
+				<< "\t\ttime\n";
 		sz << "#Position=i-"
 				<< "\t <Sz_i>\t"
 				<< "\t <Sz_i Sz_{i+1}>\t"
@@ -949,13 +971,10 @@ int main(int argc, char *argv[]) {
 				<< "\t (-1)^i<Sz_i>\t"
 				<< "\t\ttime\n";
 
-		sx << "#Position=i-"
+		sxsysz << "#Position=i-"
 				<< "\t <Sx_i>\t"
-				<< "\t <Sx_i Sx_{i+1}>\t"
-				<< "\t <Sx_i Sx_{i+2}>\t"
-				<< "\t <Sx_i Sx_{i+3}>\t"
-				<< "\t <Sx_i Sx_{i+4}>\t"
-				<< "\t <Sx_i Sz_{i+1}>\t"
+				<< "\t <Sy_i>\t"
+				<< "\t <Sz_i>\t"
 				<< "\t\ttime\n";
 
 		sz_avrg << "#Position=i-"
@@ -1058,59 +1077,58 @@ int main(int argc, char *argv[]) {
 
 		if (param.val("Sz") > 0) {
 			if (n % int(param.val("Sz") / tau) == 0) {
+				sx << "\"t=" << time << "\"" << endl;
+				sy << "\"t=" << time << "\"" << endl;
 				sz << "\"t=" << time << "\"" << endl;
+
+				sxsysz << "\"t=" << time << "\"" << endl;
+
+				sx_avrg << "\"t=" << time << "\"" << endl;
 				sz_avrg << "\"t=" << time << "\"" << endl;
 
-				sx << "\"t=" << time << "\"" << endl;
-				sx_avrg << "\"t=" << time << "\"" << endl;
 				double sz_left = 0, sz_right = 0, sz_dot = 0;
 				sz_tot = 0;
 				sx_tot = 0;
 
-				double sz_odd = 0;
-				double sx_odd = 0;
-				double sxsx1_odd = 0;
-				double sxsx2_odd = 0;
-				double sxsx3_odd = 0;
-				double sxsx4_odd = 0;
+				double sx_odd = 0, sy_odd = 0, sz_odd = 0;
+				double sxsx1_odd = 0, sxsx2_odd = 0, sxsx3_odd = 0, sxsx4_odd = 0;
+				double sysy1_odd = 0, sysy2_odd = 0, sysy3_odd = 0, sysy4_odd = 0;
+				double szsz1_odd = 0, szsz2_odd = 0, szsz3_odd = 0, szsz4_odd = 0;
 
-				double szsz1_odd = 0;
-				double szsz2_odd = 0;
-				double szsz3_odd = 0;
-				double szsz4_odd = 0;
+				double sxsz_odd  = 0, sysz_odd  = 0;
 
-				double sxsz_odd = 0;
 				for (int i = 1; i <= N; i ++) {
 					double s = Sz(psi, sites, i);
 					double sx1 = Sx(psi, sites, i);
-					double sxsx1 = 0;
-					double sxsx2 = 0;
-					double sxsx3 = 0;
-					double sxsx4 = 0;
-
-					double szsz1 = 0;
-					double szsz2 = 0;
-					double szsz3 = 0;
-					double szsz4 = 0;
+					double sy1 = Sy(psi, sites, i);
+					double sxsx1 = 0, sxsx2 = 0, sxsx3 = 0, sxsx4 = 0;
+					double sysy1 = 0, sysy2 = 0, sysy3 = 0, sysy4 = 0;
+					double szsz1 = 0, szsz2 = 0, szsz3 = 0, szsz4 = 0;
 
 					double sxsz = 0;
+					double sysz = 0;
 
 					if (i <= N - 1) {
 						sxsx1 = real(Correlation(psi, sites, "Sx", "Sx", i, i+1));
+						sysy1 = real(Correlation(psi, sites, "Sy", "Sy", i, i+1));
 						szsz1 = real(Correlation(psi, sites, "Sz", "Sz", i, i+1));
 
 						sxsz  = real(Correlation(psi, sites, "Sx", "Sz", i, i+1));
+						sysz  = real(Correlation(psi, sites, "Sy", "Sz", i, i+1));
 					}
 					if (i <= N - 2) {
 						sxsx2 = real(Correlation(psi, sites, "Sx", "Sx", i, i+2));
+						sysy2 = real(Correlation(psi, sites, "Sy", "Sy", i, i+2));
 						szsz2 = real(Correlation(psi, sites, "Sz", "Sz", i, i+2));
 					}
 					if (i <= N - 3) {
 						sxsx3 = real(Correlation(psi, sites, "Sx", "Sx", i, i+3));
+						sysy3 = real(Correlation(psi, sites, "Sy", "Sy", i, i+3));
 						szsz3 = real(Correlation(psi, sites, "Sz", "Sz", i, i+3));
 					}
 					if (i <= N - 4) {
 						sxsx4 = real(Correlation(psi, sites, "Sx", "Sx", i, i+4));
+						sysy4 = real(Correlation(psi, sites, "Sy", "Sy", i, i+4));
 						szsz4 = real(Correlation(psi, sites, "Sz", "Sz", i, i+4));
 					}
 
@@ -1138,6 +1156,21 @@ int main(int argc, char *argv[]) {
 						<< sxsx4 << "\t"			//6
 						<< sxsz << "\t"				//7
 						<< time << endl;
+					sy << i - dot  << "\t"			//column ID below
+						<< sy1 << "\t"				//2
+						<< sysy1 << "\t"			//3
+						<< sysy2 << "\t"			//4
+						<< sysy3 << "\t"			//5
+						<< sysy4 << "\t"			//6
+						<< sysz << "\t"				//7
+						<< time << endl;
+					sxsysz << i - dot  << "\t"		//column ID below
+						<< sx1 << "\t"				//2
+						<< sy1 << "\t"				//3
+						<< s << "\t"				//4
+						<< time << endl;
+
+
 					if ( i % 2 == 1) { //odd site
 						sz_odd = s;
 						sx_odd = sx1;
@@ -1171,11 +1204,15 @@ int main(int argc, char *argv[]) {
 				}
 
 				{ //I need this part to separate time steps in *.dat files (for gnuplot)
+					sx << "\n\n";
+					sx_avrg << "\n\n";
+
+					sy << "\n\n";
+
 					sz << "\n\n";
 					sz_avrg << "\n\n";
 
-					sx << "\n\n";
-					sx_avrg << "\n\n";
+					sxsysz << "\n\n";
 				}
 				//sz_tot += Sz(psi, sites, N-1) + Sz(psi, sites, N);
 				if (n == 0) {
@@ -1183,8 +1220,7 @@ int main(int argc, char *argv[]) {
 				}
 				cout << "\n<Sz_left>=" << sz_left << "\t" << "<Sz_right>="
 						<< sz_right << "\t" << "<Sz_DOT>=" << sz_dot << "\t"
-						<< "<Sz_tot>=" << sz_tot << "\t"
-						<< "<Sx_tot>=" << sx_tot
+						<< "<Sz_tot>=" << sz_tot
 						<<endl;
 			}
 		}
@@ -1227,7 +1263,7 @@ int main(int argc, char *argv[]) {
 
 			// Hadamar gates act at time == 5
 			if(n * param.val("tau") == (int)param.val("Measurement")
-					&& param.val("Measurement") !=0 ){
+					&& param.val("Measurement") != 0 ){
 				cout << "TIME IS == \"Measurement\". I ACT WITH HADAMAR GATES" << endl;
 				HadamarGate(N/2-1);
 				HadamarGate(N/2  );
