@@ -1079,7 +1079,7 @@ int main(int argc, char *argv[]) {
 				}
 				if (n < n_steps)
 					entropy_profile << endl << endl;
-			}LPTMS (
+			}
 		// ------- Sz profile -------
 
 		if (param.val("Sz") > 0) {
