@@ -701,7 +701,7 @@ int main(int argc, char *argv[]) {
 		}
 
 
-		HadamarGate(N / 2 - 1);
+//		HadamarGate(N / 2 - 1);
 //		HadamarGate(N / 2 	 );
 //		HadamarGate(N / 2 + 1);
 //		HadamarGate(N / 2 + 2);
@@ -709,8 +709,8 @@ int main(int argc, char *argv[]) {
 
 
 
-//		const double alpha = param.val("alpha");
-//		UnitaryGate(N/2 - 1,alpha);
+		const double alpha = param.val("alpha");
+		UnitaryGate(N/2 - 1,alpha);
 //		UnitaryGate(N/2    ,alpha);
 //		UnitaryGate(N/2 + 1,alpha);
 //		UnitaryGate(N/2 + 2,alpha);
