@@ -806,7 +806,6 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		psi = MPS(initState);
-		HadamarGate(N / 2 + 1);
 		HadamarGate(N / 2 - 1);
 		psi.noPrime();
 
