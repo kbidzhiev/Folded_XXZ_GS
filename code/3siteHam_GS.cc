@@ -691,7 +691,7 @@ int main(int argc, char *argv[]) {
 		//initState.set(N/2 + 1,"Dn");
 		//initState.set(N/2 + 2,"Dn");
 
-		initState.set(N/2 - 1,"Dn");
+		//initState.set(N/2 - 1,"Dn");
 
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
@@ -701,7 +701,7 @@ int main(int argc, char *argv[]) {
 		}
 
 
-//		HadamarGate(N / 2 - 1);
+		HadamarGate(N / 2 - 1);
 //		HadamarGate(N / 2 	 );
 //		HadamarGate(N / 2 + 1);
 //		HadamarGate(N / 2 + 2);
