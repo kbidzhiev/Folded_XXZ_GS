@@ -677,7 +677,7 @@ int main(int argc, char *argv[]) {
 		psi.noPrime();
 
 
-	} else if ( param.longval("AlphaGate") != 0) {
+	} else if ( param.longval("AlphaGate") > 0) {
 			auto initState = InitState(sites);
 			for (int i = 1; i <= N; ++i){
 					initState.set(i, "Up");
