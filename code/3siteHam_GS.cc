@@ -140,6 +140,7 @@ public:
 		operator[]("Loschmidt") = 0; // loschmidt echo <psi(t)|psi(0)>
 		operator[]("Dhar") = 0; // Deepak Dhar term in hamiltonian (time evolution ONLY)
 		operator[]("Measurement") = 0; // Deepak Dhar term in hamiltonian (time evolution ONLY)
+		operator[]("AlphaGate") = 0; // Deepak Dhar term in hamiltonian (time evolution ONLY)
 	}
 
 };
@@ -452,6 +453,20 @@ int main(int argc, char *argv[]) {
 		psi.setA(i, psi.A(i) * Had);
 	};
 
+	auto AlphaGate = [&](int i, const double alpha) {
+		// U = exp[i alpha (n*s)]; |n|^2==1, s = {sx,sy,sz}
+		// n = {0,1,0}
+		auto ind = sites(i);
+		auto indP = prime(sites(i));
+		auto Had = ITensor(ind, indP);
+		Had.set(ind(1), indP(1),  cos(alpha));
+		Had.set(ind(1), indP(2),  sin(alpha));
+		Had.set(ind(2), indP(1), -sin(alpha));
+		Had.set(ind(2), indP(2),  cos(alpha));
+		psi.setA(i, psi.A(i) * Had);
+	};
+
+
 
 	if (param.longval("GroundState") == 1) {
 		// GS of the initial Hamiltonian
@@ -523,31 +538,6 @@ int main(int argc, char *argv[]) {
 			initState.set(i, "Dn");
 		psi = MPS(initState);
 
-	}else if (param.longval("Impurity") == 2 || param.longval("Impurity") == 4) {
-		cout << "initil state is {RND} {--} {RND}" << endl;
-		auto initState = InitState(sites);
-		std::srand(std::time(0));
-		for (int i = 1; i <= N; i++) {
-			int rnd = rand();
-			if (rnd % 2 == 0 || i == N) {
-				initState.set(i, "Up");
-			} else {
-				initState.set(i, "Up");
-				i += 1;
-				initState.set(i, "Dn");
-			}
-		}
-		if (param.longval("Impurity") == 2) {
-			initState.set(N / 2, "Dn");
-			initState.set(N / 2 + 1, "Dn");
-		} else if (param.longval("Impurity") == 4){
-			initState.set(N / 2 - 1, "Dn");
-			initState.set(N / 2, "Dn");
-			initState.set(N / 2 + 1, "Dn");
-			initState.set(N / 2 + 2, "Dn");
-		}
-		psi = MPS(initState);
-
 	} else if (param.longval("Neel") == 1) {
 		// Neel state: |+- +- +- >
 		cout << "initil state is {Neel}{----}" << endl;
@@ -584,33 +574,6 @@ int main(int argc, char *argv[]) {
 		initState.set(N, "Up");
 		psi = MPS(initState);
 
-	} else if (param.longval("RandomState") >= 1 ) {
-		int m = param.longval("RandomState");
-		if (m > N ){
-			cout << "RandomState position should be < system size N" << endl;
-			return 1;
-		}
-		cout << "initial state is {RND and ---}" << endl;
-		auto initState = InitState(sites);
-		std::srand(std::time(0));
-		for (int i = 1; i <= m ; i++){
-			int rnd = rand();
-			if (rnd % 2 == 0){
-				initState.set(i, "Up");
-			}else{
-				initState.set(i, "Up");
-				i+=1;
-				initState.set(i, "Dn");
-			}
-		}
-		for (int i = m + 1; i <= N; ++i){
-			initState.set(i, "Dn");
-		}
-		psi = MPS(initState);
-//		// Random state
-//		cout << "initial state  is random state" << endl;
-//		psi = randomMPS(sites);
-//		psi.normalize();
 	} else if ( param.longval("Up") > 0) {
 		int up = param.longval("Up");
 		cout << "initial state is ...+++"<< string (up, '-') << "+++..." << endl;
@@ -700,14 +663,10 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-
 //		HadamarGate(N / 2 - 1);
 //		HadamarGate(N / 2 	 );
 //		HadamarGate(N / 2 + 1);
 //		HadamarGate(N / 2 + 2);
-
-
-
 
 		const double alpha = param.val("alpha");
 		UnitaryGate(N/2 - 1,alpha);
@@ -715,86 +674,30 @@ int main(int argc, char *argv[]) {
 //		UnitaryGate(N/2 + 1,alpha);
 //		UnitaryGate(N/2 + 2,alpha);
 
-
-
-		psi.noPrime();
-		//psi = Measure(psi, sites, "Staggered_Sz", N/2-1, args);
-		//psi.noPrime();
-		//cout << psi << endl;
-
-	} else if ( param.longval("JammedShift") == 1) {
-		cout << "initial state is  | Up Left Up Right > * | Left Up Right Up>" << endl;
-		auto initState = InitState(sites);
-		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-		for (int i = 1; i <= N/2; ++i){
-			if (i % 4 == 2){ // We start counting from 1 !
-				initState.set(i, "Dn");
-			} else {
-				initState.set(i, "Up");
-			}
-		}
-		for (int i = N/2+1; i <= N; ++i){
-			if (i % 4 == 1){ // We start counting from 1 !
-				initState.set(i, "Dn");
-			} else {
-				initState.set(i, "Up");
-			}
-		}
-
-		psi = MPS(initState);
-		for (int i = 1; i < N ; ++i) {
-			if ( (i % 2 == 0 && i <= N/2) ||
-				 (i % 2 == 1 && i > N/2) ) {
-				HadamarGate(i);
-			}
-		}
-
 		psi.noPrime();
 
-	} else if (param.longval("JammedRnd") == 1) {
-		cout << "initial state is  suffled | Up Left Up Right > in random order>" << endl;
-		auto initState = InitState(sites);
 
-		vector<int> spindownpos;
-		spindownpos.reserve(N/4);
-		std::srand(std::time(0));
+	} else if ( param.longval("AlphaGate") != 0) {
+			auto initState = InitState(sites);
+			for (int i = 1; i <= N; ++i){
+					initState.set(i, "Up");
+			}
 
-		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-		for (int i = 1; i <= N-3; i += 4) {
-			int rnd0 = rand();
-			int rnd1 = rand();
-			initState.set(i, "Up");
-			initState.set(i + 1, "Up");
-			initState.set(i + 2, "Up");
-			initState.set(i + 3, "Up");
-			if (rnd0 % 2 == 0 && rnd1 % 2 == 0) { // We start counting from 1 !
-				initState.set(i, "Dn");
-				spindownpos.push_back(1);
-			} else if (rnd0 % 2 == 0 && rnd1 % 2 == 1) {
-				initState.set(i + 1, "Dn");
-				spindownpos.push_back(2);
-			} else if (rnd0 % 2 == 1 && rnd1 % 2 == 0) {
-				initState.set(i + 2, "Dn");
-				spindownpos.push_back(3);
-			} else   {
-				initState.set(i + 3, "Dn");
-				spindownpos.push_back(0);
+			initState.set(N/2 - 1,"Dn");
+
+			psi = MPS(initState);
+
+			const double alpha = param.val("AlphaGate");
+			for (int i = 1; i <= N; ++i) {
+				if (i % 4 == 0) {
+					AlphaGate(i, alpha);
+				}else if (i % 4 == 2){
+					AlphaGate(i, -alpha);
+				}
 			}
-		}
-		psi = MPS(initState);
-		int spinsiteindex= 0;
-		for (int elem : spindownpos){
-			if (elem == 1 || elem == 3){
-				HadamarGate(spinsiteindex + 1);
-				HadamarGate(spinsiteindex + 3);
-			} else {
-				HadamarGate(spinsiteindex + 2);
-				HadamarGate(spinsiteindex + 4);
-			}
-			spinsiteindex += 4;
-		}
-		psi.noPrime();
-	} else if (param.longval("NeelImpurity") == 1) {
+			psi.noPrime();
+
+	} else if (param.longval("UpImpurity") == 1) {
 		cout << "initial state is  | Up Left Up Right > * |vac (= ----) >"<< endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
@@ -809,67 +712,6 @@ int main(int argc, char *argv[]) {
 		HadamarGate(N / 2 - 1);
 		psi.noPrime();
 
-	} else if ( param.longval("Saverio") == 1) {
-		cout << "initial state is  Up Dn Dn Dn >" << endl;
-		auto initState = InitState(sites);
-		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-		for (int i = 1; i <= N; ++i){
-			if (i % 4 == 0){ // We start counting from 1 !
-				initState.set(i, "Up");
-			} else {
-				initState.set(i, "Dn");
-			}
-		}
-		psi = MPS(initState);
-	} else if ( param.longval("Lenart") == 1) {
-		cout << "initial state is  | Down Left Down Right >" << endl;
-		auto initState = InitState(sites);
-		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-		for (int i = 1; i <= N; ++i){
-			if (i % 4 == 0){ // We start counting from 1 !
-				initState.set(i, "Up");
-			} else {
-				initState.set(i, "Dn");
-			}
-		}
-		psi = MPS(initState);
-		for (int i = 1; i <= N ; ++i) {
-			if (i % 2 == 0) {
-				HadamarGate(i);
-			}
-		}
-		psi.noPrime();
-
-	}	else if (param.longval("Flux") == 1) {
-		cout << "initial state is  | Up Left Down Right > * |vac (= ----) >"
-				<< endl;
-		auto initState = InitState(sites);
-		// Hadamar_2 Hadamar_4 |+++-> = |+ left + right>
-		for (int i = 1; i <= N; ++i) {
-			if (i % 4 == 0 || i % 4 == 1) {
-				initState.set(i, "Dn");
-			} else {
-				initState.set(i, "Up");
-			}
-		}
-//		for (int i = N / 2; i <= N; ++i) {
-//			initState.set(i, "Dn");
-//		}
-		psi = MPS(initState);
-
-		for (int i = 1; i <= N ; ++i) {
-			if (i % 2 == 0) {
-				auto ind = sites(i);
-				auto indP = prime(sites(i));
-				auto Had = ITensor(ind, indP);
-				Had.set(ind(1), indP(1), ISqrt2);
-				Had.set(ind(1), indP(2), ISqrt2);
-				Had.set(ind(2), indP(1), ISqrt2);
-				Had.set(ind(2), indP(2), -ISqrt2);
-				psi.setA(i, psi.A(i) * Had);
-			}
-		}
-		psi.noPrime();
 
 	}else {
 		cout << "Choose: GroundState, Neel, DomainWall,Impurity, UpRND, Jammed = 1, or RandomState >1 or Up > 0" << endl;
