@@ -654,7 +654,7 @@ int main(int argc, char *argv[]) {
 		//initState.set(N/2 + 1,"Dn");
 		//initState.set(N/2 + 2,"Dn");
 
-		//initState.set(N/2 - 1,"Dn");
+		initState.set(N/2 - 1,"Dn");
 
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
@@ -668,8 +668,8 @@ int main(int argc, char *argv[]) {
 //		HadamarGate(N / 2 + 1);
 //		HadamarGate(N / 2 + 2);
 
-		const double alpha = param.val("alpha");
-		UnitaryGate(N/2 - 1,alpha);
+//		const double alpha = param.val("alpha");
+//		UnitaryGate(N/2 - 1,alpha);
 //		UnitaryGate(N/2    ,alpha);
 //		UnitaryGate(N/2 + 1,alpha);
 //		UnitaryGate(N/2 + 2,alpha);
@@ -677,7 +677,7 @@ int main(int argc, char *argv[]) {
 		psi.noPrime();
 
 
-	} else if ( param.val("AlphaGate") != 0) {
+	} else if ( param.val("AlphaGate") > 0) {
 			auto initState = InitState(sites);
 			for (int i = 1; i <= N; ++i){
 					initState.set(i, "Up");
