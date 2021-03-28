@@ -456,6 +456,7 @@ int main(int argc, char *argv[]) {
 	auto AlphaGate = [&](int i, const double alpha) {
 		// U = exp[i alpha (n*s)]; |n|^2==1, s = {sx,sy,sz}
 		// n = {0,1,0}
+		// the spin will be {cos a, sin a}
 		auto ind = sites(i);
 		auto indP = prime(sites(i));
 		auto Had = ITensor(ind, indP);
@@ -654,7 +655,7 @@ int main(int argc, char *argv[]) {
 		//initState.set(N/2 + 1,"Dn");
 		//initState.set(N/2 + 2,"Dn");
 
-		initState.set(N/2 - 1,"Dn");
+		//initState.set(N/2 - 1,"Dn");
 
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
@@ -663,6 +664,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
+		AlphaGate(N/2-1, 0.5);
 //		HadamarGate(N / 2 - 1);
 //		HadamarGate(N / 2 	 );
 //		HadamarGate(N / 2 + 1);
@@ -1112,11 +1114,12 @@ int main(int argc, char *argv[]) {
 			// Hadamar gates act at time == 5
 			if(n * param.val("tau") == (int)param.val("Measurement")
 					&& param.val("Measurement") != 0 ){
-				cout << "TIME IS == \"Measurement\". I ACT WITH HADAMAR GATES" << endl;
-				HadamarGate(N/2-1);
-				HadamarGate(N/2  );
-				HadamarGate(N/2+1);
-				HadamarGate(N/2+2);
+				AlphaGate(N/2-1, -0.5);
+//				cout << "TIME IS == \"Measurement\". I ACT WITH HADAMAR GATES" << endl;
+//				HadamarGate(N/2-1);
+//				HadamarGate(N/2  );
+//				HadamarGate(N/2+1);
+//				HadamarGate(N/2+2);
 				psi.noPrime();
 			}
 
