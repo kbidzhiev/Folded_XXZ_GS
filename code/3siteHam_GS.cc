@@ -636,7 +636,7 @@ int main(int argc, char *argv[]) {
 		psi.noPrime();
 
 	} else if ( param.longval("JammedImpurity") == 1) {
-		cout << "initial state is  | Up Left Up Right > * |vac (= ----) >" << endl;
+		cout << "initial state is  | Up Left Up Right > " << endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
 		for (int i = 1; i <= N; ++i){
@@ -664,7 +664,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		AlphaGate(N/2-1, 0.5);
+//		AlphaGate(N/2-1, 0.5);
 //		HadamarGate(N / 2 - 1);
 //		HadamarGate(N / 2 	 );
 //		HadamarGate(N / 2 + 1);
@@ -695,6 +695,23 @@ int main(int argc, char *argv[]) {
 					AlphaGate(i, alpha);
 				}else if (i % 4 == 2){
 					AlphaGate(i, -alpha);
+				}
+			}
+			psi.noPrime();
+
+	} else if ( param.longval("Saverio") == 1) {
+			cout << "initial state is  | Up Left Up Right > " << endl;
+			auto initState = InitState(sites);
+
+			for (int i = 1; i <= N; ++i){
+					initState.set(i, "Up");
+			}
+			initState.set(N/2 - 1 ,"Dn");
+			initState.set(N/2 ,"Dn");
+			psi = MPS(initState);
+			for (int i = 1; i <= N; ++i) {
+				if (i % 2 == 0 && i != N/2 && i != N/2-1) {
+					HadamarGate(i);
 				}
 			}
 			psi.noPrime();
@@ -954,6 +971,7 @@ int main(int argc, char *argv[]) {
 					double sxsx1 = 0, sxsx2 = 0, sxsx3 = 0, sxsx4 = 0;
 					double sysy1 = 0, sysy2 = 0, sysy3 = 0, sysy4 = 0;
 					double szsz1 = 0, szsz2 = 0, szsz3 = 0, szsz4 = 0;
+					complex<double> kss = 0;
 
 					double sxsz = 0;
 					double sysz = 0;
@@ -970,6 +988,7 @@ int main(int argc, char *argv[]) {
 						sxsx2 = real(Correlation(psi, sites, "Sx", "Sx", i, i+2));
 						sysy2 = real(Correlation(psi, sites, "Sy", "Sy", i, i+2));
 						szsz2 = real(Correlation(psi, sites, "Sz", "Sz", i, i+2));
+						kss = KSS(psi, sites, i);
 					}
 					if (i <= N - 3) {
 						sxsx3 = real(Correlation(psi, sites, "Sx", "Sx", i, i+3));
@@ -1018,6 +1037,7 @@ int main(int argc, char *argv[]) {
 						<< sx1 << "\t"				//2
 						<< sy1 << "\t"				//3
 						<< s << "\t"				//4
+						<< real(kss) << "\t"		//5
 						<< time << endl;
 
 

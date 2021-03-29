@@ -58,3 +58,7 @@ complex<double> Q2(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>&
 double Q2plus(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i);
 double Q2minus(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i);
 
+complex<double> KSS(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i);
+
+
+

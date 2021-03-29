@@ -289,6 +289,15 @@ double Q2minus(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sit
 	return imag(Q2(psi, sites, i));
 }
 
+complex<double> KSS(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){
+	// KSS means kinetic(i,i+2) - sz(i) - sz(i+2);
+	complex <double> kss = 0;
+	kss += 4.0 * Correlation(psi, sites, "Sx", "Sx", i, i+2);
+	kss += 4.0 * Correlation(psi, sites, "Sy", "Sy", i, i+2);
+	kss += - 2.0 * (Sz(psi, sites, i) + Sz(psi, sites, i + 2));
+	kss += 2.0;
+	return kss;
+}
 
 
 
