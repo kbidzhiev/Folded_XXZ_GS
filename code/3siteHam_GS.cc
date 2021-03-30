@@ -122,7 +122,7 @@ public:
 		operator[]("JammedNeel") = 0;
 		operator[]("JammedRnd") = 0;
 		operator[]("JammedShift") = 0;
-		operator[]("Saverio") = 0;
+		operator[]("Sav") = 0;
 		operator[]("Lenart") = 0;
 		operator[]("NeelImpurity") = 0;
 		operator[]("Flux") = 0;
@@ -699,7 +699,7 @@ int main(int argc, char *argv[]) {
 			}
 			psi.noPrime();
 
-	} else if ( param.longval("Saverio") == 1) {
+	} else if ( param.longval("Sav") == 1) {
 			cout << "initial state is  | Up Left Up Right > " << endl;
 			auto initState = InitState(sites);
 
