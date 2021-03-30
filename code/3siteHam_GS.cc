@@ -977,6 +977,9 @@ int main(int argc, char *argv[]) {
 
 				sxsysz << "\"t=" << time << "\"" << endl;
 
+				correlation1 << "\"t=" << time << "\"" << endl;
+				correlation2 << "\"t=" << time << "\"" << endl;
+
 				sx_avrg << "\"t=" << time << "\"" << endl;
 				sz_avrg << "\"t=" << time << "\"" << endl;
 
