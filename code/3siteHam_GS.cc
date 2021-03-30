@@ -706,11 +706,11 @@ int main(int argc, char *argv[]) {
 			for (int i = 1; i <= N; ++i){
 					initState.set(i, "Up");
 			}
-			initState.set(N/2 - 1 ,"Dn");
+			//initState.set(N/2 - 1 ,"Dn");
 			initState.set(N/2 ,"Dn");
 			psi = MPS(initState);
 			for (int i = 1; i <= N; ++i) {
-				if (i % 2 == 0 && i != N/2 && i != N/2-1) {
+				if (i % 2 == 1) {
 					HadamarGate(i);
 				}
 			}
@@ -801,8 +801,8 @@ int main(int argc, char *argv[]) {
 		sz.open("Sz_profile.dat", mode);
 		sxsysz.open("SxSySz_profile.dat", mode);
 
-		correlation1.open("correlation1.dat", mode);
-		correlation2.open("correlation2.dat", mode);
+		correlation1.open("Correlation1.dat", mode);
+		correlation2.open("Correlation2.dat", mode);
 
 		sz_avrg.open("Sz_average_profile.dat", mode);
 		sx_avrg.open("Sx_average_profile.dat", mode);
