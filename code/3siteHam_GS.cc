@@ -757,7 +757,8 @@ int main(int argc, char *argv[]) {
 // Output and observables
 // _______
 	ofstream ent, spec, entropy_profile, sz, sz_avrg, energy_beta,
-				q1_profile, q2_profile, sx, sy, sxsysz,  sx_avrg, loschmidt; //here I'm defining output streams == files
+				q1_profile, q2_profile, sx, sy, sxsysz,  sx_avrg, loschmidt,
+				correlation1, correlation2; //here I'm defining output streams == files
 		ios_base::openmode mode;
 		mode = std::ofstream::out; //Erase previous file (if present)
 
@@ -798,8 +799,10 @@ int main(int argc, char *argv[]) {
 		sx.open("Sx_profile.dat", mode);
 		sy.open("Sy_profile.dat", mode);
 		sz.open("Sz_profile.dat", mode);
-
 		sxsysz.open("SxSySz_profile.dat", mode);
+
+		correlation1.open("correlation1.dat", mode);
+		correlation2.open("correlation2.dat", mode);
 
 		sz_avrg.open("Sz_average_profile.dat", mode);
 		sx_avrg.open("Sx_average_profile.dat", mode);
@@ -842,6 +845,30 @@ int main(int argc, char *argv[]) {
 				<< "\t <Sx_i>\t"
 				<< "\t <Sy_i>\t"
 				<< "\t <Sz_i>\t"
+				<< "\t\ttime\n";
+
+		correlation1<< "#Position=i-"
+				<< "\t <Sx_i Sx_{i+1}>\t"	//2
+				<< "\t <Sx_i Sy_{i+1}>\t"	//3
+				<< "\t <Sx_i Sz_{i+1}>\t"	//4
+				<< "\t <Sy_i Sx_{i+1}>\t"	//5
+				<< "\t <Sy_i Sy_{i+1}>\t"	//6
+				<< "\t <Sy_i Sz_{i+1}>\t"	//7
+				<< "\t <Sz_i Sx_{i+1}>\t"	//8
+				<< "\t <Sz_i Sy_{i+1}>\t"	//9
+				<< "\t <Sz_i Sz_{i+1}>\t"	//10
+				<< "\t\ttime\n";
+
+		correlation2<< "#Position=i-"
+				<< "\t <Sx_i Sx_{i+2}>\t" 	//2
+				<< "\t <Sx_i Sy_{i+2}>\t"	//3
+				<< "\t <Sx_i Sz_{i+2}>\t"	//4
+				<< "\t <Sy_i Sx_{i+2}>\t"	//5
+				<< "\t <Sy_i Sy_{i+2}>\t"	//6
+				<< "\t <Sy_i Sz_{i+2}>\t"	//7
+				<< "\t <Sz_i Sx_{i+2}>\t"	//8
+				<< "\t <Sz_i Sy_{i+2}>\t"	//9
+				<< "\t <Sz_i Sz_{i+2}>\t"	//10
 				<< "\t\ttime\n";
 
 		sz_avrg << "#Position=i-"
@@ -968,26 +995,48 @@ int main(int argc, char *argv[]) {
 					double s = Sz(psi, sites, i);
 					double sx1 = Sx(psi, sites, i);
 					double sy1 = Sy(psi, sites, i);
-					double sxsx1 = 0, sxsx2 = 0, sxsx3 = 0, sxsx4 = 0;
-					double sysy1 = 0, sysy2 = 0, sysy3 = 0, sysy4 = 0;
-					double szsz1 = 0, szsz2 = 0, szsz3 = 0, szsz4 = 0;
-					complex<double> kss = 0;
+					double sxsx3 = 0, sxsx4 = 0;
+					double sysy3 = 0, sysy4 = 0;
+					double szsz3 = 0, szsz4 = 0;
 
-					double sxsz = 0;
-					double sysz = 0;
+					// some correlations have form C(i,i+2)
+					// if i > N-2 I define correlation to be 0
+					double sxsx1 = 0, sxsy1 = 0, sxsz1 = 0;
+					double sysx1 = 0, sysy1 = 0, sysz1 = 0;
+					double szsx1 = 0, szsy1 = 0, szsz1 = 0;
+					double sxsx2 = 0, sxsy2 = 0, sxsz2 = 0;
+					double sysx2 = 0, sysy2 = 0, sysz2 = 0;
+					double szsx2 = 0, szsy2 = 0, szsz2 = 0;
+
+					complex<double> kss = 0;
 
 					if (i <= N - 1) {
 						sxsx1 = real(Correlation(psi, sites, "Sx", "Sx", i, i+1));
+						sxsy1 = real(Correlation(psi, sites, "Sx", "Sy", i, i+1));
+						sxsz1 = real(Correlation(psi, sites, "Sx", "Sz", i, i+1));
+
+						sysx1 = real(Correlation(psi, sites, "Sy", "Sx", i, i+1));
 						sysy1 = real(Correlation(psi, sites, "Sy", "Sy", i, i+1));
+						sysz1 = real(Correlation(psi, sites, "Sy", "Sz", i, i+1));
+
+						szsx1 = real(Correlation(psi, sites, "Sz", "Sx", i, i+1));
+						szsy1 = real(Correlation(psi, sites, "Sz", "Sy", i, i+1));
 						szsz1 = real(Correlation(psi, sites, "Sz", "Sz", i, i+1));
 
-						sxsz  = real(Correlation(psi, sites, "Sx", "Sz", i, i+1));
-						sysz  = real(Correlation(psi, sites, "Sy", "Sz", i, i+1));
 					}
 					if (i <= N - 2) {
 						sxsx2 = real(Correlation(psi, sites, "Sx", "Sx", i, i+2));
+						sxsy2 = real(Correlation(psi, sites, "Sx", "Sy", i, i+2));
+						sxsz2 = real(Correlation(psi, sites, "Sx", "Sz", i, i+2));
+
+						sysx2 = real(Correlation(psi, sites, "Sy", "Sx", i, i+2));
 						sysy2 = real(Correlation(psi, sites, "Sy", "Sy", i, i+2));
+						sysz2 = real(Correlation(psi, sites, "Sy", "Sz", i, i+2));
+
+						szsx2 = real(Correlation(psi, sites, "Sz", "Sx", i, i+2));
+						szsy2 = real(Correlation(psi, sites, "Sz", "Sy", i, i+2));
 						szsz2 = real(Correlation(psi, sites, "Sz", "Sz", i, i+2));
+
 						kss = KSS(psi, sites, i);
 					}
 					if (i <= N - 3) {
@@ -1023,7 +1072,7 @@ int main(int argc, char *argv[]) {
 						<< sxsx2 << "\t"			//4
 						<< sxsx3 << "\t"			//5
 						<< sxsx4 << "\t"			//6
-						<< sxsz << "\t"				//7
+						<< sxsz1 << "\t"				//7
 						<< time << endl;
 					sy << i - dot  << "\t"			//column ID below
 						<< sy1 << "\t"				//2
@@ -1031,7 +1080,7 @@ int main(int argc, char *argv[]) {
 						<< sysy2 << "\t"			//4
 						<< sysy3 << "\t"			//5
 						<< sysy4 << "\t"			//6
-						<< sysz << "\t"				//7
+						<< sysz1 << "\t"			//7
 						<< time << endl;
 					sxsysz << i - dot  << "\t"		//column ID below
 						<< sx1 << "\t"				//2
@@ -1040,6 +1089,29 @@ int main(int argc, char *argv[]) {
 						<< real(kss) << "\t"		//5
 						<< time << endl;
 
+					correlation1 << i - dot  << "\t"		//column ID below
+						<< sxsx1 << "\t"				//2
+						<< sxsy1 << "\t"				//3
+						<< sxsz1 << "\t"				//4
+						<< sysx1 << "\t"				//5
+						<< sysy1 << "\t"				//6
+						<< sysz1 << "\t"				//7
+						<< szsx1 << "\t"				//8
+						<< szsy1 << "\t"				//9
+						<< szsz1 << "\t"				//10
+						<< time << endl;
+
+					correlation2 << i - dot  << "\t"		//column ID below
+						<< sxsx2 << "\t"				//2
+						<< sxsy2 << "\t"				//3
+						<< sxsz2 << "\t"				//4
+						<< sysx2 << "\t"				//5
+						<< sysy2 << "\t"				//6
+						<< sysz2 << "\t"				//7
+						<< szsx2 << "\t"				//8
+						<< szsy2 << "\t"				//9
+						<< szsz2 << "\t"				//10
+						<< time << endl;
 
 					if ( i % 2 == 1) { //odd site
 						sz_odd = s;
@@ -1053,7 +1125,7 @@ int main(int argc, char *argv[]) {
 						sxsx2_odd = sxsx2;
 						sxsx3_odd = sxsx3;
 						sxsx4_odd = sxsx4;
-						sxsz_odd = sxsz;
+						sxsz_odd = sxsz1;
 					} else {
 						sz_avrg << i - dot + 1 << "\t"
 								<< 0.5 * (s + sz_odd) << "\t"
@@ -1068,7 +1140,7 @@ int main(int argc, char *argv[]) {
 								<< 0.5 * (sxsx2 + sxsx2_odd) << "\t"
 								<< 0.5 * (sxsx3 + sxsx3_odd) << "\t"
 								<< 0.5 * (sxsx4 + sxsx4_odd) << "\t"
-								<< 0.5 * (sxsz  + sxsz_odd) << "\t"
+								<< 0.5 * (sxsz1  + sxsz_odd) << "\t"
 								<< time << endl;
 					}
 				}
@@ -1083,6 +1155,9 @@ int main(int argc, char *argv[]) {
 					sz_avrg << "\n\n";
 
 					sxsysz << "\n\n";
+
+					correlation1 << "\n\n";
+					correlation2 << "\n\n";
 				}
 				//sz_tot += Sz(psi, sites, N-1) + Sz(psi, sites, N);
 				if (n == 0) {
