@@ -238,6 +238,7 @@ private:
 					<< (h(N) + pow(-1, N / 2) * rho) << "): " << N << endl;
 			ampo += -J * m * 2, "Sz", N - 1; // Sublattice A even sites
 
+
 			ampo += -J * (h(N) + pow(-1, N / 2) * rho) * 2, "Sx", N;
 		} else if (ham_type == "Ising"){
 			// to create an initial state as GS of ladder ham, we start with GS
