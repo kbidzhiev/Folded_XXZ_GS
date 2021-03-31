@@ -215,7 +215,7 @@ private:
 			//return 2.0*cos(j); // this term add "chaotic" h
 		};
 		const double rho = param.val("rho");
-		double m = 2.0;
+		double m = 1.0;
 
 
 		dot = N / 2 + 1;  //Position of the central spin
