@@ -245,10 +245,13 @@ private:
 			// of uniform ising model to introduce initial correlations,
 			// otherwise DMRG procedure cannot find a GS
 			for (int j = 1; j < N; j++){
-				ampo += -J * 4, "Sz", j, "Sz", j+1;
-				ampo += -J * m * 2, "Sz", j;
+				//ampo += -J * 4, "Sx", j, "Sx", j+1;
+				ampo += -J * 2, "S+", j, "S-", j+1;
+				ampo += -J * 2, "S-", j, "S+", j+1;
+
+				//ampo += -J * m * 2, "Sz", j;
 			}
-			ampo += -J * m * 2, "Sz", N;
+			//ampo += -J * m * 2, "Sz", N;
 
 		} else {
 			throw invalid_argument("One should choose Ladder or Ising in the LadderHamiltonian initialization");
