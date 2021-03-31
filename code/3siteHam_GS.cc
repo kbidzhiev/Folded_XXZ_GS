@@ -166,7 +166,7 @@ private:
 		double mu = 0;
 		const double hL = param.val("hL");
 		const double hR = param.val("hR");
-		dot = N / 2;  //Position of the "dot"
+		dot = N / 2 + 1;  //Position of the "dot"
 		//cout << "The dot is on site #" << dot << endl;
 		//if ((2*N)<=3) cout<<"Error, N="<<N<<" is too small.\n",exit(0);
 		for (int j = 1; j < N-1; ++j) {
@@ -215,10 +215,10 @@ private:
 			//return 2.0*cos(j); // this term add "chaotic" h
 		};
 		const double rho = param.val("rho");
-		double m = 1.0;
+		double m = 2.0;
 
 
-		dot = (N + 1)/ 2;  //Position of the central spin
+		dot = N / 2 + 1;  //Position of the central spin
 
 		if (ham_type == "Ladder") {
 			for (int j = 1; j <= N - 2; j += 2) {
@@ -468,6 +468,16 @@ int main(int argc, char *argv[]) {
 		Had.set(ind(2), indP(2),  cos(alpha));
 		psi.setA(i, psi.A(i) * Had);
 	};
+	auto UpToDownGate = [&](int i) {
+		auto ind = sites(i);
+		auto indP = prime(sites(i));
+		auto Had = ITensor(ind, indP);
+		Had.set(ind(1), indP(1), 0);
+		Had.set(ind(1), indP(2), 1);
+		Had.set(ind(2), indP(1), 0);
+		Had.set(ind(2), indP(2), 0);
+		psi.setA(i, psi.A(i) * Had);
+	};
 
 
 
@@ -527,7 +537,8 @@ int main(int argc, char *argv[]) {
 //		HadamarGate(N/2    );
 //		HadamarGate(N/2 + 1);
 //		HadamarGate(N/2 + 2);
-
+		int dot_position = Init_H_Ladder.dot;
+		UpToDownGate(dot_position );
 
 		psi.noPrime();
 		cout << "Norm (after unitary gates )is = " << real(innerC(psi, psi)) << endl;
