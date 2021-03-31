@@ -249,9 +249,9 @@ private:
 				ampo += -J , "S+", j, "S-", j+1;
 				ampo += -J , "S-", j, "S+", j+1;
 
-				ampo += -J * m * 2, "Sz", j;
+				//ampo += -J * m * 2, "Sz", j;
 			}
-			ampo += -J * m * 2, "Sz", N;
+			//ampo += -J * m * 2, "Sz", N;
 
 		} else {
 			throw invalid_argument("One should choose Ladder or Ising in the LadderHamiltonian initialization");
