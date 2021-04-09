@@ -531,8 +531,9 @@ int main(int argc, char *argv[]) {
 //		HadamarGate(N/2    );
 //		HadamarGate(N/2 + 1);
 //		HadamarGate(N/2 + 2);
-		int dot_position = Init_H_Ladder.dot;
-		UpToDownGate(dot_position );
+		int central_site = Init_H_Ladder.dot;
+		//UpToDownGate(central_site );
+		HadamarGate(central_site);
 
 		psi.noPrime();
 		cout << "Norm (after unitary gates )is = " << real(innerC(psi, psi)) << endl;
