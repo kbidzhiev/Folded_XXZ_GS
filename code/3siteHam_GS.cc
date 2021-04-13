@@ -238,11 +238,9 @@ private:
 				//ampo += -J * 4, "Sx", j, "Sx", j+1;
 				ampo += -J , "S+", j, "S-", j+1;
 				ampo += -J , "S-", j, "S+", j+1;
-				if (j % 2 ==0 || true){
-					ampo += -J * m * 2, "Sz", j;
-				}
 
 
+				//ampo += -J * m * 2, "Sz", j;
 			}
 			//ampo += -J * m * 2, "Sz", N;
 
@@ -536,7 +534,7 @@ int main(int argc, char *argv[]) {
 //		HadamarGate(N/2 + 2);
 		int central_site = Init_H_Ladder.dot;
 		//UpToDownGate(central_site );
-		HadamarGate(central_site);
+		UpToDownGate(central_site);
 
 		psi.noPrime();
 		cout << "Norm (after unitary gates )is = " << real(innerC(psi, psi)) << endl;
