@@ -238,8 +238,11 @@ private:
 				//ampo += -J * 4, "Sx", j, "Sx", j+1;
 				ampo += -J , "S+", j, "S-", j+1;
 				ampo += -J , "S-", j, "S+", j+1;
+				if (j % 2 ==0){
+					ampo += -J * m * 2, "Sz", j;
+				}
 
-				//ampo += -J * m * 2, "Sz", j;
+
 			}
 			//ampo += -J * m * 2, "Sz", N;
 
