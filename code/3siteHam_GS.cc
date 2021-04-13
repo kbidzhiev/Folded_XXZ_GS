@@ -500,6 +500,7 @@ int main(int argc, char *argv[]) {
 		int central_site = Init_H.dot;
 		//UpToDownGate(central_site );
 		HadamarGate(central_site);
+		psi.noPrime();
 
 
 
@@ -541,8 +542,9 @@ int main(int argc, char *argv[]) {
 		int central_site = Init_H_Ladder.dot;
 		//UpToDownGate(central_site );
 		UpToDownGate(central_site);
-
 		psi.noPrime();
+
+
 		cout << "Norm (after unitary gates )is = " << real(innerC(psi, psi)) << endl;
 
 
