@@ -499,7 +499,7 @@ int main(int argc, char *argv[]) {
 
 		int central_site = Init_H.dot;
 		//UpToDownGate(central_site );
-		UpToDownGate(central_site);
+		HadamarGate(central_site);
 
 
 
