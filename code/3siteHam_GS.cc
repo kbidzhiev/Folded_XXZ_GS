@@ -497,6 +497,12 @@ int main(int argc, char *argv[]) {
 
 		cout << "After DMRG" << endl;
 
+		int central_site = Init_H.dot;
+		//UpToDownGate(central_site );
+		UpToDownGate(central_site);
+
+
+
 		//psi0 = psi; //we create to states. Psi for my time evolution, psi0 for standard one
 
 	} else if (param.longval("LadderState") == 1) {
