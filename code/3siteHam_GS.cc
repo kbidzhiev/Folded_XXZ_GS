@@ -469,7 +469,7 @@ int main(int argc, char *argv[]) {
 		auto Had = ITensor(ind, indP);
 		Had.set(ind(1), indP(1), 0);
 		Had.set(ind(1), indP(2), 1);
-		Had.set(ind(2), indP(1), 0);
+		Had.set(ind(2), indP(1), 1);
 		Had.set(ind(2), indP(2), 0);
 		psi.setA(i, psi.A(i) * Had);
 	};
@@ -499,7 +499,7 @@ int main(int argc, char *argv[]) {
 
 		int central_site = Init_H.dot;
 		//UpToDownGate(central_site );
-		HadamarGate(central_site);
+		//HadamarGate(central_site);
 		psi.noPrime();
 
 
@@ -597,10 +597,14 @@ int main(int argc, char *argv[]) {
 
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
-			if (i % 2 == 0) {
+			if (i % 2 == 0  ) {
 				HadamarGate(i);
 			}
 		}
+
+
+		UpToDownGate(N/2+1);
+
 
 //		AlphaGate(N/2-1, 0.5);
 //		HadamarGate(N / 2 - 1);
