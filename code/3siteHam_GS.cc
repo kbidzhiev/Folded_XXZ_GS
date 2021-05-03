@@ -663,7 +663,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 	//cout << "PSI = " << psi << endl;
-	psi0 = psi;
+	psi0 = psi; //here I save the initial WF
 
 
 //--------------------------------------------------------------
@@ -1149,7 +1149,7 @@ int main(int argc, char *argv[]) {
 
 			double energy = real(innerC(psi, H, psi));
 			cout << "max bond dim = " << maxLinkDim(psi) << endl;
-			cout << "Norm = " << real(innerC(psi, psi)) << endl;
+			//cout << "Norm = " << real(innerC(psi, psi)) << endl;
 			cout << "Energy = " << energy << endl;
 			cout << "E(t) - E(0) = " << (energy - energy_initial) << endl;
 			cout << "Sz(t) - Sz(0) = " << (sz_tot - sz_total_initial) << endl;
