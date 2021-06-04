@@ -676,7 +676,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		psi.noPrime();
-		psi0 = psi;
+		//psi0 = psi;
 
 		AlphaGate(N/2+1, (double)param.val("Theta"));
 		psi.noPrime();
@@ -685,7 +685,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 	//cout << "PSI = " << psi << endl;
-	//psi0 = psi; //here I save the initial WF
+	psi0 = psi; //here I save the initial WF
 
 
 //--------------------------------------------------------------
