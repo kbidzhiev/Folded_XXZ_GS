@@ -112,6 +112,7 @@ public:
 		operator[]("LadderState") = 0;
 		operator[]("JammedImpurity") = 0;
 		operator[]("alpha") = 0; // U = exp[ i alpha  n*\sigma]
+		operator[]("Theta") = 0; // U = exp[ i theta  n*\sigma] turns only the central site
 		operator[]("JammedNeel") = 0;
 		operator[]("JammedShift") = 0;
 		operator[]("Sav") = 0;
@@ -657,13 +658,34 @@ int main(int argc, char *argv[]) {
 				}
 			}
 			psi.noPrime();
+	} else if ( param.val("Theta") > 0 ) {
+		cout << "initial state is  | Up Left Up Right > " << endl;
+		auto initState = InitState(sites);
+		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+		for (int i = 1; i <= N; ++i){
+			if (i % 4 == 1){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
+				initState.set(i, "Dn");
+			} else {
+				initState.set(i, "Up");
+			}
+		}
+		psi = MPS(initState);
+		for (int i = 1; i <= N; ++i) {
+			if (i % 2 == 1) {
+				HadamarGate(i);
+			}
+		}
+		psi.noPrime();
+		psi0 = psi;
 
+		AlphaGate(N/2+1, (double)param.val("Theta"));
+		psi.noPrime();
 	}else {
 		cout << "Choose: GroundState, Neel, DomainWall,Impurity, Jammed = 1" << endl;
 		return 1;
 	}
 	//cout << "PSI = " << psi << endl;
-	psi0 = psi; //here I save the initial WF
+	//psi0 = psi; //here I save the initial WF
 
 
 //--------------------------------------------------------------
