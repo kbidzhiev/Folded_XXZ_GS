@@ -123,6 +123,7 @@ public:
 		operator[]("hR") = 0; //initial magnetization_R
 		operator[]("h") = 2.0;
 		operator[]("rho") = 0.0;
+		operator[]("n") = 1;
 		operator[]("Q1Profile") = 0; // energy and current profile
 		operator[]("Q2Profile") = 0;
 		operator[]("Current") = 0;
@@ -130,7 +131,7 @@ public:
 		operator[]("EntropyProfile") = 0; // Entropy Profile- parameter 0 -> nothing, dt>0 each second=integer parameter
 		operator[]("Loschmidt") = 0; // loschmidt echo <psi(t)|psi(0)>
 		operator[]("Dhar") = 0; // Deepak Dhar term in hamiltonian (time evolution ONLY)
-		operator[]("Measurement") = 0; // Deepak Dhar term in hamiltonian (time evolution ONLY)
+		operator[]("Measurement") = 0; // Project the central spin to be |Down> (time evolution ONLY)
 		operator[]("AlphaGate") = 0; // Deepak Dhar term in hamiltonian (time evolution ONLY)
 	}
 
@@ -505,7 +506,7 @@ int main(int argc, char *argv[]) {
 
 
 
-		//psi0 = psi; //we create to states. Psi for my time evolution, psi0 for standard one
+		//psi0 = psi; //we create two states. Psi for my time evolution, psi0 for standard one
 
 	} else if (param.longval("LadderState") == 1) {
 		// GS of the LADDER Hamiltonian
@@ -1159,9 +1160,10 @@ int main(int argc, char *argv[]) {
 
 			// Hadamar gates act at time == 5
 			if(n * param.val("tau") == (int)param.val("Measurement")
-					&& param.val("Measurement") != 0 ){
-				AlphaGate(N/2-1, -0.5);
-//				cout << "TIME IS == \"Measurement\". I ACT WITH HADAMAR GATES" << endl;
+					&& (int)param.val("Measurement") != 0 ){
+				//AlphaGate(N/2-1, -0.5);
+				cout << "TIME IS == \"Measurement\". I ACT WITH UpToDown GATES" << endl;
+				UpToDownGate(N/2-1);
 //				HadamarGate(N/2-1);
 //				HadamarGate(N/2  );
 //				HadamarGate(N/2+1);
