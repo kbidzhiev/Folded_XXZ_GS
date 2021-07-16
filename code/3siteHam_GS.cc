@@ -1159,8 +1159,10 @@ int main(int argc, char *argv[]) {
 			psi.orthogonalize(args);
 
 			// Hadamar gates act at time == 5
-			if(n * param.val("tau") == (int)param.val("Measurement")
-					&& (int)param.val("Measurement") != 0 ){
+			if(  (int)param.val("Measurement") != 0
+					&& n > 0
+					&& n  % (int)(param.val("Measurement")/param.val("tau")) == 0
+					){
 				//AlphaGate(N/2-1, -0.5);
 				cout << "TIME IS == \"Measurement\". I ACT WITH UpToDown GATES" << endl;
 				UpToDownGate(N/2-1);
@@ -1168,6 +1170,7 @@ int main(int argc, char *argv[]) {
 //				HadamarGate(N/2  );
 //				HadamarGate(N/2+1);
 //				HadamarGate(N/2+2);
+
 				psi.noPrime();
 			}
 
