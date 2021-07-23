@@ -337,15 +337,15 @@ public:
 
 
 			//Deepak Dhar term
-			if (Dhar == 1) {
+			if (Dhar > 0) {
 				cout << "Dhar term is included" << endl;
-				hh += J * 4 * 0.5 * op(sites, "Sz", j) * op(sites, "Id", j + 1)
+				hh += Dhar * 4 * 0.5 * op(sites, "Sz", j) * op(sites, "Id", j + 1)
 						* op(sites, "Sz", j + 2);
-				hh += -J * 8 * 0.5 * op(sites, "Sz", j) * op(sites, "Sz", j + 1)
+				hh += -Dhar * 8 * 0.5 * op(sites, "Sz", j) * op(sites, "Sz", j + 1)
 						* op(sites, "Sz", j + 2);
-				hh += -J * 1 * 0.5 * op(sites, "Id", j) * op(sites, "Id", j + 1)
+				hh += -Dhar * 1 * 0.5 * op(sites, "Id", j) * op(sites, "Id", j + 1)
 						* op(sites, "Id", j + 2);
-				hh += J * 2 * 0.5 * op(sites, "Id", j) * op(sites, "Sz", j + 1)
+				hh += Dhar * 2 * 0.5 * op(sites, "Id", j) * op(sites, "Sz", j + 1)
 						* op(sites, "Id", j + 2);
 			}
 
@@ -605,7 +605,8 @@ int main(int argc, char *argv[]) {
 		}
 
 
-		UpToDownGate(N/2+1);
+		//UpToDownGate(N/2+1);
+		UpToDownGate(N/2);
 
 
 //		AlphaGate(N/2-1, 0.5);
@@ -644,20 +645,21 @@ int main(int argc, char *argv[]) {
 			psi.noPrime();
 
 	} else if ( param.longval("Sav") == 1) {
-			cout << "initial state is  | Up Left Up Right > " << endl;
+			cout << "initial state is  | Up Left Up Left > " << endl;
 			auto initState = InitState(sites);
 
 			for (int i = 1; i <= N; ++i){
 					initState.set(i, "Up");
 			}
-			//initState.set(N/2 - 1 ,"Dn");
-			initState.set(N/2 ,"Dn");
+
+			//initState.set(N/2 ,"Dn");
 			psi = MPS(initState);
 			for (int i = 1; i <= N; ++i) {
-				if (i % 2 == 1) {
+				if (i % 2 == 0) {
 					HadamarGate(i);
 				}
 			}
+			UpToDownGate(N/2);
 			psi.noPrime();
 	} else if ( param.val("Theta") > 0 ) {
 		cout << "initial state is  | Up Left Up Right > " << endl;
