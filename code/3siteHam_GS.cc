@@ -115,6 +115,7 @@ public:
 		operator[]("Theta") = 0; // U = exp[ i theta  n*\sigma] turns only the central site
 		operator[]("JammedShift") = 0;
 		operator[]("DoubleSlit") = 0;
+		operator[]("SingleSlit") = 0;
 		operator[]("Sav") = 0;
 		operator[]("Lenart") = 0;
 		operator[]("begin") = 1;
