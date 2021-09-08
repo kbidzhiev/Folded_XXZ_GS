@@ -630,12 +630,10 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		int distance_between_spinflips = param.val("DoubleSlit");
+		int distance = param.val("DoubleSlit");
 
-		int to_right = distance_between_spinflips/2 ;
-		int to_left = distance_between_spinflips - to_right;
-		SigmaXGate(N/2 + to_right);
-		SigmaXGate(N/2 - to_left);
+		SigmaXGate(N/2 + distance);
+		SigmaXGate(N/2 - distance);
 		psi.noPrime();
 
 	} else if ( param.val("SingleSlit") > 0) {
@@ -657,10 +655,9 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		int distance_between_spinflips = param.val("DoubleSlit");
+		int distance = param.val("DoubleSlit");
 
-		int to_right = distance_between_spinflips/2 ;
-		SigmaXGate(N/2 + to_right);
+		SigmaXGate(N/2 + distance);
 		psi.noPrime();
 
 	} else if ( param.val("AlphaGate") > 0) {
