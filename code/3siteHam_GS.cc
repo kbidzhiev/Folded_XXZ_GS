@@ -113,7 +113,6 @@ public:
 		operator[]("JammedImpurity") = 0;
 		operator[]("alpha") = 0; // U = exp[ i alpha  n*\sigma]
 		operator[]("Theta") = 0; // U = exp[ i theta  n*\sigma] turns only the central site
-		operator[]("JammedNeel") = 0;
 		operator[]("JammedShift") = 0;
 		operator[]("Sav") = 0;
 		operator[]("Lenart") = 0;
@@ -131,8 +130,9 @@ public:
 		operator[]("EntropyProfile") = 0; // Entropy Profile- parameter 0 -> nothing, dt>0 each second=integer parameter
 		operator[]("Loschmidt") = 0; // loschmidt echo <psi(t)|psi(0)>
 		operator[]("Dhar") = 0; // Deepak Dhar term in hamiltonian (time evolution ONLY)
+		operator[]("PXXP") = 0; //Integrability breaking term
 		operator[]("Measurement") = 0; // Project the central spin to be |Down> (time evolution ONLY)
-		operator[]("AlphaGate") = 0; // Deepak Dhar term in hamiltonian (time evolution ONLY)
+		operator[]("AlphaGate") = 0;
 	}
 
 };
@@ -320,7 +320,8 @@ public:
 			const SiteSet &sites, const ThreeSiteParam &param) {
 		const int step = 3;
 		const double J = param.val("J");
-		const int Dhar = param.val("Dhar");
+		const double Dhar = param.val("Dhar");
+		const double PXXP = param.val("PXXP");
 		//cout << "Gates starts from " << begin << endl;
 		for (int j = begin; j < end - 1; j += step) {
 			//cout << "j = (" << j << ", " << j + 1 << ", " << j + 2 << ")"
@@ -347,6 +348,24 @@ public:
 						* op(sites, "Id", j + 2);
 				hh += Dhar * 2 * 0.5 * op(sites, "Id", j) * op(sites, "Sz", j + 1)
 						* op(sites, "Id", j + 2);
+			}
+			if (PXXP > 0) {
+				cout << "PXXP = (1-Sz)(1-Sz)(Sx+Sx)(1-Sz)(1-Sz)"
+					<<	"term is included " << endl;
+				auto P = 0.25 * (
+							op(sites, "Id", j ) * op(sites, "Id", j + 1)
+							+ 2.0 * op(sites, "Sz", j ) * op(sites, "Id", j + 1)
+						) * (
+							op(sites, "Id", j ) * op(sites, "Id", j + 1)
+							+ 2.0 * op(sites, "Id", j ) * op(sites, "Sz", j + 1)
+							);
+
+				hh += PXXP * P
+						* 2.0 *(
+							op(sites, "Sx", j ) * op(sites, "Id", j + 1) * op(sites, "Id", j + 2)
+							+ op(sites, "Id", j) * op(sites, "Sx", j + 1) * op(sites, "Id", j + 2)
+						)
+						* P;
 			}
 
 
@@ -548,32 +567,6 @@ int main(int argc, char *argv[]) {
 
 
 		cout << "Norm (after unitary gates )is = " << real(innerC(psi, psi)) << endl;
-
-
-	} else if ( param.longval("JammedNeel") == 1) {
-		cout << "initial state is  | Up Left Up Right > * |Neel (+-+-) >" << endl;
-		auto initState = InitState(sites);
-		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-		for (int i = 1; i <= N/2; ++i){
-			if (i % 4 == 0){ // We start counting from 1 !
-				initState.set(i, "Dn");
-			} else {
-				initState.set(i, "Up");
-			}
-		}
-		for (int i = N/2 + 1; i <= N ; ++i){
-			if(i % 2 == 0)
-				initState.set(i, "Up");
-			else
-				initState.set(i, "Dn");
-		}
-		psi = MPS(initState);
-		for (int i = 1; i <= N/2 ; ++i) {
-			if (i % 2 == 0) {
-				HadamarGate(i);
-			}
-		}
-		psi.noPrime();
 
 	} else if ( param.longval("JammedImpurity") == 1) {
 		cout << "initial state is  | Up Left Up Right > " << endl;
