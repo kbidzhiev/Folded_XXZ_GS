@@ -111,6 +111,7 @@ public:
 		operator[]("GroundState") = 0;
 		operator[]("LadderState") = 0;
 		operator[]("JammedImpurity") = 0;
+		operator[]("JammedVac") = 0;
 		operator[]("alpha") = 0; // U = exp[ i alpha  n*\sigma]
 		operator[]("Theta") = 0; // U = exp[ i theta  n*\sigma] turns only the central site
 		operator[]("JammedShift") = 0;
@@ -660,6 +661,32 @@ int main(int argc, char *argv[]) {
 
 		SigmaXGate(N/2 + distance);
 		psi.noPrime();
+
+
+	} else if ( param.longval("JammedVac") == 1) {
+			cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
+			auto initState = InitState(sites);
+			// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+			for (int i = 1; i <= N/2; ++i){
+				if (i % 4 == 0){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
+					initState.set(i, "Dn");
+				} else {
+					initState.set(i, "Up");
+				}
+			}
+			for (int i = N/2+1; i <= N; ++i){
+				initState.set(i, "Dn");
+
+			}
+
+			psi = MPS(initState);
+			for (int i = 1; i <= N/2; ++i) {
+				if (i % 2 == 0  ) {
+					HadamarGate(i);
+				}
+			}
+
+			psi.noPrime();
 
 	} else if ( param.val("AlphaGate") > 0) {
 			auto initState = InitState(sites);
