@@ -612,7 +612,7 @@ int main(int argc, char *argv[]) {
 
 
 	} else if ( param.val("DoubleSlit") > 0) {
-		cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
+		cout << "initial state is  | Up Left Up Right >  with the 2 flipped spins" << endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
 		for (int i = 1; i <= N; ++i){
@@ -638,6 +638,30 @@ int main(int argc, char *argv[]) {
 		SigmaXGate(N/2 - to_left);
 		psi.noPrime();
 
+	} else if ( param.val("SingleSlit") > 0) {
+		cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
+		auto initState = InitState(sites);
+		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+		for (int i = 1; i <= N; ++i){
+			if (i % 4 == 0){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
+				initState.set(i, "Dn");
+			} else {
+				initState.set(i, "Up");
+			}
+		}
+
+		psi = MPS(initState);
+		for (int i = 1; i <= N; ++i) {
+			if (i % 2 == 0  ) {
+				HadamarGate(i);
+			}
+		}
+
+		int distance_between_spinflips = param.val("DoubleSlit");
+
+		int to_right = distance_between_spinflips/2 ;
+		SigmaXGate(N/2 + to_right);
+		psi.noPrime();
 
 	} else if ( param.val("AlphaGate") > 0) {
 			auto initState = InitState(sites);
