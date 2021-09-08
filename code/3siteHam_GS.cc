@@ -656,7 +656,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		int distance = param.val("DoubleSlit");
+		int distance = param.val("SingleSlit");
 
 		SigmaXGate(N/2 + distance);
 		psi.noPrime();
