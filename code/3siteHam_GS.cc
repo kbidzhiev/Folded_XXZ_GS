@@ -637,7 +637,7 @@ int main(int argc, char *argv[]) {
 		SigmaXGate(N/2 - distance);
 		psi.noPrime();
 
-	} else if ( param.val("SingleSlit") > 0) {
+	} else if ( param.val("SingleSlit") != 0) {
 		cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
