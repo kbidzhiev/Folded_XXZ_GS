@@ -114,6 +114,7 @@ public:
 		operator[]("alpha") = 0; // U = exp[ i alpha  n*\sigma]
 		operator[]("Theta") = 0; // U = exp[ i theta  n*\sigma] turns only the central site
 		operator[]("JammedShift") = 0;
+		operator[]("DoubleSlit") = 0;
 		operator[]("Sav") = 0;
 		operator[]("Lenart") = 0;
 		operator[]("begin") = 1;
@@ -484,7 +485,7 @@ int main(int argc, char *argv[]) {
 		Had.set(ind(2), indP(2),  cos(alpha));
 		psi.setA(i, psi.A(i) * Had);
 	};
-	auto UpToDownGate = [&](int i) {
+	auto SigmaXGate = [&](int i) {
 		auto ind = sites(i);
 		auto indP = prime(sites(i));
 		auto Had = ITensor(ind, indP);
@@ -494,8 +495,6 @@ int main(int argc, char *argv[]) {
 		Had.set(ind(2), indP(2), 0);
 		psi.setA(i, psi.A(i) * Had);
 	};
-
-
 
 	if (param.longval("GroundState") == 1) {
 		// GS of the initial Hamiltonian
@@ -519,11 +518,9 @@ int main(int argc, char *argv[]) {
 		cout << "After DMRG" << endl;
 
 		int central_site = Init_H.dot;
-		//UpToDownGate(central_site );
+		//SigmaXGate(central_site );
 		//HadamarGate(central_site);
 		psi.noPrime();
-
-
 
 		//psi0 = psi; //we create two states. Psi for my time evolution, psi0 for standard one
 
@@ -561,15 +558,15 @@ int main(int argc, char *argv[]) {
 //		HadamarGate(N/2 + 1);
 //		HadamarGate(N/2 + 2);
 		int central_site = Init_H_Ladder.dot;
-		//UpToDownGate(central_site );
-		UpToDownGate(central_site);
+		//SigmaXGate(central_site );
+		SigmaXGate(central_site);
 		psi.noPrime();
 
 
 		cout << "Norm (after unitary gates )is = " << real(innerC(psi, psi)) << endl;
 
 	} else if ( param.longval("JammedImpurity") == 1) {
-		cout << "initial state is  | Up Left Up Right > " << endl;
+		cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
 		for (int i = 1; i <= N; ++i){
@@ -579,7 +576,6 @@ int main(int argc, char *argv[]) {
 				initState.set(i, "Up");
 			}
 		}
-
 		//initState.set(N/2 - 1,"Dn");
 		//initState.set(N/2,    "Dn");
 		//initState.set(N/2 + 1,"Up");
@@ -589,7 +585,6 @@ int main(int argc, char *argv[]) {
 		//initState.set(N/2 + 2,"Dn");
 
 		//initState.set(N/2 - 1,"Dn");
-
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
 			if (i % 2 == 0  ) {
@@ -597,9 +592,8 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-
-		//UpToDownGate(N/2+1);
-		UpToDownGate(N/2);
+		//SigmaXGate(N/2+1);
+		SigmaXGate(N/2);
 
 
 //		AlphaGate(N/2-1, 0.5);
@@ -614,6 +608,34 @@ int main(int argc, char *argv[]) {
 //		UnitaryGate(N/2 + 1,alpha);
 //		UnitaryGate(N/2 + 2,alpha);
 
+		psi.noPrime();
+
+
+	} else if ( param.val("DoubleSlit") > 0) {
+		cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
+		auto initState = InitState(sites);
+		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+		for (int i = 1; i <= N; ++i){
+			if (i % 4 == 0){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
+				initState.set(i, "Dn");
+			} else {
+				initState.set(i, "Up");
+			}
+		}
+
+		psi = MPS(initState);
+		for (int i = 1; i <= N; ++i) {
+			if (i % 2 == 0  ) {
+				HadamarGate(i);
+			}
+		}
+
+		int distance_between_spinflips = param.val("DoubleSlit");
+
+		int to_right = distance_between_spinflips/2 ;
+		int to_left = distance_between_spinflips - to_right;
+		SigmaXGate(N/2 + to_right);
+		SigmaXGate(N/2 - to_left);
 		psi.noPrime();
 
 
@@ -652,7 +674,7 @@ int main(int argc, char *argv[]) {
 					HadamarGate(i);
 				}
 			}
-			UpToDownGate(N/2);
+			SigmaXGate(N/2);
 			psi.noPrime();
 	} else if ( param.val("Theta") > 0 ) {
 		cout << "initial state is  | Up Left Up Right > " << endl;
@@ -1160,7 +1182,7 @@ int main(int argc, char *argv[]) {
 					){
 				//AlphaGate(N/2-1, -0.5);
 				cout << "TIME IS == \"Measurement\". I ACT WITH UpToDown GATES" << endl;
-				UpToDownGate(N/2-1);
+				SigmaXGate(N/2-1);
 //				HadamarGate(N/2-1);
 //				HadamarGate(N/2  );
 //				HadamarGate(N/2+1);
