@@ -115,6 +115,7 @@ public:
 		operator[]("alpha") = 0; // U = exp[ i alpha  n*\sigma]
 		operator[]("Theta") = 0; // U = exp[ i theta  n*\sigma] turns only the central site
 		operator[]("UUD") = 0;
+		operator[]("UUUD") = 0;
 		operator[]("DoubleSlit") = 0;
 		operator[]("SingleSlit") = 0;
 		operator[]("Sav") = 0;
@@ -580,6 +581,32 @@ int main(int argc, char *argv[]) {
 			}
 
 			psi = MPS(initState);
+
+//			for (int i = 1; i <= N; ++i) {
+//				if (i % 2 == 0  ) {
+//					HadamarGate(i);
+//				}
+//			}
+
+			SigmaXGate(N/2);
+
+
+			psi.noPrime();
+
+	} else if ( param.longval("UUUD") == 1) {
+			cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
+			auto initState = InitState(sites);
+			// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+			for (int i = 1; i <= N; ++i){
+				if (i % 4 == 0){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
+					initState.set(i, "Dn");
+				} else {
+					initState.set(i, "Up");
+				}
+			}
+
+			psi = MPS(initState);
+
 //			for (int i = 1; i <= N; ++i) {
 //				if (i % 2 == 0  ) {
 //					HadamarGate(i);
