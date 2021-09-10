@@ -153,15 +153,27 @@ double Energy(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& site
 	   4 comes from XX+YY term
 	   8 comes from (XX+YY)*Z
 
-	   coeff 0.25 appeared cause the Hamiltonian H = 1/2 * (XX+YY)(1-Z)
+	   coeff 0.25 (0.5 in the beginning and 0.5 right before return)
+	   appears cause the Hamiltonian H = 1/2 * (XX+YY)(1-Z)
 	   then (XX+YY) = 0.5(SpSm+SmSp), so
 	   H = 0.25(SpSm+SmSp)(1-Sz)
+
 
 	 */
 	double energy_kin = 2 * real (4 * 0.5 * Correlation(psi,sites, "S+", "S-", i, i+2) );
 	double energy_pot = 2 * real(-8 * 0.5 * SzCorrelation(psi,sites, "S+", "S-", i ) );	
 	double energy = 0.5*(energy_kin + energy_pot);
 	return energy;
+}
+
+
+double SpSp_plus_SmSm(MPS& psi, const itensor::BasicSiteSet<itensor::SpinHalfSite>& sites, const int i){
+	psi.position(i);
+
+	// SpSp + conj(SpSp) == 2 real(SpSp);
+	complex<double> spsp = Correlation(psi, sites, "S+", "S+", i, i + 1);
+	complex<double> smsm = Correlation(psi, sites, "S-", "S-", i, i + 1);
+	return real(4 * 0.5 * (spsp + smsm));
 }
 
 // (SxSy-SySx)/2   - (SxSzSy-SySzSx)/2
