@@ -1295,7 +1295,7 @@ int main(int argc, char *argv[]) {
 					&& n  % (int)(param.val("Measurement")/param.val("tau")) == 0
 					){
 				//AlphaGate(N/2-1, -0.5);
-				cout << "TIME IS == \"Measurement\". I ACT WITH UpToDown GATES" << endl;
+				cout << "TIME IS == \"Measurement\". I ACT WITH SigmaXGate GATES" << endl;
 				SigmaXGate(N/2-1);
 //				HadamarGate(N/2-1);
 //				HadamarGate(N/2  );
@@ -1305,12 +1305,17 @@ int main(int argc, char *argv[]) {
 				psi.noPrime();
 			}
 
+			double sz_TOT = 0;
+			for (int i = 1; i <= N; i ++) {
+				sz_TOT = Sz(psi, sites, i);
+			}
+
 			double energy = real(innerC(psi, H, psi));
 			cout << "max bond dim = " << maxLinkDim(psi) << endl;
 			//cout << "Norm = " << real(innerC(psi, psi)) << endl;
 			cout << "Energy = " << energy << endl;
 			cout << "E(t) - E(0) = " << (energy - energy_initial) << endl;
-			cout << "Sz(t) - Sz(0) = " << (sz_tot - sz_total_initial) << endl;
+			cout << "Sz(t) - Sz(0) = " << (sz_TOT - sz_total_initial) << endl;
 		}
 	}
 	cout << "\nTime evolution complete.\n";
