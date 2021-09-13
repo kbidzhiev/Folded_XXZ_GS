@@ -829,9 +829,9 @@ int main(int argc, char *argv[]) {
 		mode = std::ofstream::out; //Erase previous file (if present)
 
 	{
-		sztotal_strm.open("sz_total.dat", mode);
+		sztotal_strm.open("Sz_total.dat", mode);
 		sztotal_strm.precision(15);
-		sztotal_strm << "#time \t  <Sz_total> \n";
+		sztotal_strm << "#time \t  <Sz_total>  \t <Sz_total - sz_min>\n";
 	}
 	double dt = param.val("Loschmidt");
 	if (dt != 0) { //Loschmidt echo
