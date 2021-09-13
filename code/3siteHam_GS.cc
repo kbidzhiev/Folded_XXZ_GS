@@ -520,7 +520,7 @@ int main(int argc, char *argv[]) {
 
 		cout << "After DMRG" << endl;
 
-		int central_site = Init_H.dot;
+		//int central_site = Init_H.dot;
 		//SigmaXGate(central_site );
 		//HadamarGate(central_site);
 		psi.noPrime();
@@ -824,11 +824,15 @@ int main(int argc, char *argv[]) {
 // _______
 	ofstream ent, spec, entropy_profile, sz, sz_avrg, energy_beta,
 				q1_profile, q2_profile, sx, sy, sxsysz,  sx_avrg, loschmidt,
-				correlation1, correlation2, spsp; //here I'm defining output streams == files
+				correlation1, correlation2, spsp, sztotal_strm; //here I'm defining output streams == files
 		ios_base::openmode mode;
 		mode = std::ofstream::out; //Erase previous file (if present)
 
-
+	{
+		sztotal_strm.open("sz_total.dat", mode);
+		sztotal_strm.precision(15);
+		sztotal_strm << "#time \t  <Sz_total> \n";
+	}
 	double dt = param.val("Loschmidt");
 	if (dt != 0) { //Loschmidt echo
 		loschmidt.open("Loschmidt.dat", mode);
@@ -1306,9 +1310,12 @@ int main(int argc, char *argv[]) {
 			}
 
 			double sz_TOT = 0;
-			for (int i = 1; i <= N; i ++) {
+			for (int i = 1; i <= N; i++) {
 				sz_TOT = Sz(psi, sites, i);
 			}
+			sztotal_strm << time << "\t" << setw(16) << setfill('0')
+									<< sz_TOT << "\t" << sz_TOT - sz_total_initial
+									<< endl;
 
 			double energy = real(innerC(psi, H, psi));
 			cout << "max bond dim = " << maxLinkDim(psi) << endl;
