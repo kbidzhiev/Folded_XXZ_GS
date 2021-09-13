@@ -1294,7 +1294,7 @@ int main(int argc, char *argv[]) {
 			psi.orthogonalize(args);
 
 			// Hadamar gates act at time == 5
-			if(  (int)param.val("Measurement") != 0
+			if(  (double)param.val("Measurement") > 0
 					&& n > 0
 					&& n  % (int)(param.val("Measurement")/param.val("tau")) == 0
 					){
