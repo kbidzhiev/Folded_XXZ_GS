@@ -1311,7 +1311,7 @@ int main(int argc, char *argv[]) {
 
 			double sz_TOT = 0;
 			for (int i = 1; i <= N; i++) {
-				sz_TOT = Sz(psi, sites, i);
+				sz_TOT += Sz(psi, sites, i);
 			}
 			sztotal_strm << time << "\t" << setw(16) << setfill('0')
 									<< sz_TOT << "\t" << sz_TOT - sz_total_initial
