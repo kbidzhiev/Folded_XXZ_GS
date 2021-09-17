@@ -115,6 +115,7 @@ public:
 		operator[]("alpha") = 0; // U = exp[ i alpha  n*\sigma]
 		operator[]("Theta") = 0; // U = exp[ i theta  n*\sigma] turns only the central site
 		operator[]("UUD") = 0;
+		operator[]("ShiftUUD") = 0;
 		operator[]("UUUD") = 0;
 		operator[]("DoubleSlit") = 0;
 		operator[]("SingleSlit") = 0;
@@ -124,7 +125,7 @@ public:
 		//operator[]("end") = 10;
 		operator[]("hL") = 0; //initial magnetization_L
 		operator[]("hR") = 0; //initial magnetization_R
-		operator[]("h") = 2.0;
+		operator[]("h") = 0.0;
 		operator[]("rho") = 0.0;
 		operator[]("n") = 1;
 		operator[]("Q1Profile") = 0; // energy and current profile
@@ -592,6 +593,9 @@ int main(int argc, char *argv[]) {
 
 
 			psi.noPrime();
+	//		operator[]("UUD") = 0;
+
+
 
 	} else if ( param.longval("UUUD") == 1) {
 			cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
@@ -824,7 +828,7 @@ int main(int argc, char *argv[]) {
 // _______
 	ofstream ent, spec, entropy_profile, sz, sz_avrg, energy_beta,
 				q1_profile, q2_profile, sx, sy, sxsysz,  sx_avrg, loschmidt,
-				correlation1, correlation2, spsp, sztotal_strm; //here I'm defining output streams == files
+				correlation1, correlation2, sxsx, sztotal_strm; //here I'm defining output streams == files
 		ios_base::openmode mode;
 		mode = std::ofstream::out; //Erase previous file (if present)
 
@@ -870,7 +874,7 @@ int main(int argc, char *argv[]) {
 		sy.open("Sy_profile.dat", mode);
 		sz.open("Sz_profile.dat", mode);
 		sxsysz.open("SxSySz_profile.dat", mode);
-		spsp.open("SpSp_profile.dat", mode);
+		sxsx.open("SxSx_r_correlation.dat", mode);
 
 		correlation1.open("Correlation1.dat", mode);
 		correlation2.open("Correlation2.dat", mode);
@@ -882,7 +886,7 @@ int main(int argc, char *argv[]) {
 		sy.precision(15);
 		sz.precision(15);
 		sxsysz.precision(15);
-		spsp.precision(15);
+		sxsx.precision(15);
 
 
 		sz_avrg.precision(15);
@@ -919,8 +923,10 @@ int main(int argc, char *argv[]) {
 				<< "\t <Sz_i>\t"
 				<< "\t\ttime\n";
 
-		spsp	<< "#Position=i-"
-				<< "\t <SpSp+SmSm>\t"
+		sxsx	<< "#Position=i-"
+				<< "\t <SxSx>\t"
+				<< "\t RE<SxSy>\t"
+				<< "\t IM<SxSy>\t"
 				<< "\t\ttime\n";
 
 		correlation1<< "#Position=i-"
@@ -1050,6 +1056,7 @@ int main(int argc, char *argv[]) {
 				sx << "\"t=" << time << "\"" << endl;
 				sy << "\"t=" << time << "\"" << endl;
 				sz << "\"t=" << time << "\"" << endl;
+				sxsx << "\"t=" << time << "\"" << endl;
 
 				sxsysz << "\"t=" << time << "\"" << endl;
 
@@ -1086,7 +1093,6 @@ int main(int argc, char *argv[]) {
 					double sxsx2 = 0, sxsy2 = 0, sxsz2 = 0;
 					double sysx2 = 0, sysy2 = 0, sysz2 = 0;
 					double szsx2 = 0, szsy2 = 0, szsz2 = 0;
-					double spsp1 = 0;
 
 					complex<double> kss = 0;
 
@@ -1103,7 +1109,7 @@ int main(int argc, char *argv[]) {
 						szsy1 = real(Correlation(psi, sites, "Sz", "Sy", i, i+1));
 						szsz1 = real(Correlation(psi, sites, "Sz", "Sz", i, i+1));
 
-						spsp1 = SpSp_plus_SmSm(psi, sites, i);
+
 					}
 					if (i <= N - 2) {
 						sxsx2 = real(Correlation(psi, sites, "Sx", "Sx", i, i+2));
@@ -1130,6 +1136,24 @@ int main(int argc, char *argv[]) {
 						sysy4 = real(Correlation(psi, sites, "Sy", "Sy", i, i+4));
 						szsz4 = real(Correlation(psi, sites, "Sz", "Sz", i, i+4));
 					}
+					if (i > N / 2) {
+						complex<double> sxsx_r = 0;
+						complex<double> sxsy_r = 0;
+						double szsz_r =0;
+
+						sxsx_r = 	Correlation(psi, sites, "Sx", "Sx", N/2, i);
+						sxsy_r = 	Correlation(psi, sites, "Sx", "Sy", N/2, i);
+						szsz_r = real(Correlation(psi, sites, "Sz", "Sz", N/2, i));
+
+						sxsx << i - dot << "\t"
+								<< sxsx_r.real() << "\t"
+								<< sxsx_r.imag() << "\t"
+								<< sxsy_r.real() << "\t"
+								<< sxsy_r.imag() << "\t"
+								<< szsz_r << "\t"
+								<< time	<< endl;
+					}
+
 
 					sz_tot += s;
 					sx_tot += sx1;
@@ -1194,9 +1218,7 @@ int main(int argc, char *argv[]) {
 						<< szsz2 << "\t"				//10
 						<< time << endl;
 
-					spsp << i - dot << "\t"
-							<< spsp1 << "\t"
-							<< time << endl;
+
 
 					if ( i % 2 == 1) { //odd site
 						sz_odd = s;
@@ -1244,7 +1266,7 @@ int main(int argc, char *argv[]) {
 					correlation1 << "\n\n";
 					correlation2 << "\n\n";
 
-					spsp << "\n\n";
+					sxsx << "\n\n";
 				}
 				//sz_tot += Sz(psi, sites, N-1) + Sz(psi, sites, N);
 				if (n == 0) {
