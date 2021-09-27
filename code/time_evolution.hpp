@@ -51,7 +51,6 @@ private:
 };
 
 
-
 class LadderHamiltonian {
 public:
 	int dot;
@@ -60,8 +59,40 @@ public:
 	LadderHamiltonian(const SiteSet &sites, const ThreeSiteParam &param, const string ham_type_);
 private:
 	int N;
-	string ham_type;
+	const string ham_type;
 	void init(const ThreeSiteParam &param);
 };
 
+//I'm creating a Folded XXZ 3-site Hamiltonian
+class XXZ {
+public:
+	int dot;
+	AutoMPO ampo;
+	XXZ(const SiteSet &sites, const ThreeSiteParam &param);
+private:
+	int N;
+	void init(const ThreeSiteParam &param);
+};
+
+
+
+//Trotter Gates
+class TrotterExp {
+public:
+	struct TGate {
+		int i1 = 0;
+		ITensor G;
+		TGate(int i1_, ITensor G_)
+		: i1(i1_)
+		, G(G_) {
+		}
+	};
+	TrotterExp(const SiteSet &sites, const ThreeSiteParam &param, const complex<double> tau);
+	void initialize(const SiteSet &sites, const ThreeSiteParam &param, const complex<double> tau);
+	void TimeGates(const int begin, const int end, const complex<double> tau,
+			const SiteSet &sites, const ThreeSiteParam &param);
+	void Evolve(MPS &psi, const Args &args) ;
+private:
+	vector<TGate> gates;
+};
 
