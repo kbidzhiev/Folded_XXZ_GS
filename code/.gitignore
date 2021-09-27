@@ -2,3 +2,8 @@
 
 
 *.pdf
+/Entropy_profile.dat_cp
+/err
+/err_out
+/SxSySz_profile.dat_cp
+/fit.log
