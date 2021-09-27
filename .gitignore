@@ -15,3 +15,4 @@ this_dir.mk
 *.eps
 *.gp
 *.pdf
+*.svg
