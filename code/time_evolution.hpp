@@ -76,7 +76,7 @@ private:
 
 
 
-//Trotter Gates
+//Trotter Gates for the Folded_XXZ
 class TrotterExp {
 public:
 	struct TGate {
