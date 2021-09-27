@@ -5,7 +5,7 @@ using namespace itensor;
 using namespace std;
 
 
-
+//
 ThreeSiteHamiltonian::ThreeSiteHamiltonian(const SiteSet &sites,
 		const ThreeSiteParam &param)
 			: ampo(sites)
