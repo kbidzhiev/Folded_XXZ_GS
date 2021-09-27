@@ -16,3 +16,5 @@ this_dir.mk
 *.gp
 *.pdf
 *.svg
+
+out_1
