@@ -9,7 +9,6 @@ using namespace std;
 //_____________________________________________________
 
 //Trotter Gates
-
 TrotterExp::TrotterExp(const SiteSet &sites, const ThreeSiteParam &param,
 		const complex<double> tau) {
 	initialize(sites, param, tau);
