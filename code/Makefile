@@ -19,16 +19,16 @@ LIBGFLAGS=-L$(ITENSOR_LIBDIR) $(ITENSOR_LIBGFLAGS)
 
 #Rules ------------------
 
-%.o: %.cc $(ITENSOR_LIBS) $(TENSOR_HEADERS)
+%.o: %.cpp $(ITENSOR_LIBS) $(TENSOR_HEADERS)
 	$(CCCOM) -c $(CCFLAGS) -o $@ $<
 
-.debug_objs/%.o: %.cc $(ITENSOR_GLIBS) $(TENSOR_HEADERS)
+.debug_objs/%.o: %.cpp $(ITENSOR_GLIBS) $(TENSOR_HEADERS)
 	$(CCCOM) -c $(CCGFLAGS) -o $@ $<
 
 #Targets -----------------
 
-3siteHam_GS.exe: 3siteHam_GS.cc observables_GS.cc quantum_measurement.cc $(ITENSOR_LIBS) $(TENSOR_HEADERS)
-	$(CCCOM) $(CCFLAGS) 3siteHam_GS.cc observables_GS.cc quantum_measurement.cc -o $@ $(LIBFLAGS)
+3siteHam_GS.exe: 3siteHam_GS.cpp observables_GS.cpp quantum_measurement.cpp $(ITENSOR_LIBS) $(TENSOR_HEADERS)
+	$(CCCOM) $(CCFLAGS) 3siteHam_GS.cpp observables_GS.cpp quantum_measurement.cpp -o $@ $(LIBFLAGS)
 
 
 all: 3siteHam_GS.exe

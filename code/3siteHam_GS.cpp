@@ -13,8 +13,8 @@
 
 
 #include <cstdlib>
-#include "observables_GS.h"
-#include "quantum_measurement.h"
+#include "observables_GS.hpp"
+#include "quantum_measurement.hpp"
 
 using namespace itensor;
 using namespace std;
