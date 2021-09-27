@@ -14,17 +14,17 @@ using namespace std;
 //The function below translate numbers (etc.) into character strings
 //the second parameter (optional) is the precision (digits)
 
-template<class T>
-string to_string(const T &t, unsigned int precision = 0) {
-	stringstream ss;
-	if (precision > 0)
-		ss.precision(precision);
-	ss << t;
-	return ss.str();
-}
-double char2double(char *a) ;
+//template<class T>
+//string to_string(const T &t, unsigned int precision = 0) {
+//	stringstream ss;
+//	if (precision > 0) ss.precision(precision);
+//	ss << t;
+//	return ss.str();
+//}
 
-class Parameters: public map<string, double> { // class Parameters have all methods from container map<str,double>
+double char2double(char *a);
+
+class Parameters: public map<string, double> { // class Parameters inherits all methods from container map<str,double>
 public:
 	double val(string var_name) const ;
 	long longval(string var_name) const ;
