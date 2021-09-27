@@ -6,9 +6,19 @@ using namespace std;
 
 
 
-//____________________________________________________________
 
-double Parameters::val(string var_name) const { // .val("C") gives value for parmeter C
+//____________________________________________________________
+double char2double(char *a) {
+	char *end_ptr;
+	const double x = strtod(a, &end_ptr);
+	if (end_ptr == a || ('\0' != *end_ptr))
+		cout << endl << "ERROR :" << a << " is not a valid format for a double."
+				<< endl, exit(0);
+	return x;
+}
+
+//____________________________________________________________
+double Parameters::val(string var_name) const { // .val("C") gives value for parameter C
 	map<string, double>::const_iterator it = find(var_name);
 	if (it == end()) {
 		cout << "Error: Parameter " << var_name << " is not defined.\n", exit(0);
@@ -27,10 +37,11 @@ long Parameters::longval(string var_name) const {
 	}
 }
 void Parameters::PRint(ostream &o) const {
-	for (map<string, double>::const_iterator it = begin(); it != end(); it++) {
+	for (map<string, double>::const_iterator it = begin(); it != end(); ++it) {
 		o << it->first << "=" << it->second << endl;
 	}
 }
+
 void Parameters::ReadArguments(int argc, char *argv[]) {
 	for (int n = 1; n < argc; n++) {
 		string var_name(argv[n]);
@@ -52,8 +63,6 @@ void Parameters::ReadArguments(int argc, char *argv[]) {
 }
 
 //_____________________________________________________
-
-
 // class of PUBLIC parameters
 ThreeSiteParam::ThreeSiteParam() { //Constructor
 	//Specify below all the allowed parameter names,
@@ -83,7 +92,6 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("Sav") = 0;
 	operator[]("Lenart") = 0;
 	operator[]("begin") = 1;
-	//operator[]("end") = 10;
 	operator[]("hL") = 0; //initial magnetization_L
 	operator[]("hR") = 0; //initial magnetization_R
 	operator[]("h") = 0.0;
@@ -100,46 +108,6 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("Measurement") = 0; // Project the central spin to be |Down> (time evolution ONLY)
 	operator[]("AlphaGate") = 0;
 }
-//_____________________________________________________
 
 
-
-
-
-ThreeSiteHamiltonian::ThreeSiteHamiltonian(const SiteSet &sites,
-		const ThreeSiteParam &param) :
-		ampo(sites), N(length(sites)) {
-	//N = length(sites); // size of Hamiltonian comes with onject SiteSet sites, not just as number N
-	init(param);   // initializing the Hamiltonian
-	cout << "A Hamiltonian with " << N << " sites was constructed." << endl;
-}
-
-void ThreeSiteHamiltonian::init(const ThreeSiteParam &param) {   //.init (param)
-	const double J = param.val("J");
-	double mu = 0;
-	const double hL = param.val("hL");
-	const double hR = param.val("hR");
-	dot = N / 2 + 1;  //Position of the "dot"
-	//cout << "The dot is on site #" << dot << endl;
-	//if ((2*N)<=3) cout<<"Error, N="<<N<<" is too small.\n",exit(0);
-	for (int j = 1; j < N - 1; ++j) {
-		//Strange coefficients are needed to match with
-		// Pauli matrices instead of spin Sx Sy
-		ampo += J * 4 * 0.25, "S+", j, "S-", j + 2; // 0.5 (SpSm+ SmSp) = SxSx + SySy
-		ampo += J * 4 * 0.25, "S-", j, "S+", j + 2;
-		ampo += J * -8 * 0.25, "S+", j, "Sz", j + 1, "S-", j + 2;
-		ampo += J * -8 * 0.25, "S-", j, "Sz", j + 1, "S+", j + 2;
-		//cout << "j = "<< j << "/ " << N-3 << endl;
-		//cout << "site (" << j << ", " << j + 1 << ", " << j + 2 << ")"
-		//		<< endl;
-		if (j <= dot) {
-			mu = hL;
-		} else {
-			mu = hR;
-		}
-		ampo += mu, "Sz", j;
-	}
-	ampo += mu, "Sz", N - 1;
-	ampo += mu, "Sz", N;
-}
 

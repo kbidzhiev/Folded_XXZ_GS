@@ -22,35 +22,24 @@ string to_string(const T &t, unsigned int precision = 0) {
 	ss << t;
 	return ss.str();
 }
-//____________________________________________________________
-double char2double(char *a) {
-	char *end_ptr;
-	const double x = strtod(a, &end_ptr);
-	if (end_ptr == a || ('\0' != *end_ptr))
-		cout << endl << "ERROR :" << a << " is not a valid format for a double."
-				<< endl, exit(0);
-	return x;
-}
+double char2double(char *a) ;
 
-//____________________________________________________________
-class Parameters: public map<string, double> { // class Parameters have all methods from container "map" (string key, double value)
+class Parameters: public map<string, double> { // class Parameters have all methods from container map<str,double>
 public:
 	double val(string var_name) const ;
 	long longval(string var_name) const ;
 	void PRint(ostream &o) const ;
 	void ReadArguments(int argc, char *argv[]);
 };
-//_____________________________________________________
+
 // class of PUBLIC parameters
 class ThreeSiteParam: public Parameters {
 public:
 	ThreeSiteParam();
 };
-//_____________________________________________________
 
 
-//I'm creating a 3 site Hamiltonian for system of N sites
-
+//I'm creating a Folded XXZ 3-site Hamiltonian
 class ThreeSiteHamiltonian {
 public:
 	int dot;
@@ -60,3 +49,19 @@ private:
 	int N;
 	void init(const ThreeSiteParam &param);
 };
+
+
+
+class LadderHamiltonian {
+public:
+	int dot;
+	AutoMPO ampo;
+	//Define a constructor for this class 'LadderHamiltonian'
+	LadderHamiltonian(const SiteSet &sites, const ThreeSiteParam &param, const string ham_type_);
+private:
+	int N;
+	string ham_type;
+	void init(const ThreeSiteParam &param);
+};
+
+

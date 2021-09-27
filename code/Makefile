@@ -27,8 +27,8 @@ LIBGFLAGS=-L$(ITENSOR_LIBDIR) $(ITENSOR_LIBGFLAGS)
 
 #Targets -----------------
 
-3siteHam_GS.exe: 3siteHam_GS.cpp time_evolution.cpp observables_GS.cpp quantum_measurement.cpp $(ITENSOR_LIBS) $(TENSOR_HEADERS)
-	$(CCCOM) $(CCFLAGS) 3siteHam_GS.cpp time_evolution.cpp observables_GS.cpp quantum_measurement.cpp -o $@ $(LIBFLAGS)
+3siteHam_GS.exe: 3siteHam_GS.cpp tech_param.cpp Folded_XXZ.cpp XXZ.cpp observables_GS.cpp quantum_measurement.cpp $(ITENSOR_LIBS) $(TENSOR_HEADERS)
+	$(CCCOM) $(CCFLAGS) 3siteHam_GS.cpp tech_param.cpp Folded_XXZ.cpp XXZ.cpp observables_GS.cpp quantum_measurement.cpp -o $@ $(LIBFLAGS)
 
 
 all: 3siteHam_GS.exe
