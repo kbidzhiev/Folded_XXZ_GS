@@ -139,7 +139,61 @@ void TrotterExp::Evolve(MPS &psi, const Args &args) {
 	}
 }
 
+vector<MPO> XXZ_time_evol(const SiteSet &sites, const ThreeSiteParam &param,
+		const size_t order = 4) {
+	vector<MPO> Exp_H_vec;
+	XXZ Init_H(sites, param);
+	auto H = toMPO(Init_H.ampo);
+	Cplx t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0, t6 = 0, t7 = 0;
+	vector<complex<double>> time_steps;
+	time_steps.reserve(order)
+	if (order == 1) {
+		//Approx. with error O(tau^3)
+		time_steps[0] = Cplx_i * tau;
+	}
+	if (order == 2) {
+		//Approx. with error O(tau^3)
+		time_steps[0] = 0.5 * ( 1 + Cplx_i) * tau;
+		time_steps[1] = 0.5 * (-1 + Cplx_i) * tau;
 
+	}
+	if (order == 3) {
+		//Approx. with error O(tau^4) [thanks to Kemal]
+		//WARNINIG more less TESTED
+		//Tested -it's ok
+		time_steps[0] = 0.10566243270259355887 - 0.39433756729740644113 * Cplx_i;
+		time_steps[1] = Cplx_i * t1;
+		time_steps[2] = conj(t2);
+		time_steps[3] = Cplx_i * t3;
+		for (auto &time_step : time_steps){
+			time_step *= Cplx_i * tau;
+		}
+	}
+	if (order == 4) {
+		//Approx. with error O(tau^5) [thanks to Kemal twice]
+		//WARNINIG Not fully TESTED
+		//Tested -it's ok
+		time_steps[0] = 0.25885339861091821723 + 0.04475613401114190287 * Cplx_i;
+		time_steps[1] = -0.03154685814880379274 + 0.24911905427556321757 * Cplx_i;
+		time_steps[2] = 0.19082905211066719664 - 0.23185374923210605447 * Cplx_i;
+		time_steps[3] = 0.1637288148544367438753;
+		time_steps[4] = conj(time_steps[2]);
+		time_steps[5] = conj(time_steps[1]);
+		time_steps[6] = conj(time_steps[0]);
+		for (auto &time_step : time_steps){
+			time_step *= Cplx_i * tau;
+		}
+
+	}
+
+	Exp_H_vec.reserve(order);
+	for (auto time_step : time_steps){
+		auto expH_i = toExpH < ITensor > (Ham.ampo, time_step);
+		Exp_H_vec.push_back(expH_i);
+	}
+
+	return Exp_H_vec;
+}
 
 
 
