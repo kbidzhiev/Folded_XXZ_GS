@@ -188,7 +188,7 @@ vector<MPO> XXZ_time_evol(const SiteSet &sites, const ThreeSiteParam &param) {
 	XXZ Init_H(sites, param);
 	Exp_H_vec.reserve(order);
 	for (auto time_step : time_steps){
-		auto expH_i = toExpH < ITensor > (Init_H.ampo, time_step);
+		auto expH_i = toExpH <ITensor> (Init_H.ampo, time_step);
 		Exp_H_vec.push_back(expH_i);
 	}
 
