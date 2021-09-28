@@ -107,6 +107,7 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("PXXP") = 0; //Integrability breaking term
 	operator[]("Measurement") = 0; // Project the central spin to be |Down> (time evolution ONLY)
 	operator[]("AlphaGate") = 0;
+	operator[]("TrotterOrder") = 0;
 }
 
 

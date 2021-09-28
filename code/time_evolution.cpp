@@ -139,14 +139,13 @@ void TrotterExp::Evolve(MPS &psi, const Args &args) {
 	}
 }
 
-vector<MPO> XXZ_time_evol(const SiteSet &sites, const ThreeSiteParam &param,
-		const size_t order = 4) {
-	vector<MPO> Exp_H_vec;
-	XXZ Init_H(sites, param);
-	auto H = toMPO(Init_H.ampo);
-	Cplx t1 = 0, t2 = 0, t3 = 0, t4 = 0, t5 = 0, t6 = 0, t7 = 0;
+vector<MPO> XXZ_time_evol(const SiteSet &sites, const ThreeSiteParam &param) {
+
+	double tau = param.val("tau");
+	const int order = param.val("TrotterOrder");
+
 	vector<complex<double>> time_steps;
-	time_steps.reserve(order)
+	time_steps.reserve(order);
 	if (order == 1) {
 		//Approx. with error O(tau^3)
 		time_steps[0] = Cplx_i * tau;
@@ -159,12 +158,11 @@ vector<MPO> XXZ_time_evol(const SiteSet &sites, const ThreeSiteParam &param,
 	}
 	if (order == 3) {
 		//Approx. with error O(tau^4) [thanks to Kemal]
-		//WARNINIG more less TESTED
 		//Tested -it's ok
 		time_steps[0] = 0.10566243270259355887 - 0.39433756729740644113 * Cplx_i;
-		time_steps[1] = Cplx_i * t1;
-		time_steps[2] = conj(t2);
-		time_steps[3] = Cplx_i * t3;
+		time_steps[1] = Cplx_i * time_steps[0];
+		time_steps[2] = conj(time_steps[1]);
+		time_steps[3] = Cplx_i * time_steps[2];
 		for (auto &time_step : time_steps){
 			time_step *= Cplx_i * tau;
 		}
@@ -186,9 +184,11 @@ vector<MPO> XXZ_time_evol(const SiteSet &sites, const ThreeSiteParam &param,
 
 	}
 
+	vector<MPO> Exp_H_vec;
+	XXZ Init_H(sites, param);
 	Exp_H_vec.reserve(order);
 	for (auto time_step : time_steps){
-		auto expH_i = toExpH < ITensor > (Ham.ampo, time_step);
+		auto expH_i = toExpH < ITensor > (Init_H.ampo, time_step);
 		Exp_H_vec.push_back(expH_i);
 	}
 
