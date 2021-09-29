@@ -429,6 +429,7 @@ int main(int argc, char *argv[]) {
 	psi0 = psi; //here I save the initial WF
 
 
+
 //--------------------------------------------------------------
 
 	//Hamiltonian for the dynamics
@@ -448,8 +449,8 @@ int main(int argc, char *argv[]) {
 	ofstream ent, spec, entropy_profile, sz, sz_avrg, energy_beta,
 				q1_profile, q2_profile, sx, sy, sxsysz,  sx_avrg, loschmidt,
 				correlation1, correlation2, sxsx, sztotal_strm; //here I'm defining output streams == files
-		ios_base::openmode mode;
-		mode = std::ofstream::out; //Erase previous file (if present)
+	ios_base::openmode mode;
+	mode = std::ofstream::out; //Erase previous file (if present)
 
 	{
 		sztotal_strm.open("Sz_total.dat", mode);
@@ -610,7 +611,9 @@ int main(int argc, char *argv[]) {
 
 	double tau = param.val("tau");
 	const long int n_steps = param.val("T") / param.val("tau");
-	TrotterExp expH(sites, param, -Cplx_i * tau);
+	TrotterExp expH_Folded_XXZ(sites, param, -Cplx_i * tau);
+	vector<MPO> XXZ_time_evol_vec = XXZ_time_evol(sites, param);
+
 
 // Time evolution
 	double sz_total_initial = 9999;
@@ -651,8 +654,7 @@ int main(int argc, char *argv[]) {
 			if (n % int(param.val("Loschmidt") / tau) == 0) {
 				complex<double> echo = innerC(psi0,psi);
 				loschmidt << time << "\t" << setw(16) << setfill('0')
-						<< real(echo) << "\t" << imag(echo)
-						<< endl;
+						<< real(echo) << "\t" << imag(echo)	<< endl;
 			}
 
 		// ------- entanglement Entropy Profile -----
@@ -691,7 +693,6 @@ int main(int argc, char *argv[]) {
 
 				double sx_odd = 0,  sz_odd = 0;
 				double sxsx1_odd = 0, sxsx2_odd = 0, sxsx3_odd = 0, sxsx4_odd = 0;
-				//double sysy1_odd = 0, sysy2_odd = 0, sysy3_odd = 0, sysy4_odd = 0;
 				double szsz1_odd = 0, szsz2_odd = 0, szsz3_odd = 0, szsz4_odd = 0;
 
 				double sxsz_odd  = 0; //sysz_odd  = 0;
@@ -727,8 +728,6 @@ int main(int argc, char *argv[]) {
 						szsx1 = real(Correlation(psi, sites, "Sz", "Sx", i, i+1));
 						szsy1 = real(Correlation(psi, sites, "Sz", "Sy", i, i+1));
 						szsz1 = real(Correlation(psi, sites, "Sz", "Sz", i, i+1));
-
-
 					}
 					if (i <= N - 2) {
 						sxsx2 = real(Correlation(psi, sites, "Sx", "Sx", i, i+2));
@@ -813,7 +812,7 @@ int main(int argc, char *argv[]) {
 						<< real(kss) << "\t"		//5
 						<< time << endl;
 
-					correlation1 << i - dot  << "\t"		//column ID below
+					correlation1 << i - dot  << "\t"	//column ID below
 						<< sxsx1 << "\t"				//2
 						<< sxsy1 << "\t"				//3
 						<< sxsz1 << "\t"				//4
@@ -825,7 +824,7 @@ int main(int argc, char *argv[]) {
 						<< szsz1 << "\t"				//10
 						<< time << endl;
 
-					correlation2 << i - dot  << "\t"		//column ID below
+					correlation2 << i - dot  << "\t"	//column ID below
 						<< sxsx2 << "\t"				//2
 						<< sxsy2 << "\t"				//3
 						<< sxsz2 << "\t"				//4
@@ -836,8 +835,6 @@ int main(int argc, char *argv[]) {
 						<< szsy2 << "\t"				//9
 						<< szsz2 << "\t"				//10
 						<< time << endl;
-
-
 
 					if ( i % 2 == 1) { //odd site
 						sz_odd = s;
@@ -874,17 +871,12 @@ int main(int argc, char *argv[]) {
 				{ //I need this part to separate time steps in *.dat files (for gnuplot)
 					sx << "\n\n";
 					sx_avrg << "\n\n";
-
 					sy << "\n\n";
-
 					sz << "\n\n";
 					sz_avrg << "\n\n";
-
 					sxsysz << "\n\n";
-
 					correlation1 << "\n\n";
 					correlation2 << "\n\n";
-
 					sxsx << "\n\n";
 				}
 				//sz_tot += Sz(psi, sites, N-1) + Sz(psi, sites, N);
@@ -931,10 +923,16 @@ int main(int argc, char *argv[]) {
 		if (n < n_steps) {
 			//MPS psi_temp = psi;
 			cout << "Time evol" << endl;
-			expH.Evolve(psi, args);
+			if(XXZ == 1){
+				for(auto & expH_XXZ : XXZ_time_evol_vec)
+				psi = applyMPO(expH_XXZ, psi, args);
+			} else{
+				expH_Folded_XXZ.Evolve(psi, args);
+			}
 			psi.orthogonalize(args);
 
-			// Hadamar gates act at time == 5
+
+			// Hadamar gates act at time == "Measurement"
 			if(  (double)param.val("Measurement") > 0
 					&& n > 0
 					&& n  % (int)(param.val("Measurement")/param.val("tau")) == 0
@@ -942,11 +940,6 @@ int main(int argc, char *argv[]) {
 				//AlphaGate(N/2-1, -0.5);
 				cout << "TIME IS == \"Measurement\". I ACT WITH SigmaXGate GATES" << endl;
 				SigmaXGate(N/2-1);
-//				HadamarGate(N/2-1);
-//				HadamarGate(N/2  );
-//				HadamarGate(N/2+1);
-//				HadamarGate(N/2+2);
-
 				psi.noPrime();
 			}
 
@@ -955,8 +948,7 @@ int main(int argc, char *argv[]) {
 				sz_TOT += Sz(psi, sites, i);
 			}
 			sztotal_strm << time << "\t" << setw(16) << setfill('0')
-									<< sz_TOT << "\t" << sz_TOT - sz_total_initial
-									<< endl;
+					<< sz_TOT << "\t" << sz_TOT - sz_total_initial << endl;
 
 			double energy = real(innerC(psi, H, psi));
 			cout << "max bond dim = " << maxLinkDim(psi) << endl;
@@ -967,7 +959,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	cout << "\nTime evolution complete.\n";
-	println("Done !");
+	cout << "Done !" << endl;
 	return 0;
 }
 

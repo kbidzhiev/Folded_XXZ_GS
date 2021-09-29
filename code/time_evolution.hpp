@@ -96,3 +96,6 @@ private:
 	vector<TGate> gates;
 };
 
+
+vector<MPO> XXZ_time_evol(const SiteSet &sites, const ThreeSiteParam &param);
+
