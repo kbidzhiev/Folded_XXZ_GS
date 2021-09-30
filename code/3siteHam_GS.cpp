@@ -361,7 +361,7 @@ int main(int argc, char *argv[]) {
 			}
 
 			psi.noPrime();
-	} else if ( param.longval("VacVac") == 1) {
+	} else if ( param.val("XXZ") == 1) {
 		cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
@@ -935,7 +935,7 @@ int main(int argc, char *argv[]) {
 		if (n < n_steps) {
 			//MPS psi_temp = psi;
 			cout << "Time evol" << endl;
-			if(1){
+			if(param.val("XXZ") == 1){
 				for(auto & expH_XXZ : XXZ_time_evol_vec)
 				psi = applyMPO(expH_XXZ, psi, args);
 				psi.noPrime();

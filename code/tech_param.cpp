@@ -82,7 +82,6 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("LadderState") = 0;
 	operator[]("JammedImpurity") = 0;
 	operator[]("JammedVac") = 0;
-	operator[]("VacVac") = 0;
 	operator[]("alpha") = 0; // U = exp[ i alpha  n*\sigma]
 	operator[]("Theta") = 0; // U = exp[ i theta  n*\sigma] turns only the central site
 	operator[]("UUD") = 0;
@@ -109,6 +108,7 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("Measurement") = 0; // Project the central spin to be |Down> (time evolution ONLY)
 	operator[]("AlphaGate") = 0;
 	operator[]("TrotterOrderXXZ") = 4;
+	operator[]("XXZ") = 0;
 	operator[]("Delta") = 4;
 }
 

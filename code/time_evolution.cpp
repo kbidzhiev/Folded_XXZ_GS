@@ -94,14 +94,10 @@ void TrotterExp::TimeGates(const int begin, const int end,
 		if (PXXP > 0) {
 			cout << "PXXP = (1-Sz)(1-Sz)(Sx+Sx)(1-Sz)(1-Sz)"
 					<< "term is included " << endl;
-			auto P =
-					0.25
-							* (op(sites, "Id", j) * op(sites, "Id", j + 1)
-									+ 2.0 * op(sites, "Sz", j)
-											* op(sites, "Id", j + 1))
-							* (op(sites, "Id", j) * op(sites, "Id", j + 1)
-									+ 2.0 * op(sites, "Id", j)
-											* op(sites, "Sz", j + 1));
+			auto P = 0.25 * (op(sites, "Id", j) * op(sites, "Id", j + 1)
+					+ 2.0 * op(sites, "Sz", j)  * op(sites, "Id", j + 1))
+						  * (op(sites, "Id", j) * op(sites, "Id", j + 1)
+					+ 2.0 * op(sites, "Id", j)	* op(sites, "Sz", j + 1));
 
 			hh += PXXP * P * 2.0
 					* (op(sites, "Sx", j) * op(sites, "Id", j + 1)
@@ -286,21 +282,35 @@ void Exp_B::Evolve(MPS &psi, const Args &args) {
 		auto &G = gate.G;
 		psi.position(j);
 		auto WF = psi(j - 1) *psi(j) * psi(j + 1) * psi(j + 2);
+		cout << length(WF)<< endl;
 		WF = G * WF;
 		WF /= norm(WF);
 		WF.noPrime();
 		{
-			auto [Uj1, Vj1] = factor(WF,
-					{ siteIndex(psi, j), leftLinkIndex(psi, j) }, args);
-			auto indR = commonIndex(Uj1, Vj1);
-			auto [Uj2, Vj2] = factor(Vj1, { siteIndex(psi, j + 1), indR }, args);
-			psi.set(j, Uj1);
-			psi.set(j + 1, Uj2);
-			psi.set(j + 2, Vj2);
+			auto [Uj_minus_1, Vj_minus_1] = factor(WF,
+					{ siteIndex(psi, j-1), leftLinkIndex(psi, j-1) }, args);
+
+			auto indR = commonIndex(Uj_minus_1, Vj_minus_1);
+			auto [Uj, Vj] = factor(Vj_minus_1,
+					{ siteIndex(psi, j ), indR }, args);
+
+			indR = commonIndex(Uj, Vj);
+			auto [Uj_plus_1, Vj_plus_1] = factor(Vj,
+					{ siteIndex(psi, j + 1 ), indR }, args);
+
+			indR = commonIndex(Uj_plus_1, Vj_plus_1);
+			auto [Uj_plus_2, Vj_plus_2] = factor(Vj_plus_1,
+					{ siteIndex(psi, j + 2 ), indR }, args);
+
+
+			psi.set(j - 1, Uj_minus_1);
+			psi.set(j    , Uj);
+			psi.set(j + 1, Uj_plus_2);
+			psi.set(j + 2, Vj_plus_2);
+
 
 		}
 	}
 }
-
 
 
