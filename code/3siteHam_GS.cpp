@@ -370,31 +370,28 @@ int main(int argc, char *argv[]) {
 		initState.set(N/2  , "Dn");
 		initState.set(N/2+1, "Up");
 
-		bool is_up = true;
-		for (int i = N/2 - 2 ; i > 1; i-=3) {
-			if(is_up){
+		int counter = 0;
+		for (int i = N/2 - 2 ; i >0 ; --i) {
+			if(counter % 6 == 0
+					|| counter % 6 == 1
+					|| counter % 6 == 2){
 				initState.set(i, "Up");
-				initState.set(i - 1, "Up");
-				initState.set(i - 2, "Up");
 			} else {
 				initState.set(i, "Dn");
-				initState.set(i - 1, "Dn");
-				initState.set(i - 2, "Dn");
 			}
-			is_up = !is_up;
+			++counter;
 		}
-		bool is_up = false;
-		for (int i = N/2 + 2 ; i < N; i+=3) {
-			if(is_up){
+
+		counter = 0;
+		for (int i = N/2 + 2 ; i <= N; ++i) {
+			if(counter % 6 == 3
+					|| counter % 6 == 4
+					|| counter % 6 == 5){
 				initState.set(i, "Up");
-				initState.set(i + 1, "Up");
-				initState.set(i + 2, "Up");
 			} else {
 				initState.set(i, "Dn");
-				initState.set(i + 1, "Dn");
-				initState.set(i + 2, "Dn");
 			}
-			is_up = !is_up;
+			++counter;
 		}
 		psi = MPS(initState);
 		psi.noPrime();

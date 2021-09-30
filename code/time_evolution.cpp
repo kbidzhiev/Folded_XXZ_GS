@@ -180,17 +180,11 @@ vector<MPO> XXZ_time_evol(const SiteSet &sites, const ThreeSiteParam &param) {
 	vector<MPO> Exp_H_vec;
 	Exp_H_vec.reserve(time_steps.size());
 
-	for (auto elem : time_steps){
-		cout << elem << endl;
-	}
-
 	XXZ H_XXZ(sites, param);
 	for (auto time_step : time_steps){
 		MPO expH_i = toExpH(H_XXZ.ampo, time_step);
 		Exp_H_vec.push_back(expH_i);
 	}
-	cout << "time_steps" << time_steps.size() << "\n"
-				<< "Exp_H_vec" << Exp_H_vec.size() << endl;
 
 	return Exp_H_vec;
 }
@@ -238,9 +232,6 @@ void Exp_B::TimeGates(const int begin, const int end,
 		const complex<double> tau, const SiteSet &sites,
 		const ThreeSiteParam &param) {
 	const int step = 3;
-	const double J = param.val("J");
-	const double Dhar = param.val("Dhar");
-	const double PXXP = param.val("PXXP");
 	const double Delta_inverse = 1.0/param.val("Delta");
 
 	// 1/8 is a prefactor of exponent, 8 comes from SPin to Pauli
@@ -282,7 +273,7 @@ void Exp_B::Evolve(MPS &psi, const Args &args) {
 		auto &G = gate.G;
 		psi.position(j);
 		auto WF = psi(j - 1) *psi(j) * psi(j + 1) * psi(j + 2);
-		cout << length(WF)<< endl;
+		//cout << length(WF)<< endl;
 		WF = G * WF;
 		WF /= norm(WF);
 		WF.noPrime();
