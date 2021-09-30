@@ -109,6 +109,7 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("Measurement") = 0; // Project the central spin to be |Down> (time evolution ONLY)
 	operator[]("AlphaGate") = 0;
 	operator[]("TrotterOrderXXZ") = 4;
+	operator[]("Delta") = 4;
 }
 
 

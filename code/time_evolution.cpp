@@ -221,36 +221,20 @@ void Exp_B::initialize(const SiteSet &sites, const ThreeSiteParam &param,
 
 	} else {
 		cout << "trotter 2 scheme" << endl;
-		/*
-		 double a1 = 1. / 6;		// more precise arrpoximation coefficients
-		 double a2 = 1 - 2. * a1;
-		 double b1 = (3 - sqrt(3)) / 6.;
-		 double b2 = 1. / 2 - b1;
-		 double c1 = 1. / 2;
-		 */
+
 		double begin0 = begin; //this variable are needed to change operators ABC
 		double begin2 = begin + 1;
 		double begin4 = begin + 2;
 		//Trotter gates from arxiv.org/abs/1901.04974
 		// Eq. (38),(47)
 
-		cout << "Time evolutions " << endl;
+		cout << "Time evolution " << endl;
 		TimeGates(begin0, end, 0.5 * tau, sites, param); //A
 		TimeGates(begin2, end, 0.5 * tau, sites, param); //B
 		TimeGates(begin4, end, tau, sites, param); //C
 		TimeGates(begin2, end, 0.5 * tau, sites, param); //B
 		TimeGates(begin0, end, 0.5 * tau, sites, param); //A
-		/*
-		 TimeGates(begin0, end, a1 * tau, sites, param); //A
-		 TimeGates(begin2, end, b1 * tau, sites, param); //B
-		 TimeGates(begin4, end, c1 * tau, sites, param); //C
-		 TimeGates(begin2, end, b2 * tau, sites, param); //B
-		 TimeGates(begin0, end, a2 * tau, sites, param); //A
-		 TimeGates(begin2, end, b2 * tau, sites, param); //B
-		 TimeGates(begin4, end, c1 * tau, sites, param); //C
-		 TimeGates(begin2, end, b1 * tau, sites, param); //B
-		 TimeGates(begin0, end, a1 * tau, sites, param); //A
-		 */
+
 	}
 }
 
@@ -261,51 +245,37 @@ void Exp_B::TimeGates(const int begin, const int end,
 	const double J = param.val("J");
 	const double Dhar = param.val("Dhar");
 	const double PXXP = param.val("PXXP");
+	const double Delta_inverse = 1.0/param.val("Delta");
+
+	// 1/8 is a prefactor of exponent, 8 comes from SPin to Pauli
+	// 1/2 from {SxSy - SySx} -> 1/{SpSm-SmSp}
+	const double coeff = 0.5;
 	//cout << "Gates starts from " << begin << endl;
-	for (int j = begin; j < end - 1; j += step) {
-		//cout << "j = (" << j << ", " << j + 1 << ", " << j + 2 << ")"
-		//		<< endl;
-		//this part act on real sites
-		auto hh = J * 4 * 0.25 * op(sites, "Sp", j) * op(sites, "Id", j + 1)
-				* op(sites, "Sm", j + 2);
-		hh += J * 4 * 0.25 * op(sites, "Sm", j) * op(sites, "Id", j + 1)
-				* op(sites, "Sp", j + 2);
-		hh += -J * 8 * 0.25 * op(sites, "Sp", j) * op(sites, "Sz", j + 1)
-				* op(sites, "Sm", j + 2);
-		hh += -J * 8 * 0.25 * op(sites, "Sm", j) * op(sites, "Sz", j + 1)
-				* op(sites, "Sp", j + 2);
+	for (int j = begin + 1; j < end - 1; j += step) {
+		// 8 here is to match spin matrices and pauli matrices
+		auto hh = Delta_inverse * coeff
+				* op(sites, "Id", j - 1)
+				* op(sites, "Sp", j)
+				* op(sites, "Sm", j + 1)
+				* op(sites, "Sz", j + 2);
+		hh += - Delta_inverse * coeff
+				* op(sites, "Id", j - 1)
+				* op(sites, "Sm", j)
+				* op(sites, "Sp", j + 1)
+				* op(sites, "Sz", j + 2);
 
-		//Deepak Dhar term
-		if (Dhar > 0) {
-			cout << "Dhar term is included" << endl;
-			hh += Dhar * 4 * 0.5 * op(sites, "Sz", j) * op(sites, "Id", j + 1)
-					* op(sites, "Sz", j + 2);
-			hh += -Dhar * 8 * 0.5 * op(sites, "Sz", j) * op(sites, "Sz", j + 1)
-					* op(sites, "Sz", j + 2);
-			hh += -Dhar * 1 * 0.5 * op(sites, "Id", j) * op(sites, "Id", j + 1)
-					* op(sites, "Id", j + 2);
-			hh += Dhar * 2 * 0.5 * op(sites, "Id", j) * op(sites, "Sz", j + 1)
-					* op(sites, "Id", j + 2);
-		}
-		if (PXXP > 0) {
-			cout << "PXXP = (1-Sz)(1-Sz)(Sx+Sx)(1-Sz)(1-Sz)"
-					<< "term is included " << endl;
-			auto P =
-					0.25
-							* (op(sites, "Id", j) * op(sites, "Id", j + 1)
-									+ 2.0 * op(sites, "Sz", j)
-											* op(sites, "Id", j + 1))
-							* (op(sites, "Id", j) * op(sites, "Id", j + 1)
-									+ 2.0 * op(sites, "Id", j)
-											* op(sites, "Sz", j + 1));
+		hh += - Delta_inverse * coeff
+				* op(sites, "Sz", j - 1)
+				* op(sites, "Sp", j    )
+				* op(sites, "Sm", j + 1);
+				* op(sites, "Id", j + 2)
 
-			hh += PXXP * P * 2.0
-					* (op(sites, "Sx", j) * op(sites, "Id", j + 1)
-							* op(sites, "Id", j + 2)
-							+ op(sites, "Id", j) * op(sites, "Sx", j + 1)
-									* op(sites, "Id", j + 2)) * P;
-		}
 
+		hh += + Delta_inverse * coeff
+				* op(sites, "Sz", j - 1)
+				* op(sites, "Sm", j    )
+				* op(sites, "Sp", j + 1);
+				* op(sites, "Id", j + 2)
 		auto G = expHermitian(hh, tau);
 		gates.emplace_back(j, move(G));
 	}
@@ -315,7 +285,7 @@ void Exp_B::Evolve(MPS &psi, const Args &args) {
 		auto j = gate.i1;
 		auto &G = gate.G;
 		psi.position(j);
-		auto WF = psi(j) * psi(j + 1) * psi(j + 2);
+		auto WF = psi(j - 1) *psi(j) * psi(j + 1) * psi(j + 2);
 		WF = G * WF;
 		WF /= norm(WF);
 		WF.noPrime();
