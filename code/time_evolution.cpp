@@ -267,15 +267,15 @@ void Exp_B::TimeGates(const int begin, const int end,
 		hh += - Delta_inverse * coeff
 				* op(sites, "Sz", j - 1)
 				* op(sites, "Sp", j    )
-				* op(sites, "Sm", j + 1);
-				* op(sites, "Id", j + 2)
-
+				* op(sites, "Sm", j + 1)
+				* op(sites, "Id", j + 2);
 
 		hh += + Delta_inverse * coeff
 				* op(sites, "Sz", j - 1)
 				* op(sites, "Sm", j    )
-				* op(sites, "Sp", j + 1);
-				* op(sites, "Id", j + 2)
+				* op(sites, "Sp", j + 1)
+				* op(sites, "Id", j + 2);
+
 		auto G = expHermitian(hh, tau);
 		gates.emplace_back(j, move(G));
 	}
