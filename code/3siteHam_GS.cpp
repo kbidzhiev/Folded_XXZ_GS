@@ -365,16 +365,42 @@ int main(int argc, char *argv[]) {
 		cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-		for (int i = 1; i <= N / 2; ++i) {
-			initState.set(i, "Up");
-		}
-		for (int i = N/2+1; i <= N; ++i) {
-			initState.set(i, "Dn");
 
-		}
+		initState.set(N/2-1, "Dn");
+		initState.set(N/2  , "Dn");
+		initState.set(N/2+1, "Up");
 
+		bool is_up = true;
+		for (int i = N/2 - 2 ; i > 1; i-=3) {
+			if(is_up){
+				initState.set(i, "Up");
+				initState.set(i - 1, "Up");
+				initState.set(i - 2, "Up");
+			} else {
+				initState.set(i, "Dn");
+				initState.set(i - 1, "Dn");
+				initState.set(i - 2, "Dn");
+			}
+			is_up = !is_up;
+		}
+		bool is_up = false;
+		for (int i = N/2 + 2 ; i < N; i+=3) {
+			if(is_up){
+				initState.set(i, "Up");
+				initState.set(i + 1, "Up");
+				initState.set(i + 2, "Up");
+			} else {
+				initState.set(i, "Dn");
+				initState.set(i + 1, "Dn");
+				initState.set(i + 2, "Dn");
+			}
+			is_up = !is_up;
+		}
 		psi = MPS(initState);
 		psi.noPrime();
+
+
+
 	} else if ( param.val("AlphaGate") > 0) {
 			auto initState = InitState(sites);
 			for (int i = 1; i <= N; ++i){
