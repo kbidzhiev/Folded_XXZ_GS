@@ -247,7 +247,7 @@ void Exp_B::initialize(const SiteSet &sites, const ThreeSiteParam &param,
 void Exp_B::TimeGates(const int begin, const int end,
 		const complex<double> tau, const SiteSet &sites,
 		const ThreeSiteParam &param) {
-	const int step = 3;
+	const int gate_range = 3;
 
 	// 1/8 is a prefactor of exponent, 8 comes from SPin to Pauli
 	// 1/2 from {SxSy - SySx} -> 0.5{SpSm-SmSp}
@@ -255,7 +255,7 @@ void Exp_B::TimeGates(const int begin, const int end,
 	const double Delta_inverse = 1.0/param.val("Delta");
 
 
-	for (int j = begin; j < end - 1; j += step) {
+	for (int j = begin; j < end - 1; j += gate_range) {
 		auto hh = Delta_inverse * coeff
 				* op(sites, "Sp", j)
 				* op(sites, "Sm", j + 1)

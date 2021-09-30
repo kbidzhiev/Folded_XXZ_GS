@@ -363,7 +363,7 @@ int main(int argc, char *argv[]) {
 			psi.noPrime();
 	} else if ( param.val("XXZ") == 1) {
 		cout << "initial state is (ddduuu)DDU(ddduuu) evolved with Eq (66)"
-				<< " from https://scipost.org/SciPostPhysCore.4.2.010/pdf " << endl;
+				//<< " from https://scipost.org/SciPostPhysCore.4.2.010/pdf " << endl;
 		auto initState = InitState(sites);
 
 		initState.set(N/2-1, "Dn");
