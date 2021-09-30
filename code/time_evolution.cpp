@@ -203,14 +203,14 @@ void Exp_B::initialize(const SiteSet &sites, const ThreeSiteParam &param,
 	const int end = param.val("N");
 	const int order = param.val("TrotterOrder");
 	if (order == 1) {
-		cout << "trotter 1 scheme" << endl;
+		cout << "Exp_B : trotter 1 scheme" << endl;
 
 		TimeGates(begin, end, tau, sites, param);
 		TimeGates(begin + 1, end, tau, sites, param);
 		TimeGates(begin + 2, end, tau, sites, param);
 
 	} else {
-		cout << "trotter 2 scheme" << endl;
+		cout << "Exp_B : trotter 2 scheme" << endl;
 
 		double begin0 = begin; //this variable are needed to change operators ABC
 		double begin2 = begin + 1;
@@ -231,37 +231,34 @@ void Exp_B::initialize(const SiteSet &sites, const ThreeSiteParam &param,
 void Exp_B::TimeGates(const int begin, const int end,
 		const complex<double> tau, const SiteSet &sites,
 		const ThreeSiteParam &param) {
-	const int step = 3;
+
+	const int size_of_gates = 4;
 	const double Delta_inverse = 1.0/param.val("Delta");
 
 	// 1/8 is a prefactor of exponent, 8 comes from SPin to Pauli
 	// 1/2 from {SxSy - SySx} -> 1/{SpSm-SmSp}
 	const double coeff = 0.5;
-	//cout << "Gates starts from " << begin << endl;
-	for (int j = begin + 1; j < end - 1; j += step) {
-		// 8 here is to match spin matrices and pauli matrices
+	for (int j = begin; j < end - 1; j += size_of_gates) {
+		cout << "(" << j << ", ... ," << j + 3 << ")"<< endl;
 		auto hh = Delta_inverse * coeff
-				* op(sites, "Id", j - 1)
-				* op(sites, "Sp", j)
-				* op(sites, "Sm", j + 1)
-				* op(sites, "Sz", j + 2);
-		hh += - Delta_inverse * coeff
-				* op(sites, "Id", j - 1)
-				* op(sites, "Sm", j)
-				* op(sites, "Sp", j + 1)
+				* op(sites, "Sx", j  )
+				* op(sites, "Sy", j + 1)
 				* op(sites, "Sz", j + 2);
 
 		hh += - Delta_inverse * coeff
-				* op(sites, "Sz", j - 1)
-				* op(sites, "Sp", j    )
-				* op(sites, "Sm", j + 1)
-				* op(sites, "Id", j + 2);
+				* op(sites, "Sy", j )
+				* op(sites, "Sx", j + 1)
+				* op(sites, "Sz", j + 2);
+
+		hh += - Delta_inverse * coeff
+				* op(sites, "Sz", j )
+				* op(sites, "Sx", j + 1)
+				* op(sites, "Sy", j + 2);
 
 		hh += + Delta_inverse * coeff
-				* op(sites, "Sz", j - 1)
-				* op(sites, "Sm", j    )
-				* op(sites, "Sp", j + 1)
-				* op(sites, "Id", j + 2);
+				* op(sites, "Sz", j )
+				* op(sites, "Sy", j + 1)
+				* op(sites, "Sx", j + 2);
 
 		auto G = expHermitian(hh, tau);
 		gates.emplace_back(j, move(G));
@@ -272,34 +269,25 @@ void Exp_B::Evolve(MPS &psi, const Args &args) {
 		auto j = gate.i1;
 		auto &G = gate.G;
 		psi.position(j);
-		auto WF = psi(j - 1) *psi(j) * psi(j + 1) * psi(j + 2);
+		auto WF = psi(j) * psi(j + 1) * psi(j + 2); //* psi(j + 3);
 		//cout << length(WF)<< endl;
 		WF = G * WF;
 		WF /= norm(WF);
 		WF.noPrime();
 		{
-			auto [Uj_minus_1, Vj_minus_1] = factor(WF,
-					{ siteIndex(psi, j-1), leftLinkIndex(psi, j-1) }, args);
-
-			auto indR = commonIndex(Uj_minus_1, Vj_minus_1);
-			auto [Uj, Vj] = factor(Vj_minus_1,
-					{ siteIndex(psi, j ), indR }, args);
-
-			indR = commonIndex(Uj, Vj);
+			auto [Uj, Vj] = factor(WF,
+					{ siteIndex(psi, j), leftLinkIndex(psi, j) }, args);
+			auto indR = commonIndex(Uj, Vj);
 			auto [Uj_plus_1, Vj_plus_1] = factor(Vj,
 					{ siteIndex(psi, j + 1 ), indR }, args);
-
-			indR = commonIndex(Uj_plus_1, Vj_plus_1);
-			auto [Uj_plus_2, Vj_plus_2] = factor(Vj_plus_1,
-					{ siteIndex(psi, j + 2 ), indR }, args);
-
-
-			psi.set(j - 1, Uj_minus_1);
+//
+//			indR = commonIndex(Uj_plus_1, Vj_plus_1);
+//			auto [Uj_plus_2, Vj_plus_2] = factor(Vj_plus_1,
+//					{ siteIndex(psi, j + 2 ), indR }, args);
 			psi.set(j    , Uj);
-			psi.set(j + 1, Uj_plus_2);
-			psi.set(j + 2, Vj_plus_2);
-
-
+			psi.set(j + 1, Uj_plus_1);
+			psi.set(j + 2, Vj_plus_1);
+			//psi.set(j + 3, Vj_plus_2);
 		}
 	}
 }

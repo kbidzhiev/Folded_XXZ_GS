@@ -362,9 +362,9 @@ int main(int argc, char *argv[]) {
 
 			psi.noPrime();
 	} else if ( param.val("XXZ") == 1) {
-		cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
+		cout << "initial state is (ddduuu)DDU(ddduuu) evolved with Eq (66)"
+				<< " from https://scipost.org/SciPostPhysCore.4.2.010/pdf " << endl;
 		auto initState = InitState(sites);
-		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
 
 		initState.set(N/2-1, "Dn");
 		initState.set(N/2  , "Dn");
@@ -396,6 +396,17 @@ int main(int argc, char *argv[]) {
 		psi = MPS(initState);
 		psi.noPrime();
 
+		auto initial_state = psi;
+
+		double step_in_delta = 0.001;
+		Exp_B expB_XXZ(sites, param,  step_in_delta);
+		int total_steps = 1.0/ (step_in_delta * param.val("Delta") );
+		for (int i = 0; i < total_steps; ++i){
+			expB_XXZ.Evolve(psi, args);
+			psi.orthogonalize(args);
+			cout << "step " << i << " / " << total_steps << " is done" << endl;
+			cout << "Overlap = " << innerC(initial_state, psi) << endl;
+		}
 
 
 	} else if ( param.val("AlphaGate") > 0) {
