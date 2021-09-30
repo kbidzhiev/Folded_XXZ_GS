@@ -191,7 +191,7 @@ vector<MPO> XXZ_time_evol(const SiteSet &sites, const ThreeSiteParam &param) {
 
 
 
-//Trotter Gates
+//Trotter Gates for Exp_B
 Exp_B::Exp_B(const SiteSet &sites, const ThreeSiteParam &param,
 		const complex<double> tau) {
 	initialize(sites, param, tau);
@@ -203,62 +203,78 @@ void Exp_B::initialize(const SiteSet &sites, const ThreeSiteParam &param,
 	const int end = param.val("N");
 	const int order = param.val("TrotterOrder");
 	if (order == 1) {
-		cout << "Exp_B : trotter 1 scheme" << endl;
+		cout << "trotter 1 scheme" << endl;
 
 		TimeGates(begin, end, tau, sites, param);
 		TimeGates(begin + 1, end, tau, sites, param);
 		TimeGates(begin + 2, end, tau, sites, param);
 
 	} else {
-		cout << "Exp_B : trotter 2 scheme" << endl;
-
+		cout << "trotter 2 scheme" << endl;
+		/*
+		 double a1 = 1. / 6;		// more precise arrpoximation coefficients
+		 double a2 = 1 - 2. * a1;
+		 double b1 = (3 - sqrt(3)) / 6.;
+		 double b2 = 1. / 2 - b1;
+		 double c1 = 1. / 2;
+		 */
 		double begin0 = begin; //this variable are needed to change operators ABC
 		double begin2 = begin + 1;
 		double begin4 = begin + 2;
 		//Trotter gates from arxiv.org/abs/1901.04974
 		// Eq. (38),(47)
 
-		cout << "Time evolution " << endl;
+		cout << "Time evolutions " << endl;
 		TimeGates(begin0, end, 0.5 * tau, sites, param); //A
 		TimeGates(begin2, end, 0.5 * tau, sites, param); //B
 		TimeGates(begin4, end, tau, sites, param); //C
 		TimeGates(begin2, end, 0.5 * tau, sites, param); //B
 		TimeGates(begin0, end, 0.5 * tau, sites, param); //A
-
+		/*
+		 TimeGates(begin0, end, a1 * tau, sites, param); //A
+		 TimeGates(begin2, end, b1 * tau, sites, param); //B
+		 TimeGates(begin4, end, c1 * tau, sites, param); //C
+		 TimeGates(begin2, end, b2 * tau, sites, param); //B
+		 TimeGates(begin0, end, a2 * tau, sites, param); //A
+		 TimeGates(begin2, end, b2 * tau, sites, param); //B
+		 TimeGates(begin4, end, c1 * tau, sites, param); //C
+		 TimeGates(begin2, end, b1 * tau, sites, param); //B
+		 TimeGates(begin0, end, a1 * tau, sites, param); //A
+		 */
 	}
 }
 
 void Exp_B::TimeGates(const int begin, const int end,
 		const complex<double> tau, const SiteSet &sites,
 		const ThreeSiteParam &param) {
-
-	const int size_of_gates = 4;
-	const double Delta_inverse = 1.0/param.val("Delta");
+	const int step = 3;
 
 	// 1/8 is a prefactor of exponent, 8 comes from SPin to Pauli
-	// 1/2 from {SxSy - SySx} -> 1/{SpSm-SmSp}
+	// 1/2 from {SxSy - SySx} -> 0.5{SpSm-SmSp}
 	const double coeff = 0.5;
-	for (int j = begin; j < end - 1; j += size_of_gates) {
-		cout << "(" << j << ", ... ," << j + 3 << ")"<< endl;
+	const double Delta_inverse = 1.0/param.val("Delta");
+
+
+	for (int j = begin; j < end - 1; j += step) {
 		auto hh = Delta_inverse * coeff
-				* op(sites, "Sx", j  )
-				* op(sites, "Sy", j + 1)
+				* op(sites, "Sp", j)
+				* op(sites, "Sm", j + 1)
 				* op(sites, "Sz", j + 2);
 
-		hh += - Delta_inverse * coeff
-				* op(sites, "Sy", j )
-				* op(sites, "Sx", j + 1)
+		hh += Delta_inverse * coeff
+				* op(sites, "Sm", j)
+				* op(sites, "Sp", j + 1)
 				* op(sites, "Sz", j + 2);
 
-		hh += - Delta_inverse * coeff
-				* op(sites, "Sz", j )
-				* op(sites, "Sx", j + 1)
-				* op(sites, "Sy", j + 2);
+		hh -= Delta_inverse * coeff
+				* op(sites, "Sz", j)
+				* op(sites, "Sp", j + 1)
+				* op(sites, "Sm", j + 2);
 
-		hh += + Delta_inverse * coeff
-				* op(sites, "Sz", j )
-				* op(sites, "Sy", j + 1)
-				* op(sites, "Sx", j + 2);
+		hh += Delta_inverse * coeff
+				* op(sites, "Sz", j)
+				* op(sites, "Sm", j + 1)
+				* op(sites, "Sp", j + 2);
 
 		auto G = expHermitian(hh, tau);
 		gates.emplace_back(j, move(G));
@@ -269,25 +285,19 @@ void Exp_B::Evolve(MPS &psi, const Args &args) {
 		auto j = gate.i1;
 		auto &G = gate.G;
 		psi.position(j);
-		auto WF = psi(j) * psi(j + 1) * psi(j + 2); //* psi(j + 3);
-		//cout << length(WF)<< endl;
+		auto WF = psi(j) * psi(j + 1) * psi(j + 2);
 		WF = G * WF;
 		WF /= norm(WF);
 		WF.noPrime();
 		{
-			auto [Uj, Vj] = factor(WF,
+			auto [Uj1, Vj1] = factor(WF,
 					{ siteIndex(psi, j), leftLinkIndex(psi, j) }, args);
-			auto indR = commonIndex(Uj, Vj);
-			auto [Uj_plus_1, Vj_plus_1] = factor(Vj,
-					{ siteIndex(psi, j + 1 ), indR }, args);
-//
-//			indR = commonIndex(Uj_plus_1, Vj_plus_1);
-//			auto [Uj_plus_2, Vj_plus_2] = factor(Vj_plus_1,
-//					{ siteIndex(psi, j + 2 ), indR }, args);
-			psi.set(j    , Uj);
-			psi.set(j + 1, Uj_plus_1);
-			psi.set(j + 2, Vj_plus_1);
-			//psi.set(j + 3, Vj_plus_2);
+			auto indR = commonIndex(Uj1, Vj1);
+			auto [Uj2, Vj2] = factor(Vj1, { siteIndex(psi, j + 1), indR }, args);
+			psi.set(j, Uj1);
+			psi.set(j + 1, Uj2);
+			psi.set(j + 2, Vj2);
+
 		}
 	}
 }

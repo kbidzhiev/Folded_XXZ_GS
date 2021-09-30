@@ -398,14 +398,16 @@ int main(int argc, char *argv[]) {
 
 		auto initial_state = psi;
 
-		double step_in_delta = 0.001;
+		double step_in_delta = 0.01;
 		Exp_B expB_XXZ(sites, param,  step_in_delta);
+		//TrotterExp expH_Folded_XXZ(sites, param, -Cplx_i * step_in_delta);
 		int total_steps = 1.0/ (step_in_delta * param.val("Delta") );
 		for (int i = 0; i < total_steps; ++i){
 			expB_XXZ.Evolve(psi, args);
+			//expH_Folded_XXZ.Evolve(psi, args);
 			psi.orthogonalize(args);
 			cout << "step " << i << " / " << total_steps << " is done" << endl;
-			cout << "Overlap = " << innerC(initial_state, psi) << endl;
+			cout << "Overlap = " << innerC(psi, psi) << endl;
 		}
 
 
