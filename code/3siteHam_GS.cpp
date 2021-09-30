@@ -361,7 +361,20 @@ int main(int argc, char *argv[]) {
 			}
 
 			psi.noPrime();
+	} else if ( param.longval("VacVac") == 1) {
+		cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
+		auto initState = InitState(sites);
+		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+		for (int i = 1; i <= N / 2; ++i) {
+			initState.set(i, "Up");
+		}
+		for (int i = N/2+1; i <= N; ++i) {
+			initState.set(i, "Dn");
 
+		}
+
+		psi = MPS(initState);
+		psi.noPrime();
 	} else if ( param.val("AlphaGate") > 0) {
 			auto initState = InitState(sites);
 			for (int i = 1; i <= N; ++i){
@@ -389,7 +402,6 @@ int main(int argc, char *argv[]) {
 			for (int i = 1; i <= N; ++i){
 					initState.set(i, "Up");
 			}
-
 			//initState.set(N/2 ,"Dn");
 			psi = MPS(initState);
 			for (int i = 1; i <= N; ++i) {
@@ -923,11 +935,14 @@ int main(int argc, char *argv[]) {
 		if (n < n_steps) {
 			//MPS psi_temp = psi;
 			cout << "Time evol" << endl;
-			if(XXZ == 1){
+			if(1){
 				for(auto & expH_XXZ : XXZ_time_evol_vec)
 				psi = applyMPO(expH_XXZ, psi, args);
+				psi.noPrime();
+				cout << "XXZ" << endl;
 			} else{
 				expH_Folded_XXZ.Evolve(psi, args);
+				cout << "Folded XXZ" << endl;
 			}
 			psi.orthogonalize(args);
 

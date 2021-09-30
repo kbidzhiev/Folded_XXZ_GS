@@ -142,27 +142,27 @@ void TrotterExp::Evolve(MPS &psi, const Args &args) {
 vector<MPO> XXZ_time_evol(const SiteSet &sites, const ThreeSiteParam &param) {
 
 	double tau = param.val("tau");
-	const int order = param.val("TrotterOrder");
+	const int order = param.val("TrotterOrderXXZ");
 
 	vector<complex<double>> time_steps;
-	time_steps.reserve(order);
+	time_steps.reserve(7);
 	if (order == 1) {
 		//Approx. with error O(tau^3)
-		time_steps[0] = Cplx_i * tau;
+		time_steps.push_back(Cplx_i * tau);
 	}
 	if (order == 2) {
 		//Approx. with error O(tau^3)
-		time_steps[0] = 0.5 * ( 1 + Cplx_i) * tau;
-		time_steps[1] = 0.5 * (-1 + Cplx_i) * tau;
+		time_steps.push_back(0.5 * ( 1 + Cplx_i) * tau);
+		time_steps.push_back(0.5 * (-1 + Cplx_i) * tau);
 
 	}
 	if (order == 3) {
 		//Approx. with error O(tau^4) [thanks to Kemal]
 		//Tested -it's ok
-		time_steps[0] = 0.10566243270259355887 - 0.39433756729740644113 * Cplx_i;
-		time_steps[1] = Cplx_i * time_steps[0];
-		time_steps[2] = conj(time_steps[1]);
-		time_steps[3] = Cplx_i * time_steps[2];
+		time_steps.push_back(0.10566243270259355887 - 0.39433756729740644113 * Cplx_i);
+		time_steps.push_back(Cplx_i * time_steps[0]);
+		time_steps.push_back(conj(time_steps[1]));
+		time_steps.push_back(Cplx_i * time_steps[2]);
 		for (auto &time_step : time_steps){
 			time_step *= Cplx_i * tau;
 		}
@@ -171,13 +171,13 @@ vector<MPO> XXZ_time_evol(const SiteSet &sites, const ThreeSiteParam &param) {
 		//Approx. with error O(tau^5) [thanks to Kemal twice]
 		//WARNINIG Not fully TESTED
 		//Tested -it's ok
-		time_steps[0] = 0.25885339861091821723 + 0.04475613401114190287 * Cplx_i;
-		time_steps[1] = -0.03154685814880379274 + 0.24911905427556321757 * Cplx_i;
-		time_steps[2] = 0.19082905211066719664 - 0.23185374923210605447 * Cplx_i;
-		time_steps[3] = 0.1637288148544367438753;
-		time_steps[4] = conj(time_steps[2]);
-		time_steps[5] = conj(time_steps[1]);
-		time_steps[6] = conj(time_steps[0]);
+		time_steps.push_back( 0.25885339861091821723 + 0.04475613401114190287 * Cplx_i);
+		time_steps.push_back(-0.03154685814880379274 + 0.24911905427556321757 * Cplx_i);
+		time_steps.push_back( 0.19082905211066719664 - 0.23185374923210605447 * Cplx_i);
+		time_steps.push_back( 0.1637288148544367438753);
+		time_steps.push_back(conj(time_steps[2]));
+		time_steps.push_back(conj(time_steps[1]));
+		time_steps.push_back(conj(time_steps[0]));
 		for (auto &time_step : time_steps){
 			time_step *= Cplx_i * tau;
 		}
@@ -185,13 +185,20 @@ vector<MPO> XXZ_time_evol(const SiteSet &sites, const ThreeSiteParam &param) {
 	}
 
 	vector<MPO> Exp_H_vec;
-	Exp_H_vec.reserve(order);
+	Exp_H_vec.reserve(time_steps.size());
 
-	XXZ Init_H(sites, param);
+	for (auto elem : time_steps){
+		cout << elem << endl;
+	}
+
+	XXZ H_XXZ(sites, param);
 	for (auto time_step : time_steps){
-		MPO expH_i = toExpH(Init_H.ampo, time_step);
+		MPO expH_i = toExpH(H_XXZ.ampo, time_step);
 		Exp_H_vec.push_back(expH_i);
 	}
+	cout << "time_steps" << time_steps.size() << "\n"
+				<< "Exp_H_vec" << Exp_H_vec.size() << endl;
+
 	return Exp_H_vec;
 }
 

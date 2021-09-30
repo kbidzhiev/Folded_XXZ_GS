@@ -91,7 +91,6 @@ void LadderHamiltonian::init(const ThreeSiteParam &param) {    //.init (param)
 		throw invalid_argument(
 				"One should choose 'Ladder' or 'Ising' in the LadderHamiltonian ham_type_ parameter");
 	}
-
 }
 
 
