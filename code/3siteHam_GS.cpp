@@ -398,7 +398,7 @@ int main(int argc, char *argv[]) {
 
 		auto initial_state = psi;
 
-		double dt = 0.01 * M_PI/(4 * param.val("Delta"));
+		double dt = 0.01;// * M_PI/(4 * param.val("Delta"));
 		Exp_B expB_XXZ(sites, param, -Cplx_i * dt);
 		int total_steps =  1.0 / (dt * param.val("Delta")) ;
 		for (int i = 0; i < total_steps; ++i){
@@ -659,8 +659,8 @@ int main(int argc, char *argv[]) {
 
 	//exp(Ham) for the dynamics
 
-	double tau = param.val("tau");
-	const long int n_steps = param.val("T") / param.val("tau");
+	double tau = param.val("tau") * M_PI / (4.0 * param.val("Delta"));
+	const long int n_steps = param.val("T") / tau;
 	TrotterExp expH_Folded_XXZ(sites, param, -Cplx_i * tau);
 	vector<MPO> XXZ_time_evol_vec = XXZ_time_evol(sites, param);
 
@@ -988,7 +988,7 @@ int main(int argc, char *argv[]) {
 			// Hadamar gates act at time == "Measurement"
 			if(  (double)param.val("Measurement") > 0
 					&& n > 0
-					&& n  % (int)(param.val("Measurement")/param.val("tau")) == 0
+					&& n  % (int)(param.val("Measurement")/tau) == 0
 					){
 				//AlphaGate(N/2-1, -0.5);
 				cout << "TIME IS == \"Measurement\". I ACT WITH SigmaXGate GATES" << endl;
