@@ -663,7 +663,7 @@ int main(int argc, char *argv[]) {
 	if(param.val("XXZ") == 1){
 		tau *= M_PI / (4.0 * param.val("Delta"));
 	}
-	const long int n_steps = param.val("T") / tau;
+	const long int n_steps = param.val("T") / param.val("tau");
 	TrotterExp expH_Folded_XXZ(sites, param, -Cplx_i * tau);
 	vector<MPO> XXZ_time_evol_vec = XXZ_time_evol(sites, param);
 
@@ -688,7 +688,7 @@ int main(int argc, char *argv[]) {
 					<< BondDim(psi, dot) << "\t" << maxLinkDim(psi) << endl;
 
 			if (param.val("SVD_spec") > 0) {
-				if (n % int(param.val("SVD_spec") / tau) == 0) {
+				if (n % int(param.val("SVD_spec") / param.val("tau")) == 0) {
 					spec << "\"t=" << time << "\"" << endl;
 					int si = Myspec.size();
 					for (int i = 0; i < si; i++) {
@@ -704,7 +704,7 @@ int main(int argc, char *argv[]) {
 
 		// ------- Loschmidt echo -----
 		if (param.val("Loschmidt") > 0)
-			if (n % int(param.val("Loschmidt") / tau) == 0) {
+			if (n % int(param.val("Loschmidt") / param.val("tau")) == 0) {
 				complex<double> echo = innerC(psi0,psi);
 				loschmidt << time << "\t" << setw(16) << setfill('0')
 						<< real(echo) << "\t" << imag(echo)	<< endl;
@@ -712,7 +712,7 @@ int main(int argc, char *argv[]) {
 
 		// ------- entanglement Entropy Profile -----
 		if (param.val("EntropyProfile") > 0)
-			if (n % int(param.val("EntropyProfile") / tau) == 0) {
+			if (n % int(param.val("EntropyProfile") / param.val("tau")) == 0) {
 				entropy_profile << "\"t=" << time << "\"" << endl;
 				for (int i = 1; i < N; i++) {
 					double entr_std = Entropy(psi, i, Myspec, 1); // p log p
@@ -726,7 +726,7 @@ int main(int argc, char *argv[]) {
 		// ------- Sz profile -------
 
 		if (param.val("Sz") > 0) {
-			if (n % int(param.val("Sz") / tau) == 0) {
+			if (n % int(param.val("Sz") / param.val("tau")) == 0) {
 				sx << "\"t=" << time << "\"" << endl;
 				sy << "\"t=" << time << "\"" << endl;
 				sz << "\"t=" << time << "\"" << endl;
@@ -944,7 +944,7 @@ int main(int argc, char *argv[]) {
 		}
 		// ------- Energy Profile -------
 		if (param.val("Q1Profile") > 0 ) {
-			if (n % int(param.val("Q1Profile") / tau) == 0) {
+			if (n % int(param.val("Q1Profile") / param.val("tau")) == 0) {
 				q1_profile << "\"t=" << time << "\"" << endl;
 				for (int i = 1; i <= N - 3; i++) {
 					const complex<double> q1 = Q1(psi, sites, i);
@@ -960,7 +960,7 @@ int main(int argc, char *argv[]) {
 		}
 		// ------- Q2 Profile -------
 		if (param.val("Q2Profile") > 0 ) {
-			if (n % int(param.val("Q2Profile") / tau) == 0) {
+			if (n % int(param.val("Q2Profile") / param.val("tau")) == 0) {
 				q2_profile << "\"t=" << time << "\"" << endl;
 				for (int i = 1; i <= N - 5; i++) {
 					const complex<double> q2 = Q2(psi, sites, i);
@@ -991,7 +991,7 @@ int main(int argc, char *argv[]) {
 			// Hadamar gates act at time == "Measurement"
 			if(  (double)param.val("Measurement") > 0
 					&& n > 0
-					&& n  % (int)(param.val("Measurement")/tau) == 0
+					&& n  % (int)(param.val("Measurement")/param.val("tau")) == 0
 					){
 				//AlphaGate(N/2-1, -0.5);
 				cout << "TIME IS == \"Measurement\". I ACT WITH SigmaXGate GATES" << endl;
