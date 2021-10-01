@@ -398,7 +398,7 @@ int main(int argc, char *argv[]) {
 
 		auto initial_state = psi;
 
-		double dt = 0.01 ;//* M_PI/(4 * param.val("Delta"));
+		double dt = 0.01 * M_PI/(4 * param.val("Delta"));
 		Exp_B expB_XXZ(sites, param, -Cplx_i * dt);
 		int total_steps =  1.0 / (dt * param.val("Delta")) ;
 		for (int i = 0; i < total_steps; ++i){

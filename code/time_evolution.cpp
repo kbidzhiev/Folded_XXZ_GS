@@ -251,7 +251,7 @@ void Exp_B::TimeGates(const int begin, const int end,
 
 	// 1/8 is a prefactor of exponent, 8 comes from SPin to Pauli
 	// 1/2 from {SxSy - SySx} -> 0.5{SpSm-SmSp}
-	const double coeff = 0.5;
+	const double coeff = 1.0; // 8 from spin matrices 8 from 4*2, so 8/8 == 1
 	const double Delta_inverse = 1.0/param.val("Delta");
 
 
