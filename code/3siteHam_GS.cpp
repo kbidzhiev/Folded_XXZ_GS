@@ -398,10 +398,10 @@ int main(int argc, char *argv[]) {
 
 		auto initial_state = psi;
 
-		double step_in_delta = 0.01;
+		double step_in_delta = M_PI/(4* param.val("Delta"));
 		Exp_B expB_XXZ(sites, param,  step_in_delta);
 		//TrotterExp expH_Folded_XXZ(sites, param, -Cplx_i * step_in_delta);
-		int total_steps = 1.0/ (step_in_delta * param.val("Delta") );
+		int total_steps =  step_in_delta ;
 		for (int i = 0; i < total_steps; ++i){
 			expB_XXZ.Evolve(psi, args);
 			//expH_Folded_XXZ.Evolve(psi, args);
