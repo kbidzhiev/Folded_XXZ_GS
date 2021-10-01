@@ -24,6 +24,8 @@ void XXZ::init(const ThreeSiteParam &param) {
 	double mu = 0;
 	const double hL = param.val("hL");
 	const double hR = param.val("hR");
+
+	const double Delta = param.val("Delta");
 	dot = N / 2 + 1;  //Position of the "dot"
 	cout << "The dot is on site #" << dot << endl;
 	for (int j = 1; j < N - 1; ++j) {
@@ -33,7 +35,7 @@ void XXZ::init(const ThreeSiteParam &param) {
 		// and the other is "Jacobian", i.e. 0.5 (SpSm+ SmSp) = SxSx + SySy
 		ampo += J * 4 * 0.5, "S+", j, "S-", j + 1; //
 		ampo += J * 4 * 0.5, "S-", j, "S+", j + 1;
-		ampo += J * 4      , "Sz", j, "Sz", j + 1;
+		ampo += J * 4 * Delta, "Sz", j, "Sz", j + 1;
 		if (j <= dot) {
 			mu = hL;
 		} else {
