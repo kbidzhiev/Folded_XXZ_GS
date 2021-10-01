@@ -663,7 +663,7 @@ int main(int argc, char *argv[]) {
 	if(param.val("XXZ") == 1){
 		tau *= M_PI / (4.0 * param.val("Delta"));
 	}
-	const long int n_steps = param.val("T") / param.val("tau");
+	const long int n_steps = param.val("T") / tau;
 	TrotterExp expH_Folded_XXZ(sites, param, -Cplx_i * tau);
 	vector<MPO> XXZ_time_evol_vec = XXZ_time_evol(sites, param);
 
