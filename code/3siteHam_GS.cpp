@@ -362,7 +362,7 @@ int main(int argc, char *argv[]) {
 
 			psi.noPrime();
 	} else if ( param.val("XXZ") == 1) {
-		cout << "initial state is (ddduuu)DDU(ddduuu) evolved with Eq (66)"
+		cout << "initial state is (ddduuu)DDU(ddduuu) evolved with Eq (66)" << endl;
 				//<< " from https://scipost.org/SciPostPhysCore.4.2.010/pdf " << endl;
 		auto initState = InitState(sites);
 
@@ -398,16 +398,14 @@ int main(int argc, char *argv[]) {
 
 		auto initial_state = psi;
 
-		double step_in_delta = M_PI/(4* param.val("Delta"));
-		Exp_B expB_XXZ(sites, param,  step_in_delta);
-		//TrotterExp expH_Folded_XXZ(sites, param, -Cplx_i * step_in_delta);
-		int total_steps =  step_in_delta ;
+		double dt = 0.01 ;//* M_PI/(4 * param.val("Delta"));
+		Exp_B expB_XXZ(sites, param, -Cplx_i * dt);
+		int total_steps =  1.0 / (dt * param.val("Delta")) ;
 		for (int i = 0; i < total_steps; ++i){
 			expB_XXZ.Evolve(psi, args);
-			//expH_Folded_XXZ.Evolve(psi, args);
 			psi.orthogonalize(args);
 			cout << "step " << i << " / " << total_steps << " is done" << endl;
-			cout << "Overlap = " << innerC(psi, psi) << endl;
+			cout << "Overlap = " << innerC(initial_state, psi) << endl;
 		}
 
 
@@ -432,21 +430,25 @@ int main(int argc, char *argv[]) {
 			psi.noPrime();
 
 	} else if ( param.longval("Sav") == 1) {
-			cout << "initial state is  | Up Left Up Left > " << endl;
+			cout << "dudu[UU]dudu" << endl;
 			auto initState = InitState(sites);
 
 			for (int i = 1; i <= N; ++i){
+				if(i % 2 == 0){
 					initState.set(i, "Up");
-			}
-			//initState.set(N/2 ,"Dn");
-			psi = MPS(initState);
-			for (int i = 1; i <= N; ++i) {
-				if (i % 2 == 0) {
-					HadamarGate(i);
+				} else {
+					initState.set(i, "Dn");
 				}
 			}
-			SigmaXGate(N/2);
+			psi = MPS(initState);
+
+			const int distance = param.val("Distance");
+			SigmaXGate(N/2 + distance);
+			SigmaXGate(N/2 );
+
 			psi.noPrime();
+			cout << "constructing is done" << endl;
+
 	} else if ( param.val("Theta") > 0 ) {
 		cout << "initial state is  | Up Left Up Right > " << endl;
 		auto initState = InitState(sites);

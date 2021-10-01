@@ -257,24 +257,24 @@ void Exp_B::TimeGates(const int begin, const int end,
 
 	for (int j = begin; j < end - 1; j += gate_range) {
 		auto hh = Delta_inverse * coeff
-				* op(sites, "Sp", j)
-				* op(sites, "Sm", j + 1)
+				* op(sites, "Sx", j)
+				* op(sites, "Sy", j + 1)
 				* op(sites, "Sz", j + 2);
 
 		hh += Delta_inverse * coeff
-				* op(sites, "Sm", j)
-				* op(sites, "Sp", j + 1)
+				* op(sites, "Sy", j)
+				* op(sites, "Sx", j + 1)
 				* op(sites, "Sz", j + 2);
 
 		hh -= Delta_inverse * coeff
 				* op(sites, "Sz", j)
-				* op(sites, "Sp", j + 1)
-				* op(sites, "Sm", j + 2);
+				* op(sites, "Sx", j + 1)
+				* op(sites, "Sy", j + 2);
 
 		hh += Delta_inverse * coeff
 				* op(sites, "Sz", j)
-				* op(sites, "Sm", j + 1)
-				* op(sites, "Sp", j + 2);
+				* op(sites, "Sy", j + 1)
+				* op(sites, "Sx", j + 2);
 
 		auto G = expHermitian(hh, tau);
 		gates.emplace_back(j, move(G));
