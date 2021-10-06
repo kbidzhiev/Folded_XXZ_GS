@@ -449,6 +449,52 @@ int main(int argc, char *argv[]) {
 			psi.noPrime();
 			cout << "constructing is done" << endl;
 
+	} else if ( param.longval("Sav2") == 1) {
+			cout << "dudu[D]udu  ... du[L]ud" << endl;
+			auto initState = InitState(sites);
+
+			for (int i = 1; i <= N; ++i){
+				if(i % 2 == 0){
+					initState.set(i, "Up");
+				} else {
+					initState.set(i, "Dn");
+				}
+			}
+			psi = MPS(initState);
+
+			const int distance = param.val("Distance");
+			HadamarGate(N/2 + distance);
+			SigmaXGate(N/2);
+
+			psi.noPrime();
+			cout << "constructing is done" << endl;
+
+	} else if ( param.longval("Mau") == 1) {
+			cout << "dudu[D]udu  ... du[L]ud" << endl;
+			auto initState = InitState(sites);
+
+			for (int i = 1; i <= N; ++i){
+				if(i % 2 == 0){
+					initState.set(i, "Up");
+				} else {
+					initState.set(i, "Dn");
+				}
+			}
+			psi = MPS(initState);
+
+			SigmaXGate(N/2);
+			const int distance = param.val("Distance");
+			for(int i = distance; i < distance + 6; i+=2){
+				SigmaXGate(N/2 + i);
+			}
+
+
+
+			psi.noPrime();
+			cout << "constructing is done" << endl;
+
+
+
 	} else if ( param.val("Theta") > 0 ) {
 		cout << "initial state is  | Up Left Up Right > " << endl;
 		auto initState = InitState(sites);
@@ -498,7 +544,7 @@ int main(int argc, char *argv[]) {
 // _______
 	ofstream ent, spec, entropy_profile, sz, sz_avrg, energy_beta,
 				q1_profile, q2_profile, sx, sy, sxsysz,  sx_avrg, loschmidt,
-				correlation1, correlation2, sxsx, sztotal_strm; //here I'm defining output streams == files
+				correlation1, correlation2, correlation3, sxsx, sztotal_strm; //here I'm defining output streams == files
 	ios_base::openmode mode;
 	mode = std::ofstream::out; //Erase previous file (if present)
 
@@ -548,6 +594,7 @@ int main(int argc, char *argv[]) {
 
 		correlation1.open("Correlation1.dat", mode);
 		correlation2.open("Correlation2.dat", mode);
+		correlation3.open("Correlation3.dat", mode);
 
 		sz_avrg.open("Sz_average_profile.dat", mode);
 		sx_avrg.open("Sx_average_profile.dat", mode);
@@ -621,6 +668,18 @@ int main(int argc, char *argv[]) {
 				<< "\t <Sz_i Sx_{i+2}>\t"	//8
 				<< "\t <Sz_i Sy_{i+2}>\t"	//9
 				<< "\t <Sz_i Sz_{i+2}>\t"	//10
+				<< "\t\ttime\n";
+
+		correlation3<< "#Position=i-"
+				<< "\t <Sx_i Sx_{i+3}>\t" 	//2
+				<< "\t <Sx_i Sy_{i+3}>\t"	//3
+				<< "\t <Sx_i Sz_{i+3}>\t"	//4
+				<< "\t <Sy_i Sx_{i+3}>\t"	//5
+				<< "\t <Sy_i Sy_{i+3}>\t"	//6
+				<< "\t <Sy_i Sz_{i+3}>\t"	//7
+				<< "\t <Sz_i Sx_{i+3}>\t"	//8
+				<< "\t <Sz_i Sy_{i+3}>\t"	//9
+				<< "\t <Sz_i Sz_{i+3}>\t"	//10
 				<< "\t\ttime\n";
 
 		sz_avrg << "#Position=i-"
@@ -736,6 +795,7 @@ int main(int argc, char *argv[]) {
 
 				correlation1 << "\"t=" << time << "\"" << endl;
 				correlation2 << "\"t=" << time << "\"" << endl;
+				correlation3 << "\"t=" << time << "\"" << endl;
 
 				sx_avrg << "\"t=" << time << "\"" << endl;
 				sz_avrg << "\"t=" << time << "\"" << endl;
@@ -754,9 +814,9 @@ int main(int argc, char *argv[]) {
 					double s = Sz(psi, sites, i);
 					double sx1 = Sx(psi, sites, i);
 					double sy1 = Sy(psi, sites, i);
-					double sxsx3 = 0, sxsx4 = 0;
-					double sysy3 = 0, sysy4 = 0;
-					double szsz3 = 0, szsz4 = 0;
+					double sxsx4 = 0;
+					double sysy4 = 0;
+					double szsz4 = 0;
 
 					// some correlations have form C(i,i+2)
 					// if i > N-2 I define correlation to be 0
@@ -766,6 +826,10 @@ int main(int argc, char *argv[]) {
 					double sxsx2 = 0, sxsy2 = 0, sxsz2 = 0;
 					double sysx2 = 0, sysy2 = 0, sysz2 = 0;
 					double szsx2 = 0, szsy2 = 0, szsz2 = 0;
+
+					double sxsx3 = 0, sxsy3 = 0, sxsz3 = 0;
+					double sysx3 = 0, sysy3 = 0, sysz3 = 0;
+					double szsx3 = 0, szsy3 = 0, szsz3 = 0;
 
 					complex<double> kss = 0;
 
@@ -797,10 +861,19 @@ int main(int argc, char *argv[]) {
 
 						kss = KSS(psi, sites, i);
 					}
-					if (i <= N - 3) {
-						sxsx3 = real(Correlation(psi, sites, "Sx", "Sx", i, i+3));
-						sysy3 = real(Correlation(psi, sites, "Sy", "Sy", i, i+3));
-						szsz3 = real(Correlation(psi, sites, "Sz", "Sz", i, i+3));
+					const int distance = param.val("Distance");
+					if (i <= N - distance) {
+
+						sxsx3 = real(Correlation(psi, sites, "Sx", "Sx", i, i+distance));
+						sxsy3 = real(Correlation(psi, sites, "Sx", "Sy", i, i+distance));
+						sxsz3 = real(Correlation(psi, sites, "Sx", "Sz", i, i+distance));
+						sysx3 = real(Correlation(psi, sites, "Sy", "Sx", i, i+distance));
+						sysy3 = real(Correlation(psi, sites, "Sy", "Sy", i, i+distance));
+						sysz3 = real(Correlation(psi, sites, "Sy", "Sz", i, i+distance));
+						szsx3 = real(Correlation(psi, sites, "Sz", "Sx", i, i+distance));
+						szsy3 = real(Correlation(psi, sites, "Sz", "Sy", i, i+distance));
+						szsz3 = real(Correlation(psi, sites, "Sz", "Sz", i, i+distance));
+
 					}
 					if (i <= N - 4) {
 						sxsx4 = real(Correlation(psi, sites, "Sx", "Sx", i, i+4));
@@ -889,6 +962,19 @@ int main(int argc, char *argv[]) {
 						<< szsz2 << "\t"				//10
 						<< time << endl;
 
+					correlation3 << i - dot  << "\t"	//column ID below
+						<< sxsx3 << "\t"				//2
+						<< sxsy3 << "\t"				//3
+						<< sxsz3 << "\t"				//4
+						<< sysx3 << "\t"				//5
+						<< sysy3 << "\t"				//6
+						<< sysz3 << "\t"				//7
+						<< szsx3 << "\t"				//8
+						<< szsy3 << "\t"				//9
+						<< szsz3 << "\t"				//10
+						<< time << endl;
+
+
 					if ( i % 2 == 1) { //odd site
 						sz_odd = s;
 						sx_odd = sx1;
@@ -930,6 +1016,7 @@ int main(int argc, char *argv[]) {
 					sxsysz << "\n\n";
 					correlation1 << "\n\n";
 					correlation2 << "\n\n";
+					correlation3 << "\n\n";
 					sxsx << "\n\n";
 				}
 				//sz_tot += Sz(psi, sites, N-1) + Sz(psi, sites, N);
