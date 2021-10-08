@@ -1,6 +1,6 @@
 /out_1
 
-
+*.dat
 *.pdf
 /Entropy_profile.dat_cp
 /err
