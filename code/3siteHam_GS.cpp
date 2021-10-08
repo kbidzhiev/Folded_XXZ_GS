@@ -101,22 +101,22 @@ int main(int argc, char *argv[]) {
 		// the spin will be {cos a, sin a}
 		auto ind = sites(i);
 		auto indP = prime(sites(i));
-		auto Had = ITensor(ind, indP);
+		auto Op = ITensor(ind, indP);
 		Had.set(ind(1), indP(1),  cos(alpha));
 		Had.set(ind(1), indP(2),  sin(alpha));
 		Had.set(ind(2), indP(1), -sin(alpha));
 		Had.set(ind(2), indP(2),  cos(alpha));
-		psi.setA(i, psi.A(i) * Had);
+		psi.setA(i, psi.A(i) * Op);
 	};
 	auto SigmaXGate = [&](int i) {
 		auto ind = sites(i);
 		auto indP = prime(sites(i));
-		auto Had = ITensor(ind, indP);
+		auto Op = ITensor(ind, indP);
 		Had.set(ind(1), indP(1), 0);
 		Had.set(ind(1), indP(2), 1);
 		Had.set(ind(2), indP(1), 1);
 		Had.set(ind(2), indP(2), 0);
-		psi.setA(i, psi.A(i) * Had);
+		psi.setA(i, psi.A(i) * Op);
 	};
 
 	if (param.longval("GroundState") == 1) {
