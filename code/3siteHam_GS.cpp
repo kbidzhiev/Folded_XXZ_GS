@@ -361,7 +361,7 @@ int main(int argc, char *argv[]) {
 			}
 
 			psi.noPrime();
-	} else if ( param.val("XXZ") == 1) {
+	} else if ( param.val("XXZ") > 0) {
 		cout << "initial state is (ddduuu)DDU(ddduuu) evolved with Eq (66)" << endl;
 				//<< " from https://scipost.org/SciPostPhysCore.4.2.010/pdf " << endl;
 		auto initState = InitState(sites);
@@ -861,7 +861,7 @@ int main(int argc, char *argv[]) {
 
 						kss = KSS(psi, sites, i);
 					}
-					const int distance = param.val("Distance");
+					const int distance = 3;
 					if (i <= N - distance) {
 
 						sxsx3 = real(Correlation(psi, sites, "Sx", "Sx", i, i+distance));
@@ -1063,7 +1063,7 @@ int main(int argc, char *argv[]) {
 		if (n < n_steps) {
 			//MPS psi_temp = psi;
 			cout << "Time evol" << endl;
-			if(param.val("XXZ") == 1){
+			if(param.val("XXZ") > 0){
 				for(auto & expH_XXZ : XXZ_time_evol_vec)
 				psi = applyMPO(expH_XXZ, psi, args);
 				psi.noPrime();
