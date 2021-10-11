@@ -444,7 +444,7 @@ int main(int argc, char *argv[]) {
 
 			const int distance = param.val("Distance");
 			SigmaXGate(N/2 + distance);
-			SigmaXGate(N/2 );
+			SigmaXGate(N/2 + 2 );
 
 			psi.noPrime();
 			cout << "constructing is done" << endl;
