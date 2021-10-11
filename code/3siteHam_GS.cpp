@@ -68,6 +68,11 @@ int main(int argc, char *argv[]) {
 	auto H0 = toMPO(Init_H.ampo);
 	double energy_initial = 0;
 
+	if(param.longval("XXZ") > 0){
+		XXZ Init_H_XXZ(sites, param);
+		H0 = toMPO(Init_H_XXZ.ampo);
+	}
+
 	auto HadamarGate = [&](int i) {
 		auto ind = sites(i);
 		auto indP = prime(sites(i));
@@ -530,8 +535,15 @@ int main(int argc, char *argv[]) {
 
 	//Hamiltonian for the dynamics
 	ThreeSiteHamiltonian Ham(sites, param);
-	const int dot = Ham.dot;
 	auto H = toMPO(Ham.ampo);
+	if(param.val("XXZ") > 0){
+		XXZ Ham(sites, param);
+		H = toMPO(Ham.ampo);
+	}
+
+
+	const int dot = Ham.dot;
+
 	cout << "H constructed" << endl;
 
 	energy_initial = real(innerC(psi, H, psi)); //<psi|H0|psi>
