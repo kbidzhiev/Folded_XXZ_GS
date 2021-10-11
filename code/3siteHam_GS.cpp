@@ -112,10 +112,10 @@ int main(int argc, char *argv[]) {
 		auto ind = sites(i);
 		auto indP = prime(sites(i));
 		auto Op = ITensor(ind, indP);
-		Had.set(ind(1), indP(1), 0);
-		Had.set(ind(1), indP(2), 1);
-		Had.set(ind(2), indP(1), 1);
-		Had.set(ind(2), indP(2), 0);
+		Op.set(ind(1), indP(1), 0);
+		Op.set(ind(1), indP(2), 1);
+		Op.set(ind(2), indP(1), 1);
+		Op.set(ind(2), indP(2), 0);
 		psi.setA(i, psi.A(i) * Op);
 	};
 
@@ -434,7 +434,7 @@ int main(int argc, char *argv[]) {
 			auto initState = InitState(sites);
 
 			for (int i = 1; i <= N; ++i){
-				if(i % 2 == 0){
+				if(i % 2 == 1){
 					initState.set(i, "Up");
 				} else {
 					initState.set(i, "Dn");
@@ -444,7 +444,7 @@ int main(int argc, char *argv[]) {
 
 			const int distance = param.val("Distance");
 			SigmaXGate(N/2 + distance);
-			SigmaXGate(N/2 + 2 );
+			SigmaXGate(N/2 + 3 );
 
 			psi.noPrime();
 			cout << "constructing is done" << endl;
