@@ -732,7 +732,8 @@ int main(int argc, char *argv[]) {
 
 
 	if(param.val("XXZ") == 1){
-		param.val("tau") *= M_PI / (4.0 * param.val("Delta"));
+		//param.val("tau") *= M_PI / (4.0 * param.val("Delta"));
+		param["tau"] *= M_PI / (4.0 * param.val("Delta"));
 	}
 	double tau = param.val("tau");
 
