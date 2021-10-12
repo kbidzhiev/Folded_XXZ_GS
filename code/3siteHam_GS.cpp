@@ -730,10 +730,12 @@ int main(int argc, char *argv[]) {
 
 	//exp(Ham) for the dynamics
 
-	double tau = param.val("tau");
+
 	if(param.val("XXZ") == 1){
-		tau *= M_PI / (4.0 * param.val("Delta"));
+		param.val("tau") *= M_PI / (4.0 * param.val("Delta"));
 	}
+	double tau = param.val("tau");
+
 	const long int n_steps = param.val("T") / tau;
 	TrotterExp expH_Folded_XXZ(sites, param, -Cplx_i * tau);
 	vector<MPO> XXZ_time_evol_vec = XXZ_time_evol(sites, param);
