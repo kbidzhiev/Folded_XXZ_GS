@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 	auto H0 = toMPO(Init_H.ampo);
 	double energy_initial = 0;
 
-	if(param.longval("XXZ") > 0){
+	if(param.val("XXZ") > 0){
 		XXZ Init_H_XXZ(sites, param);
 		H0 = toMPO(Init_H_XXZ.ampo);
 	}
@@ -434,7 +434,7 @@ int main(int argc, char *argv[]) {
 			}
 			psi.noPrime();
 
-	} else if ( param.longval("Sav") == 1) {
+	} else if ( param.val("Sav") == 1) {
 			cout << "dudu[UU]dudu" << endl;
 			auto initState = InitState(sites);
 
@@ -454,7 +454,7 @@ int main(int argc, char *argv[]) {
 			psi.noPrime();
 			cout << "constructing is done" << endl;
 
-	} else if ( param.longval("Sav2") == 1) {
+	} else if ( param.val("Sav2") == 1) {
 			cout << "dudu[D]udu  ... du[L]ud" << endl;
 			auto initState = InitState(sites);
 
