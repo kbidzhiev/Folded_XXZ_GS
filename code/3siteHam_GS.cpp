@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
 			}
 			int dist = param.val("UUD");
 			psi = MPS(initState);
-			SigmaXGate(N/2 + dist);
+			SigmaXGate(N/2 + 1 + dist);
 			psi.noPrime();
 
 	} else if ( param.longval("UUUD") == 1) {
@@ -418,7 +418,7 @@ int main(int argc, char *argv[]) {
 
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
-			HadamarGate(i);
+			//HadamarGate(i);
 		}
 		psi.noPrime();
 
