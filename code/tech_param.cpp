@@ -85,6 +85,7 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("alpha") = 0; // U = exp[ i alpha  n*\sigma]
 	operator[]("Theta") = 0; // U = exp[ i theta  n*\sigma] turns only the central site
 	operator[]("UUD") = 0;
+	operator[]("UUD2") = 0;
 	operator[]("ShiftUUD") = 0;
 	operator[]("UUUD") = 0;
 	operator[]("DoubleSlit") = 0;

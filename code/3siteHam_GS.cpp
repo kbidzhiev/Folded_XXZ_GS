@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
 
 		cout << "Norm (after unitary gates )is = " << real(innerC(psi, psi)) << endl;
 
-	} else if ( param.longval("UUD") == 1) {
+	} else if ( param.val("UUD") > 0) {
 			cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
 			auto initState = InitState(sites);
 			// Hadamar_2 Hadamar_4 |---+> = |- left - right>
@@ -205,22 +205,10 @@ int main(int argc, char *argv[]) {
 					initState.set(i, "Up");
 				}
 			}
-
+			int dist = param.val("UUD");
 			psi = MPS(initState);
-
-//			for (int i = 1; i <= N; ++i) {
-//				if (i % 2 == 0  ) {
-//					HadamarGate(i);
-//				}
-//			}
-
-			SigmaXGate(N/2);
-
-
+			SigmaXGate(N/2 + dist);
 			psi.noPrime();
-	//		operator[]("UUD") = 0;
-
-
 
 	} else if ( param.longval("UUUD") == 1) {
 			cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
@@ -415,7 +403,7 @@ int main(int argc, char *argv[]) {
 		}
 
 	} else if ( param.val("XXZDW") > 0) {
-		cout << "initial state is (ddduuu)DDU(ddduuu) evolved with Eq (66)" << endl;
+		cout << "LLLL RRRR in x direction" << endl;
 				//<< " from https://scipost.org/SciPostPhysCore.4.2.010/pdf " << endl;
 		auto initState = InitState(sites);
 
