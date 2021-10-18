@@ -427,12 +427,9 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-
 		psi = MPS(initState);
-		for (int i = 1; i <= N/2; ++i) {
-			if (i % 2 == 0  ) {
-				HadamarGate(i);
-			}
+		for (int i = 1; i <= N; ++i) {
+			HadamarGate(i);
 		}
 		psi.noPrime();
 
