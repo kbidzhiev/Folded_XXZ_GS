@@ -404,15 +404,37 @@ int main(int argc, char *argv[]) {
 		auto initial_state = psi;
 
 		double dt = 0.01;// * M_PI/(4 * param.val("Delta"));
-//		Exp_B expB_XXZ(sites, param, -Cplx_i * dt);
-//		int total_steps =  1.0 / (dt * param.val("Delta")) ;
-//		for (int i = 0; i < total_steps; ++i){
-//			expB_XXZ.Evolve(psi, args);
-//			psi.orthogonalize(args);
-//			cout << "step " << i << " / " << total_steps << " is done" << endl;
-//			cout << "Overlap = " << innerC(initial_state, psi) << endl;
-//		}
+		Exp_B expB_XXZ(sites, param, -Cplx_i * dt);
+		int total_steps =  1.0 / (dt * param.val("Delta")) ;
+		for (int i = 0; i < total_steps; ++i){
+			expB_XXZ.Evolve(psi, args);
+			psi.orthogonalize(args);
+			cout << "step " << i << " / " << total_steps << " is done" << endl;
+			cout << "Overlap = " << innerC(initial_state, psi) << endl;
+		}
 
+	} else if ( param.val("XXZDW") > 0) {
+		cout << "initial state is (ddduuu)DDU(ddduuu) evolved with Eq (66)" << endl;
+				//<< " from https://scipost.org/SciPostPhysCore.4.2.010/pdf " << endl;
+		auto initState = InitState(sites);
+
+
+		for (int i = 1 ; i<=N ; ++i) {
+			if(i<N/2){
+				initState.set(i, "Up");
+			} else {
+				initState.set(i, "Dn");
+			}
+		}
+
+
+		psi = MPS(initState);
+		for (int i = 1; i <= N/2; ++i) {
+			if (i % 2 == 0  ) {
+				HadamarGate(i);
+			}
+		}
+		psi.noPrime();
 
 	} else if ( param.val("AlphaGate") > 0) {
 			auto initState = InitState(sites);
