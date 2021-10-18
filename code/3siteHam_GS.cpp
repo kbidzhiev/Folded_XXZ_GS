@@ -68,7 +68,8 @@ int main(int argc, char *argv[]) {
 	auto H0 = toMPO(Init_H.ampo);
 	double energy_initial = 0;
 
-	if(param.val("XXZ") > 0){
+	if(param.val("XXZ") > 0 ||
+			param.val("XXZDW") > 0){
 		XXZ Init_H_XXZ(sites, param);
 		H0 = toMPO(Init_H_XXZ.ampo);
 	}
@@ -555,7 +556,8 @@ int main(int argc, char *argv[]) {
 	//Hamiltonian for the dynamics
 	ThreeSiteHamiltonian Ham(sites, param);
 	auto H = toMPO(Ham.ampo);
-	if(param.val("XXZ") > 0){
+	if(param.val("XXZ") > 0 ||
+			param.val("XXZDW") > 0){
 		XXZ Ham(sites, param);
 		H = toMPO(Ham.ampo);
 	}
@@ -1097,7 +1099,8 @@ int main(int argc, char *argv[]) {
 		if (n < n_steps) {
 			//MPS psi_temp = psi;
 			cout << "Time evol" << endl;
-			if(param.val("XXZ") > 0){
+			if(param.val("XXZ") > 0 ||
+					param.val("XXZDW") > 0){
 				for(auto & expH_XXZ : XXZ_time_evol_vec)
 				psi = applyMPO(expH_XXZ, psi, args);
 				psi.noPrime();
