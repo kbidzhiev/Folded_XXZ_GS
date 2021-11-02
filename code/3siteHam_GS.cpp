@@ -402,6 +402,37 @@ int main(int argc, char *argv[]) {
 			cout << "Overlap = " << innerC(initial_state, psi) << endl;
 		}
 
+	} else if ( param.val("XXZGlobal") > 0) {
+		cout << "initial state is (ddduuu - no spinflip) evolved with Eq (66)" << endl;
+				//<< " from https://scipost.org/SciPostPhysCore.4.2.010/pdf " << endl;
+		auto initState = InitState(sites);
+
+		for (int i = N/2; i >0; --i) {
+			if(counter % 6 == 0
+					|| counter % 6 == 1
+					|| counter % 6 == 2){
+				initState.set(i, "Up");
+			} else {
+				initState.set(i, "Dn");
+			}
+		}
+
+
+		psi = MPS(initState);
+		psi.noPrime();
+
+//		auto initial_state = psi;
+//
+//		double dt = 0.01;// * M_PI/(4 * param.val("Delta"));
+//		Exp_B expB_XXZ(sites, param, -Cplx_i * dt);
+//		int total_steps =  1.0 / (dt * param.val("Delta")) ;
+//		for (int i = 0; i < total_steps; ++i){
+//			expB_XXZ.Evolve(psi, args);
+//			psi.orthogonalize(args);
+//			cout << "step " << i << " / " << total_steps << " is done" << endl;
+//			cout << "Overlap = " << innerC(initial_state, psi) << endl;
+//		}
+
 	} else if ( param.val("XXZDW") > 0) {
 		cout << "LLLL RRRR in x direction" << endl;
 				//<< " from https://scipost.org/SciPostPhysCore.4.2.010/pdf " << endl;
@@ -545,7 +576,9 @@ int main(int argc, char *argv[]) {
 	ThreeSiteHamiltonian Ham(sites, param);
 	auto H = toMPO(Ham.ampo);
 	if(param.val("XXZ") > 0 ||
-			param.val("XXZDW") > 0){
+			param.val("XXZDW") > 0 ||
+			param.val("XXZGlobal" > 0)
+			){
 		XXZ Ham(sites, param);
 		H = toMPO(Ham.ampo);
 	}
@@ -1088,7 +1121,8 @@ int main(int argc, char *argv[]) {
 			//MPS psi_temp = psi;
 			cout << "Time evol" << endl;
 			if(param.val("XXZ") > 0 ||
-					param.val("XXZDW") > 0){
+					param.val("XXZDW") > 0 ||
+					param.val("XXZGlobal") > 0	){
 				for(auto & expH_XXZ : XXZ_time_evol_vec)
 				psi = applyMPO(expH_XXZ, psi, args);
 				psi.noPrime();
