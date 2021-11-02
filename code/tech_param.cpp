@@ -110,6 +110,7 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("AlphaGate") = 0;
 	operator[]("TrotterOrderXXZ") = 4;
 	operator[]("XXZ") = 0;
+	operator[]("XXZGlobal") = 0;
 	operator[]("XXZDW") = 0;
 	operator[]("Delta") = 0;
 	operator[]("Distance") = 5;
