@@ -407,10 +407,10 @@ int main(int argc, char *argv[]) {
 				//<< " from https://scipost.org/SciPostPhysCore.4.2.010/pdf " << endl;
 		auto initState = InitState(sites);
 
-		for (int i = N/2; i >0; --i) {
-			if(counter % 6 == 0
-					|| counter % 6 == 1
-					|| counter % 6 == 2){
+		for (int i = 1; i <= N; ++i) {
+			if(i % 6 == 0
+					|| i % 6 == 1
+					|| i % 6 == 2){
 				initState.set(i, "Up");
 			} else {
 				initState.set(i, "Dn");
@@ -577,7 +577,7 @@ int main(int argc, char *argv[]) {
 	auto H = toMPO(Ham.ampo);
 	if(param.val("XXZ") > 0 ||
 			param.val("XXZDW") > 0 ||
-			param.val("XXZGlobal" > 0)
+			param.val("XXZGlobal") > 0
 			){
 		XXZ Ham(sites, param);
 		H = toMPO(Ham.ampo);
