@@ -1159,8 +1159,8 @@ int main(int argc, char *argv[]) {
 					cout << "Folded" << endl;
 					expH_Folded_XXZ.Evolve(psi, args);
 				}
-				expH_Folded_XXZ.Evolve(psi, args);
-				cout << "Folded XXZ" << endl;
+//				expH_Folded_XXZ.Evolve(psi, args);
+//				cout << "Folded XXZ" << endl;
 			}
 			psi.orthogonalize(args);
 
