@@ -114,6 +114,7 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("XXZDW") = 0;
 	operator[]("Delta") = 0;
 	operator[]("Distance") = 5;
+	operator[]("Neel") = 0;
 	operator[]("Sav2") = 0;
 	operator[]("Mau") = 0;
 }

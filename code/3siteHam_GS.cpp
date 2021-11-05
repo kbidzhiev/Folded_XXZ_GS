@@ -194,6 +194,28 @@ int main(int argc, char *argv[]) {
 
 		cout << "Norm (after unitary gates )is = " << real(innerC(psi, psi)) << endl;
 
+	} else if ( param.val("Neel") > 0) {
+				cout << "initial state is |Neel>  with the flipped spin" << endl;
+
+				auto initState = InitState(sites);
+				// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+				for (int i = 1; i <= N; ++i){
+					if (i % 2 == 0){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
+						initState.set(i, "Dn");
+					} else {
+						initState.set(i, "Up");
+					}
+				}
+				psi = MPS(initState);
+				SigmaXGate(N/2);
+				if (param.val("Neel") > 1){
+					int dist = param.val("Neel");
+					for (int i = 0; i < 10; i += 2){
+						SigmaXGate(N/2 + dist + i);
+					}
+				}
+				psi.noPrime();
+
 	} else if ( param.val("UUD") > 0) {
 			cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
 			auto initState = InitState(sites);
@@ -1128,6 +1150,15 @@ int main(int argc, char *argv[]) {
 				psi.noPrime();
 				cout << "XXZ" << endl;
 			} else{
+				if(time < 1){
+					cout << "Maurizios XXZ" << endl;
+					for(auto & expH_XXZ : XXZ_time_evol_vec)
+						psi = applyMPO(expH_XXZ, psi, args);
+					psi.noPrime();
+				} else {
+					cout << "Folded" << endl;
+					expH_Folded_XXZ.Evolve(psi, args);
+				}
 				expH_Folded_XXZ.Evolve(psi, args);
 				cout << "Folded XXZ" << endl;
 			}
