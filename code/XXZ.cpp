@@ -51,6 +51,43 @@ void XXZ::init(const ThreeSiteParam &param) {
 
 
 
+//
+XP_Hamiltonian::XP_Hamiltonian(const SiteSet &sites,
+		const ThreeSiteParam &param)
+			: ampo(sites)
+			, N(length(sites)) {
+	//N = length(sites); // size of Hamiltonian comes with onject SiteSet sites, not just as number N
+	init(param);   // initializing the Hamiltonian
+	cout << "A Hamiltonian with " << N << " sites was constructed." << endl;
+}
+
+//Initialize Hamiltonian parameters
+void XP_Hamiltonian::init(const ThreeSiteParam &param) {
+	const double J = param.val("J");
+	dot = N / 2 + 1;  //Position of the "dot"
+	cout << "The dot is on site #" << dot << endl;
+	for (int j = 1; j < N - 1; ++j) {
+		//Strange coefficients are needed to match
+		// spin matrices and Pauli matrices -> Pauli = 2*Spin, so each matrix gives factor 2
+		// one of 1/2 comes from the projector (1-sigma_z)/2
+		// and the other is "Jacobian", i.e. 0.5 (SpSm+ SmSp) = SxSx + SySy
+
+
+		ampo += J * 2 * 0.5, "Sx", j; //
+		ampo += J * 4 * 0.5, "Sx", j, "Sz", j + 1;
+
+
+//		ampo += J * 2 * 0.25, "Sx", j; //
+//		ampo += J * 4 * 0.25, "Sx", j, "Sz", j + 1;
+//		ampo += J * 4 * 0.25, "Sz", j - 1, "Sx", j;
+//		ampo += J * 8 * 0.25, "Sz", j - 1, "Sx", j , "Sz", j + 1;
+	}
+}
+
+
+
+
+
 
 
 

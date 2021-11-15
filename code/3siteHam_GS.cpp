@@ -210,7 +210,7 @@ int main(int argc, char *argv[]) {
 				SigmaXGate(N/2);
 				if (param.val("Neel") > 1){
 					int dist = param.val("Neel");
-					for (int i = 0; i < 10; i += 2){
+					for (int i = 0; i < 18; i += 2){
 						SigmaXGate(N/2 + dist + i);
 					}
 				}
@@ -583,6 +583,21 @@ int main(int argc, char *argv[]) {
 
 		AlphaGate(N/2+1, (double)param.val("Theta"));
 		psi.noPrime();
+
+	} else if ( param.val("XP") > 0 ) {
+		cout << "initial state is  |DOWN> " << endl;
+		auto initState = InitState(sites);
+		for (int i = 1; i <= N; ++i){
+			if (i != N/2 ){
+				initState.set(i, "Dn");
+			} else {
+				initState.set(i, "Up");
+			}
+		}
+		psi = MPS(initState);
+		psi.noPrime();
+
+
 	}else {
 		cout << "Choose: GroundState, Neel, DomainWall,Impurity, Jammed = 1" << endl;
 		return 1;
@@ -602,6 +617,9 @@ int main(int argc, char *argv[]) {
 			param.val("XXZGlobal") > 0
 			){
 		XXZ Ham(sites, param);
+		H = toMPO(Ham.ampo);
+	} else if(param.val("XP") > 0){
+		XP_Hamiltonian Ham(sites, param);
 		H = toMPO(Ham.ampo);
 	}
 
@@ -804,6 +822,7 @@ int main(int argc, char *argv[]) {
 	const long int n_steps = param.val("T") / tau;
 	TrotterExp expH_Folded_XXZ(sites, param, -Cplx_i * tau);
 	vector<MPO> XXZ_time_evol_vec = XXZ_time_evol(sites, param);
+	vector<MPO> XP_time_evol_vec = XP_time_evol(sites, param);
 
 
 // Time evolution
@@ -1149,18 +1168,23 @@ int main(int argc, char *argv[]) {
 				psi = applyMPO(expH_XXZ, psi, args);
 				psi.noPrime();
 				cout << "XXZ" << endl;
+			} else if(param.val("XP") > 0){
+				for(auto & expH_XP : XP_time_evol_vec)
+				psi = applyMPO(expH_XP, psi, args);
+				psi.noPrime();
+				cout << "XP" << endl;
 			} else{
-				if(time < 1){
-					cout << "Maurizios XXZ" << endl;
-					for(auto & expH_XXZ : XXZ_time_evol_vec)
-						psi = applyMPO(expH_XXZ, psi, args);
-					psi.noPrime();
-				} else {
-					cout << "Folded" << endl;
-					expH_Folded_XXZ.Evolve(psi, args);
-				}
-//				expH_Folded_XXZ.Evolve(psi, args);
-//				cout << "Folded XXZ" << endl;
+//				if(time < 1){
+//					cout << "Maurizios XXZ" << endl;
+//					for(auto & expH_XXZ : XXZ_time_evol_vec)
+//						psi = applyMPO(expH_XXZ, psi, args);
+//					psi.noPrime();
+//				} else {
+//					cout << "Folded" << endl;
+//					expH_Folded_XXZ.Evolve(psi, args);
+//				}
+				expH_Folded_XXZ.Evolve(psi, args);
+				cout << "Folded XXZ" << endl;
 			}
 			psi.orthogonalize(args);
 

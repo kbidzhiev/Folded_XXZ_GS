@@ -74,6 +74,21 @@ private:
 	void init(const ThreeSiteParam &param);
 };
 
+////// XP model
+class XP_Hamiltonian{
+public:
+	int dot;
+	AutoMPO ampo;
+	XP_Hamiltonian(const SiteSet &sites, const ThreeSiteParam &param);
+private:
+	int N;
+	void init(const ThreeSiteParam &param);
+};
+
+
+
+vector<MPO> XP_time_evol(const SiteSet &sites, const ThreeSiteParam &param);
+
 
 
 //Trotter Gates for the time evolution of Folded_XXZ
@@ -123,5 +138,10 @@ public:
 private:
 	vector<TGate> gates;
 };
+
+
+
+
+
 
 
