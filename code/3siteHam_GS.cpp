@@ -232,31 +232,6 @@ int main(int argc, char *argv[]) {
 			SigmaXGate(N/2 + 1 + dist);
 			psi.noPrime();
 
-	} else if ( param.longval("UUUD") == 1) {
-			cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
-			auto initState = InitState(sites);
-			// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-			for (int i = 1; i <= N; ++i){
-				if (i % 4 == 0){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
-					initState.set(i, "Dn");
-				} else {
-					initState.set(i, "Up");
-				}
-			}
-
-			psi = MPS(initState);
-
-//			for (int i = 1; i <= N; ++i) {
-//				if (i % 2 == 0  ) {
-//					HadamarGate(i);
-//				}
-//			}
-
-			SigmaXGate(N/2);
-
-
-			psi.noPrime();
-
 	} else if ( param.longval("JammedImpurity") == 1) {
 		cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
 		auto initState = InitState(sites);
@@ -269,40 +244,14 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		//initState.set(N/2 - 1,"Dn");
-		//initState.set(N/2,    "Dn");
-		//initState.set(N/2 + 1,"Up");
-		//initState.set(N/2 + 2,"Up");
-
-		//initState.set(N/2 + 1,"Dn");
-		//initState.set(N/2 + 2,"Dn");
-
-		//initState.set(N/2 - 1,"Dn");
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
 			if (i % 2 == 0  ) {
 				HadamarGate(i);
 			}
 		}
-
-		//SigmaXGate(N/2+1);
 		SigmaXGate(N/2);
-
-
-//		AlphaGate(N/2-1, 0.5);
-//		HadamarGate(N / 2 - 1);
-//		HadamarGate(N / 2 	 );
-//		HadamarGate(N / 2 + 1);
-//		HadamarGate(N / 2 + 2);
-
-//		const double alpha = param.val("alpha");
-//		UnitaryGate(N/2 - 1,alpha);
-//		UnitaryGate(N/2    ,alpha);
-//		UnitaryGate(N/2 + 1,alpha);
-//		UnitaryGate(N/2 + 2,alpha);
-
 		psi.noPrime();
-
-
 	} else if ( param.val("DoubleSlit") > 0) {
 		cout << "initial state is  | Up Left Up Right >  with the 2 flipped spins" << endl;
 		auto initState = InitState(sites);
@@ -314,20 +263,16 @@ int main(int argc, char *argv[]) {
 				initState.set(i, "Up");
 			}
 		}
-
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
 			if (i % 2 == 0  ) {
 				HadamarGate(i);
 			}
 		}
-
 		int distance = param.val("DoubleSlit");
-
 		SigmaXGate(N/2 + distance);
 		SigmaXGate(N/2 - distance);
 		psi.noPrime();
-
 	} else if ( param.val("SingleSlit") != 0) {
 		cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
 		auto initState = InitState(sites);
@@ -339,44 +284,15 @@ int main(int argc, char *argv[]) {
 				initState.set(i, "Up");
 			}
 		}
-
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
 			if (i % 2 == 0  ) {
 				HadamarGate(i);
 			}
 		}
-
 		int distance = param.val("SingleSlit");
-
 		SigmaXGate(N/2 + distance);
 		psi.noPrime();
-
-
-	} else if ( param.longval("JammedVac") == 1) {
-			cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
-			auto initState = InitState(sites);
-			// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-			for (int i = 1; i <= N/2; ++i){
-				if (i % 4 == 0){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
-					initState.set(i, "Dn");
-				} else {
-					initState.set(i, "Up");
-				}
-			}
-			for (int i = N/2+1; i <= N; ++i){
-				initState.set(i, "Dn");
-
-			}
-
-			psi = MPS(initState);
-			for (int i = 1; i <= N/2; ++i) {
-				if (i % 2 == 0  ) {
-					HadamarGate(i);
-				}
-			}
-
-			psi.noPrime();
 	} else if ( param.val("XXZ") > 0) {
 		cout << "initial state is (ddduuu)DDU(ddduuu) evolved with Eq (66)" << endl;
 				//<< " from https://scipost.org/SciPostPhysCore.4.2.010/pdf " << endl;
@@ -473,115 +389,6 @@ int main(int argc, char *argv[]) {
 		for (int i = 1; i <= N; ++i) {
 			//HadamarGate(i);
 		}
-		psi.noPrime();
-
-	} else if ( param.val("AlphaGate") > 0) {
-			auto initState = InitState(sites);
-			for (int i = 1; i <= N; ++i){
-					initState.set(i, "Up");
-			}
-
-			initState.set(N/2 - 1,"Dn");
-
-			psi = MPS(initState);
-
-			const double alpha = param.val("AlphaGate");
-			for (int i = 1; i <= N; ++i) {
-				if (i % 4 == 0) {
-					AlphaGate(i, alpha);
-				}else if (i % 4 == 2){
-					AlphaGate(i, -alpha);
-				}
-			}
-			psi.noPrime();
-
-	} else if ( param.val("Sav") == 1) {
-			cout << "dudu[UU]dudu" << endl;
-			auto initState = InitState(sites);
-
-			for (int i = 1; i <= N; ++i){
-				if(i % 2 == 1){
-					initState.set(i, "Up");
-				} else {
-					initState.set(i, "Dn");
-				}
-			}
-			psi = MPS(initState);
-
-			const int distance = param.val("Distance");
-			SigmaXGate(N/2 + distance);
-			SigmaXGate(N/2 + 3 );
-
-			psi.noPrime();
-			cout << "constructing is done" << endl;
-
-	} else if ( param.val("Sav2") == 1) {
-			cout << "dudu[D]udu  ... du[L]ud" << endl;
-			auto initState = InitState(sites);
-
-			for (int i = 1; i <= N; ++i){
-				if(i % 2 == 0){
-					initState.set(i, "Up");
-				} else {
-					initState.set(i, "Dn");
-				}
-			}
-			psi = MPS(initState);
-
-			const int distance = param.val("Distance");
-			HadamarGate(N/2 + distance);
-			SigmaXGate(N/2);
-
-			psi.noPrime();
-			cout << "constructing is done" << endl;
-
-	} else if ( param.longval("Mau") == 1) {
-			cout << "dudu[D]udu  ... du[L]ud" << endl;
-			auto initState = InitState(sites);
-
-			for (int i = 1; i <= N; ++i){
-				if(i % 2 == 0){
-					initState.set(i, "Up");
-				} else {
-					initState.set(i, "Dn");
-				}
-			}
-			psi = MPS(initState);
-
-			SigmaXGate(N/2);
-			const int distance = param.val("Distance");
-			for(int i = distance; i < distance + 6; i+=2){
-				SigmaXGate(N/2 + i);
-			}
-
-
-
-			psi.noPrime();
-			cout << "constructing is done" << endl;
-
-
-
-	} else if ( param.val("Theta") > 0 ) {
-		cout << "initial state is  | Up Left Up Right > " << endl;
-		auto initState = InitState(sites);
-		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-		for (int i = 1; i <= N; ++i){
-			if (i % 4 == 1){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
-				initState.set(i, "Dn");
-			} else {
-				initState.set(i, "Up");
-			}
-		}
-		psi = MPS(initState);
-		for (int i = 1; i <= N; ++i) {
-			if (i % 2 == 1) {
-				HadamarGate(i);
-			}
-		}
-		psi.noPrime();
-		//psi0 = psi;
-
-		AlphaGate(N/2+1, (double)param.val("Theta"));
 		psi.noPrime();
 
 	} else if ( param.val("XP") > 0 ) {
