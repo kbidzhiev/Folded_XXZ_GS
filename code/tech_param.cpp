@@ -81,17 +81,12 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("GroundState") = 0;
 	operator[]("LadderState") = 0;
 	operator[]("JammedImpurity") = 0;
-	operator[]("JammedVac") = 0;
 	operator[]("alpha") = 0; // U = exp[ i alpha  n*\sigma]
-	operator[]("Theta") = 0; // U = exp[ i theta  n*\sigma] turns only the central site
 	operator[]("UUD") = 0;
 	operator[]("UUD2") = 0;
 	operator[]("ShiftUUD") = 0;
-	operator[]("UUUD") = 0;
 	operator[]("DoubleSlit") = 0;
 	operator[]("SingleSlit") = 0;
-	operator[]("Sav") = 0;
-	operator[]("Lenart") = 0;
 	operator[]("begin") = 1;
 	operator[]("hL") = 0; //initial magnetization_L
 	operator[]("hR") = 0; //initial magnetization_R
@@ -107,7 +102,6 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("Dhar") = 0; // Deepak Dhar term in hamiltonian (time evolution ONLY)
 	operator[]("PXXP") = 0; //Integrability breaking term
 	operator[]("Measurement") = 0; // Project the central spin to be |Down> (time evolution ONLY)
-	operator[]("AlphaGate") = 0;
 	operator[]("TrotterOrderXXZ") = 3;
 	operator[]("XXZ") = 0;
 	operator[]("XXZGlobal") = 0;
@@ -115,8 +109,6 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("Delta") = 0;
 	operator[]("Distance") = 5;
 	operator[]("Neel") = 0;
-	operator[]("Sav2") = 0;
-	operator[]("Mau") = 0;
 	operator[]("XP") = 0;
 }
 
