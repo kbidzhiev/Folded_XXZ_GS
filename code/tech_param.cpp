@@ -87,7 +87,6 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("ShiftUUD") = 0;
 	operator[]("DoubleSlit") = 0;
 	operator[]("SingleSlit") = 0;
-	operator[]("Lenart") = 0;
 	operator[]("begin") = 1;
 	operator[]("hL") = 0; //initial magnetization_L
 	operator[]("hR") = 0; //initial magnetization_R
