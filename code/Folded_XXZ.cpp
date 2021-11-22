@@ -22,8 +22,8 @@ void ThreeSiteHamiltonian::init(const ThreeSiteParam &param) {
 	const double hL = param.val("hL");
 	const double hR = param.val("hR");
 	const int PPK = param.val("PPK");
-	const int shift_of_range = 0;
-	if (PPK != 0) shift_of_range = 2;
+	int shift_of_range = 0;
+	if (PPK != 0) shift_of_range = 1;
 	dot = N / 2 + 1;  //Position of the "dot"
 	cout << "The dot is on site #" << dot << endl;
 	for (int j = 1; j < N - 1 - shift_of_range; ++j) {

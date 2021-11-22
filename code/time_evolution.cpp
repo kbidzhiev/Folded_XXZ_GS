@@ -379,12 +379,14 @@ void TrotterExp_PPK::initialize(const SiteSet &sites, const ThreeSiteParam &para
 		TimeGates(begin, end, tau, sites, param);
 		TimeGates(begin + 1, end, tau, sites, param);
 		TimeGates(begin + 2, end, tau, sites, param);
+		TimeGates(begin + 3, end, tau, sites, param);
 
 	} else {
 		cout << "trotter 2 scheme" << endl;
 		cout << "its NOT implemented"<< endl;
 		exit(1);
 
+		/*
 		double begin0 = begin; //this variable are needed to change operators ABC
 		double begin2 = begin + 1;
 		double begin4 = begin + 2;
@@ -397,18 +399,18 @@ void TrotterExp_PPK::initialize(const SiteSet &sites, const ThreeSiteParam &para
 		TimeGates(begin4, end, tau, sites, param); //C
 		TimeGates(begin2, end, 0.5 * tau, sites, param); //B
 		TimeGates(begin0, end, 0.5 * tau, sites, param); //A
-
+		 */
 	}
 }
 
 void TrotterExp_PPK::TimeGates(const int begin, const int end,
 		const complex<double> tau, const SiteSet &sites,
 		const ThreeSiteParam &param) {
-	const int step = 3;
+	const int step = 4;
 	const double J = param.val("J");
 	const double PPK = param.val("PPK");
 	//cout << "Gates starts from " << begin << endl;
-	for (int j = begin; j < end - 1; j += step) {
+	for (int j = begin; j < end - 2; j += step) {
 		//cout << "j = (" << j << ", " << j + 1 << ", " << j + 2 << ")"
 		//		<< endl;
 		//this part act on real sites

@@ -153,7 +153,7 @@ public:
 		, G(G_) {
 		}
 	};
-	TrotterExp(const SiteSet &sites, const ThreeSiteParam &param, const complex<double> tau);
+	TrotterExp_PPK(const SiteSet &sites, const ThreeSiteParam &param, const complex<double> tau);
 	void initialize(const SiteSet &sites, const ThreeSiteParam &param, const complex<double> tau);
 	void TimeGates(const int begin, const int end, const complex<double> tau,
 			const SiteSet &sites, const ThreeSiteParam &param);
