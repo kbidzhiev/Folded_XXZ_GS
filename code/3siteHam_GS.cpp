@@ -984,7 +984,7 @@ int main(int argc, char *argv[]) {
 				psi = applyMPO(expH_XP, psi, args);
 				psi.noPrime();
 				cout << "XP" << endl;
-			} else if(param.val("PPK") > 0){
+			} else if(param.val("PPK") != 0){
 				expH_Folded_XXZ_PPK.Evolve(psi, args);
 				cout << "PPK + Folded XXZ" << endl;
 			} else{
