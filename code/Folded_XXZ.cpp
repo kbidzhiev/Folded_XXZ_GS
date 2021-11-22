@@ -21,9 +21,12 @@ void ThreeSiteHamiltonian::init(const ThreeSiteParam &param) {
 	double mu = 0;
 	const double hL = param.val("hL");
 	const double hR = param.val("hR");
+	const int PPK = param.val("PPK");
+	const int shift_of_range = 0;
+	if (PPK != 0) shift_of_range = 2;
 	dot = N / 2 + 1;  //Position of the "dot"
 	cout << "The dot is on site #" << dot << endl;
-	for (int j = 1; j < N - 1; ++j) {
+	for (int j = 1; j < N - 1 - shift_of_range; ++j) {
 		//Strange coefficients are needed to match
 		// spin matrices and Pauli matrices -> Pauli = 2*Spin, so each matrix gives factor 2
 		// one of 1/2 comes from the projector (1-sigma_z)/2
@@ -32,6 +35,18 @@ void ThreeSiteHamiltonian::init(const ThreeSiteParam &param) {
 		ampo += J *  4 * 0.25, "S-", j, "S+", j + 2;
 		ampo += J * -8 * 0.25, "S+", j, "Sz", j + 1, "S-", j + 2;
 		ampo += J * -8 * 0.25, "S-", j, "Sz", j + 1, "S+", j + 2;
+
+		if (PPK != 0) {
+			ampo += PPK * 4 * 0.5, "S+", j + 2, "S-", j + 3; // (I)
+			ampo += PPK * 4 * 0.5, "S-", j + 2, "S+", j + 3;
+			ampo += -PPK * 8 * 0.5, "Sz", j, "S+", j + 2, "S-", j + 3; // (II)
+			ampo += -PPK * 8 * 0.5, "Sz", j, "S-", j + 2, "S+", j + 3;
+			ampo += -PPK * 8 * 0.5, "Sz", j + 1, "S+", j + 2, "S-", j + 3; // (III)
+			ampo += -PPK * 8 * 0.5, "Sz", j + 1, "S-", j + 2, "S+", j + 3;
+			ampo += PPK * 16 * 0.5, "Sz", j, "Sz", j + 1, "S+", j + 2, "S-", j + 3; // (IV)
+			ampo += PPK * 16 * 0.5, "Sz", j, "Sz", j + 1, "S-", j + 2, "S+", j + 3;
+		}
+
 
 		if (j <= dot) {
 			mu = hL;
