@@ -85,35 +85,35 @@ int main(int argc, char *argv[]) {
 		psi.setA(i, psi.A(i) * Had);
 	};
 
-	auto UnitaryGate = [&](int i, const double alpha) {
-		// U = exp[i alpha (n*s)]; |n|^2==1, s = {sx,sy,sz}
-		// n = {1,1,1}/sqrt(3);
-		const double nx = 1./sqrt(3.0);
-		const double ny = nx;
-		const double nz = nx;
-		auto ind = sites(i);
-		auto indP = prime(sites(i));
-		auto Had = ITensor(ind, indP);
-		Had.set(ind(1), indP(1),  cos(alpha) + Cplx_i * nz * sin(alpha));
-		Had.set(ind(1), indP(2), ( ny + Cplx_i * nx) * sin(alpha));
-		Had.set(ind(2), indP(1), (-ny + Cplx_i * nx) * sin(alpha));
-		Had.set(ind(2), indP(2),  cos(alpha) - Cplx_i * nz * sin(alpha));
-		psi.setA(i, psi.A(i) * Had);
-	};
+//	auto UnitaryGate = [&](int i, const double alpha) {
+//		// U = exp[i alpha (n*s)]; |n|^2==1, s = {sx,sy,sz}
+//		// n = {1,1,1}/sqrt(3);
+//		const double nx = 1./sqrt(3.0);
+//		const double ny = nx;
+//		const double nz = nx;
+//		auto ind = sites(i);
+//		auto indP = prime(sites(i));
+//		auto Had = ITensor(ind, indP);
+//		Had.set(ind(1), indP(1),  cos(alpha) + Cplx_i * nz * sin(alpha));
+//		Had.set(ind(1), indP(2), ( ny + Cplx_i * nx) * sin(alpha));
+//		Had.set(ind(2), indP(1), (-ny + Cplx_i * nx) * sin(alpha));
+//		Had.set(ind(2), indP(2),  cos(alpha) - Cplx_i * nz * sin(alpha));
+//		psi.setA(i, psi.A(i) * Had);
+//	};
 
-	auto AlphaGate = [&](int i, const double alpha) {
-		// U = exp[i alpha (n*s)]; |n|^2==1, s = {sx,sy,sz}
-		// n = {0,1,0}
-		// the spin will be {cos a, sin a}
-		auto ind = sites(i);
-		auto indP = prime(sites(i));
-		auto Op = ITensor(ind, indP);
-		Op.set(ind(1), indP(1),  cos(alpha));
-		Op.set(ind(1), indP(2),  sin(alpha));
-		Op.set(ind(2), indP(1), -sin(alpha));
-		Op.set(ind(2), indP(2),  cos(alpha));
-		psi.setA(i, psi.A(i) * Op);
-	};
+//	auto AlphaGate = [&](int i, const double alpha) {
+//		// U = exp[i alpha (n*s)]; |n|^2==1, s = {sx,sy,sz}
+//		// n = {0,1,0}
+//		// the spin will be {cos a, sin a}
+//		auto ind = sites(i);
+//		auto indP = prime(sites(i));
+//		auto Op = ITensor(ind, indP);
+//		Op.set(ind(1), indP(1),  cos(alpha));
+//		Op.set(ind(1), indP(2),  sin(alpha));
+//		Op.set(ind(2), indP(1), -sin(alpha));
+//		Op.set(ind(2), indP(2),  cos(alpha));
+//		psi.setA(i, psi.A(i) * Op);
+//	};
 	auto SigmaXGate = [&](int i) {
 		auto ind = sites(i);
 		auto indP = prime(sites(i));
@@ -216,7 +216,8 @@ int main(int argc, char *argv[]) {
 				}
 				psi.noPrime();
 
-	} else if ( param.val("UUD") > 0) {
+	} else if ( param.val("UUD") > 0
+			|| param.val("PPK") != 0) {
 			cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
 			auto initState = InitState(sites);
 			// Hadamar_2 Hadamar_4 |---+> = |- left - right>
@@ -631,6 +632,8 @@ int main(int argc, char *argv[]) {
 	TrotterExp expH_Folded_XXZ(sites, param, -Cplx_i * tau);
 	vector<MPO> XXZ_time_evol_vec = XXZ_time_evol(sites, param);
 	vector<MPO> XP_time_evol_vec = XP_time_evol(sites, param);
+	TrotterExp_PPK expH_Folded_XXZ_PPK(sites, param, -Cplx_i * tau);
+
 
 
 // Time evolution
@@ -981,6 +984,10 @@ int main(int argc, char *argv[]) {
 				psi = applyMPO(expH_XP, psi, args);
 				psi.noPrime();
 				cout << "XP" << endl;
+			} else if(param.val("PPK") != 0){
+				expH_Folded_XXZ_PPK.Evolve(psi, args);
+				psi.noPrime();
+				cout << "PPK + Folded XXZ" << endl;
 			} else{
 //				if(time < 1){
 //					cout << "Maurizios XXZ" << endl;

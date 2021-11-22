@@ -110,6 +110,7 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("Distance") = 5;
 	operator[]("Neel") = 0;
 	operator[]("XP") = 0;
+	operator[]("PPK") = 0;
 }
 
 
