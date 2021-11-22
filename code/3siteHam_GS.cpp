@@ -395,7 +395,8 @@ int main(int argc, char *argv[]) {
 		cout << "initial state is  |DOWN> " << endl;
 		auto initState = InitState(sites);
 		for (int i = 1; i <= N; ++i){
-			if (i != N-5 ){
+//			if (i != N-5 ){
+			if (i != N/2 ){
 				initState.set(i, "Dn");
 			} else {
 				initState.set(i, "Up");
