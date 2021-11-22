@@ -216,7 +216,8 @@ int main(int argc, char *argv[]) {
 				}
 				psi.noPrime();
 
-	} else if ( param.val("UUD") > 0) {
+	} else if ( param.val("UUD") > 0
+			|| param.val("PPK") != 0) {
 			cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
 			auto initState = InitState(sites);
 			// Hadamar_2 Hadamar_4 |---+> = |- left - right>
@@ -631,6 +632,8 @@ int main(int argc, char *argv[]) {
 	TrotterExp expH_Folded_XXZ(sites, param, -Cplx_i * tau);
 	vector<MPO> XXZ_time_evol_vec = XXZ_time_evol(sites, param);
 	vector<MPO> XP_time_evol_vec = XP_time_evol(sites, param);
+	TrotterExp_PPK expH_Folded_XXZ_PPK(sites, param, -Cplx_i * tau);
+
 
 
 // Time evolution
@@ -981,6 +984,9 @@ int main(int argc, char *argv[]) {
 				psi = applyMPO(expH_XP, psi, args);
 				psi.noPrime();
 				cout << "XP" << endl;
+			} else if(param.val("PPK") > 0){
+				expH_Folded_XXZ_PPK.Evolve(psi, args);
+				cout << "PPK + Folded XXZ" << endl;
 			} else{
 //				if(time < 1){
 //					cout << "Maurizios XXZ" << endl;

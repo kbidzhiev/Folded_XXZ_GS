@@ -1,5 +1,6 @@
 #include "itensor/all.h"
 #include "time_evolution.hpp"
+#include <cmath>
 
 using namespace itensor;
 using namespace std;
@@ -408,7 +409,7 @@ void TrotterExp_PPK::TimeGates(const int begin, const int end,
 		const ThreeSiteParam &param) {
 	const int step = 4;
 	const double J = param.val("J");
-	const double PPK = param.val("PPK");
+	const double PPK = sqrt(2)*param.val("PPK");
 	//cout << "Gates starts from " << begin << endl;
 	for (int j = begin; j < end - 2; j += step) {
 		//cout << "j = (" << j << ", " << j + 1 << ", " << j + 2 << ")"
