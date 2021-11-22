@@ -73,8 +73,10 @@ void XP_Hamiltonian::init(const ThreeSiteParam &param) {
 		// and the other is "Jacobian", i.e. 0.5 (SpSm+ SmSp) = SxSx + SySy
 
 
-		ampo += J * 2 * 0.5, "Sx", j; //
+		ampo += J * 2 * 0.5, "Sx", j;
 		ampo += J * 4 * 0.5, "Sx", j, "Sz", j + 1;
+		ampo += J * 2 * 0.5, "Sx", j + 1;
+		ampo += J * 4 * 0.5, "Sz", j, "Sx", j + 1;
 
 
 //		ampo += J * 2 * 0.25, "Sx", j; //
