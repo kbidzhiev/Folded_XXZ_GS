@@ -429,17 +429,17 @@ void TrotterExp_PPK::TimeGates(const int begin, const int end,
 		   hh += -J * 2 * Sp_0 * Z_1 * Sm_2 ;
 		   hh += -J * 2 * Sm_0 * Z_1 * Sp_2 ;
 
-//		auto Kin_term1 = op(sites, "Sp", j + 2) * op(sites, "Sm", j + 3);
-//		auto Kin_term2 = op(sites, "Sm", j + 2) * op(sites, "Sp", j + 3);
-//
-//		hh += PPK * 0.5 * I_0 * I_1 * Kin_term1; // (I)
-//		hh += PPK * 0.5 * I_0 * I_1 * Kin_term2; // (I)
-//		hh += -PPK * Z_0 * I_1 * Kin_term1; // (II)
-//		hh += -PPK * Z_0 * I_1 * Kin_term2; // (II)
-//		hh += -PPK * I_0 * Z_1 * Kin_term1; // (III)
-//		hh += -PPK * I_0 * Z_1 * Kin_term2; // (III)
-//		hh += PPK * 2.0 * Z_0 * Z_1 * Kin_term1; // (IV)
-//		hh += PPK * 2.0 * Z_0 * Z_1 * Kin_term2; // (IV)
+		auto Kin_term1 = op(sites, "Sp", j + 2) * op(sites, "Sm", j + 3);
+		auto Kin_term2 = op(sites, "Sm", j + 2) * op(sites, "Sp", j + 3);
+
+		hh += PPK * 0.5 * I_0 * I_1 * Kin_term1; // (I)
+		hh += PPK * 0.5 * I_0 * I_1 * Kin_term2; // (I)
+		hh += -PPK * Z_0 * I_1 * Kin_term1; // (II)
+		hh += -PPK * Z_0 * I_1 * Kin_term2; // (II)
+		hh += -PPK * I_0 * Z_1 * Kin_term1; // (III)
+		hh += -PPK * I_0 * Z_1 * Kin_term2; // (III)
+		hh += PPK * 2.0 * Z_0 * Z_1 * Kin_term1; // (IV)
+		hh += PPK * 2.0 * Z_0 * Z_1 * Kin_term2; // (IV)
 
 		auto G = expHermitian(hh, tau);
 		gates.emplace_back(j, move(G));
