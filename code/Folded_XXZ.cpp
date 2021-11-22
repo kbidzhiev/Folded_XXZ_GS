@@ -22,7 +22,7 @@ void ThreeSiteHamiltonian::init(const ThreeSiteParam &param) {
 	double mu = 0;
 	const double hL = param.val("hL");
 	const double hR = param.val("hR");
-	const int PPK = sqrt(2)*param.val("PPK");
+	const int PPK = sqrt(2.0)*param.val("PPK");
 	int shift_of_range = 0;
 	if (PPK != 0) shift_of_range = 1;
 	dot = N / 2 + 1;  //Position of the "dot"

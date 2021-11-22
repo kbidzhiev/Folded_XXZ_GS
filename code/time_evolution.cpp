@@ -407,41 +407,39 @@ void TrotterExp_PPK::initialize(const SiteSet &sites, const ThreeSiteParam &para
 void TrotterExp_PPK::TimeGates(const int begin, const int end,
 		const complex<double> tau, const SiteSet &sites,
 		const ThreeSiteParam &param) {
-	const int step = 4;
+	const int gate_range = 4;
 	const double J = param.val("J");
-	const double PPK = sqrt(2)*param.val("PPK");
+	const double PPK = sqrt(2.0)*param.val("PPK");
 	//cout << "Gates starts from " << begin << endl;
-	for (int j = begin; j < end - 2; j += step) {
-		//cout << "j = (" << j << ", " << j + 1 << ", " << j + 2 << ")"
-		//		<< endl;
-		//this part act on real sites
+	for (int j = begin; j < end - 2; j += gate_range) {
+		//cout << "j = (" << j << "..., " << j + 3 <<  ")" << endl;
 
 		auto I_0 = op(sites, "Id", j);
-		auto I_1 = op(sites, "Id", j+1);
 		auto Z_0 = op(sites, "Sz", j);
-		auto Z_1 = op(sites, "Sz", j+1);
 		auto Sp_0  = op(sites, "Sp", j);
 		auto Sm_0  = op(sites, "Sm", j);
-		auto Sp_2  = op(sites, "Sp", j+2);
-		auto Sm_2  = op(sites, "Sm", j+2);
-		auto I_3   = op(sites, "Id", j+3);
+		auto I_1 = op(sites, "Id", j + 1);
+		auto Z_1 = op(sites, "Sz", j + 1);
+		auto Sp_2  = op(sites, "Sp", j + 2) * op(sites, "Id", j + 3);
+		auto Sm_2  = op(sites, "Sm", j + 2) * op(sites, "Id", j + 3);
+		//auto I_3   = op(sites, "Id", j + 3);
 
-		auto hh = J * Sp_0 * I_1 * Sm_2 * I_3;
-		   hh +=  J * Sm_0 * I_1 * Sp_2 * I_3;
-		   hh += -J * 2 * Sp_0 * Z_1 * Sm_2 * I_3;
-		   hh += -J * 2 * Sm_0 * Z_1 * Sp_2 * I_3;
+		auto hh = J * Sp_0 * I_1 * Sm_2 ;
+		   hh +=  J * Sm_0 * I_1 * Sp_2 ;
+		   hh += -J * 2 * Sp_0 * Z_1 * Sm_2 ;
+		   hh += -J * 2 * Sm_0 * Z_1 * Sp_2 ;
 
-		auto Kin_term1 = op(sites, "Sp", j + 2) * op(sites, "Sm", j + 3);
-		auto Kin_term2 = op(sites, "Sm", j + 2) * op(sites, "Sp", j + 3);
-
-		hh += PPK * 0.5 * I_0 * I_1 * Kin_term1; // (I)
-		hh += PPK * 0.5 * I_0 * I_1 * Kin_term2; // (I)
-		hh += -PPK * Z_0 * I_1 * Kin_term1; // (II)
-		hh += -PPK * Z_0 * I_1 * Kin_term2; // (II)
-		hh += -PPK * I_0 * Z_1 * Kin_term1; // (III)
-		hh += -PPK * I_0 * Z_1 * Kin_term2; // (III)
-		hh += PPK * 2.0 * Z_0 * Z_1 * Kin_term1; // (IV)
-		hh += PPK * 2.0 * Z_0 * Z_1 * Kin_term2; // (IV)
+//		auto Kin_term1 = op(sites, "Sp", j + 2) * op(sites, "Sm", j + 3);
+//		auto Kin_term2 = op(sites, "Sm", j + 2) * op(sites, "Sp", j + 3);
+//
+//		hh += PPK * 0.5 * I_0 * I_1 * Kin_term1; // (I)
+//		hh += PPK * 0.5 * I_0 * I_1 * Kin_term2; // (I)
+//		hh += -PPK * Z_0 * I_1 * Kin_term1; // (II)
+//		hh += -PPK * Z_0 * I_1 * Kin_term2; // (II)
+//		hh += -PPK * I_0 * Z_1 * Kin_term1; // (III)
+//		hh += -PPK * I_0 * Z_1 * Kin_term2; // (III)
+//		hh += PPK * 2.0 * Z_0 * Z_1 * Kin_term1; // (IV)
+//		hh += PPK * 2.0 * Z_0 * Z_1 * Kin_term2; // (IV)
 
 		auto G = expHermitian(hh, tau);
 		gates.emplace_back(j, move(G));
@@ -450,6 +448,7 @@ void TrotterExp_PPK::TimeGates(const int begin, const int end,
 void TrotterExp_PPK::Evolve(MPS &psi, const Args &args) {
 	for (auto &gate : gates) {
 		auto j = gate.i1;
+		//cout << "j = " << j << endl;
 		auto &G = gate.G;
 		psi.position(j);
 		auto WF = psi(j) * psi(j + 1) * psi(j + 2) * psi(j + 3);
@@ -461,15 +460,16 @@ void TrotterExp_PPK::Evolve(MPS &psi, const Args &args) {
 					{ siteIndex(psi, j), leftLinkIndex(psi, j) }, args);
 			auto indR = commonIndex(Uj1, Vj1);
 			auto [Uj2, Vj2] = factor(Vj1, { siteIndex(psi, j + 1), indR }, args);
-			indR = commonIndex(Uj2, Vj2);
-			auto [Uj3, Vj3] = factor(Vj2, { siteIndex(psi, j + 2), indR }, args);
+			auto indR2 = commonIndex(Uj2, Vj2);
+			auto [Uj3, Vj3] = factor(Vj2, { siteIndex(psi, j + 2), indR2 }, args);
 
 			psi.set(j, Uj1);
 			psi.set(j + 1, Uj2);
 			psi.set(j + 2, Uj3);
-			psi.set(j + 3, Vj2);
+			psi.set(j + 3, Vj3);
 
 		}
+		//cout << "GATES ARE APPLIED" << endl;
 	}
 }
 
