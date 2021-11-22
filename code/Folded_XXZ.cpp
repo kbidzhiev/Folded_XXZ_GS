@@ -37,14 +37,14 @@ void ThreeSiteHamiltonian::init(const ThreeSiteParam &param) {
 		ampo += J * -8 * 0.25, "S-", j, "Sz", j + 1, "S+", j + 2;
 
 		if (PPK != 0) {
-			ampo += PPK * 4 * 0.5, "S+", j + 2, "S-", j + 3; // (I)
-			ampo += PPK * 4 * 0.5, "S-", j + 2, "S+", j + 3;
-			ampo += -PPK * 8 * 0.5, "Sz", j, "S+", j + 2, "S-", j + 3; // (II)
-			ampo += -PPK * 8 * 0.5, "Sz", j, "S-", j + 2, "S+", j + 3;
-			ampo += -PPK * 8 * 0.5, "Sz", j + 1, "S+", j + 2, "S-", j + 3; // (III)
-			ampo += -PPK * 8 * 0.5, "Sz", j + 1, "S-", j + 2, "S+", j + 3;
-			ampo += PPK * 16 * 0.5, "Sz", j, "Sz", j + 1, "S+", j + 2, "S-", j + 3; // (IV)
-			ampo += PPK * 16 * 0.5, "Sz", j, "Sz", j + 1, "S-", j + 2, "S+", j + 3;
+			ampo +=  PPK * 0.5, "S+", j + 2, "S-", j + 3; // (I)
+			ampo +=  PPK * 0.5, "S-", j + 2, "S+", j + 3;
+			ampo += -PPK * 2 * 0.5, "Sz", j, "S+", j + 2, "S-", j + 3; // (II)
+			ampo += -PPK * 2 * 0.5, "Sz", j, "S-", j + 2, "S+", j + 3;
+			ampo += -PPK * 2 * 0.5, "Sz", j + 1, "S+", j + 2, "S-", j + 3; // (III)
+			ampo += -PPK * 2 * 0.5, "Sz", j + 1, "S-", j + 2, "S+", j + 3;
+			ampo +=  PPK * 4 * 0.5, "Sz", j, "Sz", j + 1, "S+", j + 2, "S-", j + 3; // (IV)
+			ampo +=  PPK * 4 * 0.5, "Sz", j, "Sz", j + 1, "S-", j + 2, "S+", j + 3;
 		}
 
 
