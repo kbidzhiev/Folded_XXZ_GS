@@ -216,8 +216,7 @@ int main(int argc, char *argv[]) {
 				}
 				psi.noPrime();
 
-	} else if ( param.val("UUD") > 0
-			|| param.val("PPK") != 0) {
+	} else if ( param.val("UUD") > 0) {
 			cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
 			auto initState = InitState(sites);
 			// Hadamar_2 Hadamar_4 |---+> = |- left - right>
@@ -233,12 +232,13 @@ int main(int argc, char *argv[]) {
 			SigmaXGate(N/2 + 1 + dist);
 			psi.noPrime();
 
-	} else if ( param.longval("JammedImpurity") == 1) {
+	} else if ( param.longval("JammedImpurity") == 1
+			|| param.val("PPK") != 0) {
 		cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
 		for (int i = 1; i <= N; ++i){
-			if (i % 4 == 0){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
+			if (i % 2 == 0){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
 				initState.set(i, "Dn");
 			} else {
 				initState.set(i, "Up");
