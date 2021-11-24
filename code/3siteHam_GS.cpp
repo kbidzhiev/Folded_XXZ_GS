@@ -233,7 +233,8 @@ int main(int argc, char *argv[]) {
 			psi.noPrime();
 
 	} else if ( param.longval("JammedImpurity") == 1
-			|| param.val("PPK") != 0) {
+			|| param.val("PPK") != 0
+			|| param.val("PPX") != 0	) {
 		cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
