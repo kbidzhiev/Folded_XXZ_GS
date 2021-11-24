@@ -111,6 +111,7 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("Neel") = 0;
 	operator[]("XP") = 0;
 	operator[]("PPK") = 0;
+	operator[]("PPX") = 0;
 }
 
 
