@@ -65,7 +65,7 @@ void TrotterExp::TimeGates(const int begin, const int end,
 	const int step = 3;
 	const double J = param.val("J");
 	const double Dhar = param.val("Dhar");
-	const double PPX = sqrt(2)*param.val("PPX");
+	const double PPX = sqrt(2.0)*param.val("PPX");
 	//cout << "Gates starts from " << begin << endl;
 	for (int j = begin; j < end - 1; j += step) {
 		//cout << "j = (" << j << ", " << j + 1 << ", " << j + 2 << ")"
