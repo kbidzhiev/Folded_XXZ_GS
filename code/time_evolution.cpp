@@ -65,7 +65,7 @@ void TrotterExp::TimeGates(const int begin, const int end,
 	const int step = 3;
 	const double J = param.val("J");
 	const double Dhar = param.val("Dhar");
-	const double PXXP = param.val("PXXP");
+	const double PPX = sqrt(2)*param.val("PPX");
 	//cout << "Gates starts from " << begin << endl;
 	for (int j = begin; j < end - 1; j += step) {
 		//cout << "j = (" << j << ", " << j + 1 << ", " << j + 2 << ")"
@@ -80,6 +80,20 @@ void TrotterExp::TimeGates(const int begin, const int end,
 		hh += -J * 8 * 0.25 * op(sites, "Sm", j) * op(sites, "Sz", j + 1)
 				* op(sites, "Sp", j + 2);
 
+		if (PPX !=0){
+			cout << "PPX term is included" << endl;
+			auto I_0 = op(sites, "Id", j);
+			auto Z_0 = op(sites, "Sz", j);
+			auto I_1 = op(sites, "Id", j + 1);
+			auto Z_1 = op(sites, "Sz", j + 1);
+			auto Sx_2  = op(sites, "Sx", j + 2);
+
+			hh += PPX * 0.5 * I_0 * I_1 * Sx_2;
+			hh += -PPX * I_0 * Z_1 * Sx_2;
+			hh += -PPX * Z_0 * I_1 * Sx_2;
+			hh += PPX * 2.0 * Z_0 * Z_1 * Sx_2;
+		}
+
 		//Deepak Dhar term
 		if (Dhar > 0) {
 			cout << "Dhar term is included" << endl;
@@ -92,20 +106,7 @@ void TrotterExp::TimeGates(const int begin, const int end,
 			hh += Dhar * 2 * 0.5 * op(sites, "Id", j) * op(sites, "Sz", j + 1)
 					* op(sites, "Id", j + 2);
 		}
-		if (PXXP > 0) {
-			cout << "PXXP = (1-Sz)(1-Sz)(Sx+Sx)(1-Sz)(1-Sz)"
-					<< "term is included " << endl;
-			auto P = 0.25 * (op(sites, "Id", j) * op(sites, "Id", j + 1)
-					+ 2.0 * op(sites, "Sz", j)  * op(sites, "Id", j + 1))
-						  * (op(sites, "Id", j) * op(sites, "Id", j + 1)
-					+ 2.0 * op(sites, "Id", j)	* op(sites, "Sz", j + 1));
 
-			hh += PXXP * P * 2.0
-					* (op(sites, "Sx", j) * op(sites, "Id", j + 1)
-							* op(sites, "Id", j + 2)
-							+ op(sites, "Id", j) * op(sites, "Sx", j + 1)
-									* op(sites, "Id", j + 2)) * P;
-		}
 
 		auto G = expHermitian(hh, tau);
 		gates.emplace_back(j, move(G));
@@ -472,6 +473,8 @@ void TrotterExp_PPK::Evolve(MPS &psi, const Args &args) {
 		//cout << "GATES ARE APPLIED" << endl;
 	}
 }
+
+
 
 
 
