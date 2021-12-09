@@ -80,6 +80,7 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("TrotterOrder") = 2;
 	operator[]("GroundState") = 0;
 	operator[]("LadderState") = 0;
+	//operator[]("Ising") = 1;
 	operator[]("JammedImpurity") = 0;
 	operator[]("alpha") = 0; // U = exp[ i alpha  n*\sigma]
 	operator[]("UUD") = 0;

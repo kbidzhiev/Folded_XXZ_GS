@@ -49,8 +49,6 @@ void XXZ::init(const ThreeSiteParam &param) {
 }
 
 
-
-
 //
 XP_Hamiltonian::XP_Hamiltonian(const SiteSet &sites,
 		const ThreeSiteParam &param)
