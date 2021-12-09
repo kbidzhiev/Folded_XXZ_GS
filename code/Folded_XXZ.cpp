@@ -104,9 +104,9 @@ void LadderHamiltonian::init(const ThreeSiteParam &param) {    //.init (param)
 		// we start with GS of uniform Ising model to introduce initial correlations,
 		// otherwise DMRG procedure cannot find a GS
 		for (int j = 1; j < N-1; j += 2) {
-//			ampo += -J, "S+", j, "S-", j + 2;
-//			ampo += -J, "S-", j, "S+", j + 2;
-			ampo += -J, "Sz", j, "Sz", j + 2;
+			ampo += -J, "S+", j, "S-", j + 2;
+			ampo += -J, "S-", j, "S+", j + 2;
+			//ampo += -J, "Sz", j, "Sz", j + 2;
 			ampo += 5.5*J, "Sx", j;
 
 			//ampo += -J * m * 2, "Sz", j;
