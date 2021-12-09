@@ -194,27 +194,75 @@ int main(int argc, char *argv[]) {
 
 		cout << "Norm (after unitary gates )is = " << real(innerC(psi, psi)) << endl;
 
-	} else if ( param.val("Neel") > 0) {
-				cout << "initial state is |Neel>  with the flipped spin" << endl;
+	} else if (param.longval("Lenart") == 1) {
+		// UP_GS_UP_GS etc
+		cout << "initial state is UP_GS_UP_GS" << endl;
 
-				auto initState = InitState(sites);
-				// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-				for (int i = 1; i <= N; ++i){
-					if (i % 2 == 0){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
-						initState.set(i, "Dn");
-					} else {
-						initState.set(i, "Up");
-					}
-				}
-				psi = MPS(initState);
-				SigmaXGate(N/2);
-				if (param.val("Neel") > 1){
-					int dist = param.val("Neel");
-					for (int i = 0; i < 18; i += 2){
-						SigmaXGate(N/2 + dist + i);
-					}
-				}
-				psi.noPrime();
+		LadderHamiltonian Init_H_Ising(sites, param, "Ising");
+		auto H_Ising = toMPO(Init_H_Ising.ampo);
+
+		auto sweeps = Sweeps(999); //number of sweeps is 5
+		sweeps.maxdim() = 20, 50, 50, 100, 300, 4000;
+		sweeps.cutoff() = 1E-10;
+
+		auto initState = InitState(sites);
+		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+		for (int i = 1; i <= N; ++i) {
+			if (i % 2 == 0) { // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
+				initState.set(i, "Dn");
+			}
+		}
+		psi = MPS(initState);
+
+
+		energy_initial = real(innerC(psi, H_Ising, psi)); //<psi|H0|psi>
+		MyDMRGObserver obs(psi, param.val("energy"));
+		tie(energy_initial, psi) = dmrg(H_Ising, psi, sweeps, obs, "Quiet");
+		cout << "First step is DONE. Ising Ham is ready" << endl;
+
+//		LadderHamiltonian Init_H_Ladder(sites, param, "Ladder");
+//		auto H_Ladder = toMPO(Init_H_Ladder.ampo);
+//		energy_initial = inner(psi, H_Ladder, psi); //<psi|H0|psi>
+//		//MyDMRGObserver obs(psi, param.val("energy"));
+//		tie(energy_initial, psi) = dmrg(H_Ladder, psi, sweeps, obs, "Quiet");
+//
+//		cout << "Second step is DONE. Ladder Ham is ready" << endl;
+
+		cout << "Norm (before unitary gates )is = " << real(innerC(psi, psi))
+				<< endl;
+
+
+		int central_site = (Init_H_Ising.dot % 2 == 0) ? Init_H_Ising.dot:
+				Init_H_Ising.dot + 1;
+		//SigmaXGate(central_site );
+		SigmaXGate(central_site);
+		psi.noPrime();
+
+		cout << "Norm (after unitary gates )is = " << real(innerC(psi, psi))
+				<< endl;
+
+
+	} else if (param.val("Neel") > 0) {
+		cout << "initial state is |Neel>  with the flipped spin" << endl;
+
+		auto initState = InitState(sites);
+		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+		for (int i = 1; i <= N; ++i) {
+			if (i % 2 == 0) { // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
+				initState.set(i, "Dn");
+			} else {
+				initState.set(i, "Up");
+			}
+		}
+		psi = MPS(initState);
+		SigmaXGate(N / 2);
+		if (param.val("Neel") > 1) {
+			int dist = param.val("Neel");
+			for (int i = 0; i < 18; i += 2) {
+				SigmaXGate(N / 2 + dist + i);
+			}
+		}
+		psi.noPrime();
 
 	} else if ( param.val("UUD") > 0) {
 			cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
@@ -1000,7 +1048,11 @@ int main(int argc, char *argv[]) {
 //					expH_Folded_XXZ.Evolve(psi, args);
 //				}
 				expH_Folded_XXZ.Evolve(psi, args);
-				cout << "Folded XXZ" << endl;
+				string ppx_is_on = "";
+				if (param.val("PPX") != 0){
+					ppx_is_on = "+ PPX";
+				}
+				cout << "Folded XXZ" << ppx_is_on << endl;
 			}
 			psi.orthogonalize(args);
 
