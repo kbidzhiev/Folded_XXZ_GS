@@ -207,11 +207,7 @@ int main(int argc, char *argv[]) {
 
 		auto initState = InitState(sites);
 		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-		for (int i = 1; i <= N; ++i) {
-			if (i % 2 == 0) { // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
-				initState.set(i, "Dn");
-			}
-		}
+		for (int i = 1; i <= N; ++i)	initState.set(i, "Up");
 		psi = MPS(initState);
 
 
