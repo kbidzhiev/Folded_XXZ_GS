@@ -205,11 +205,14 @@ int main(int argc, char *argv[]) {
 		sweeps.maxdim() = 20, 50, 50, 100, 300, 4000;
 		sweeps.cutoff() = 1E-10;
 
-		auto initState = InitState(sites);
-		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-		for (int i = 1; i <= N; ++i)	initState.set(i, "Up");
-		psi = MPS(initState);
-
+//		auto initState = InitState(sites);
+//		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+//		for (int i = 1; i <= N; ++i){
+//			if (i % 2 == 0) initState.set(i, "Up");
+//			else initState.set(i, "Dn");
+//		}
+//		psi = MPS(initState);
+		psi = randomMPS(sites);
 
 		energy_initial = real(innerC(psi, H_Ising, psi)); //<psi|H0|psi>
 		MyDMRGObserver obs(psi, param.val("energy"));
