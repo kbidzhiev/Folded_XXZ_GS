@@ -351,8 +351,8 @@ int main(int argc, char *argv[]) {
 				initState.set(i, "Dn");
 			}
 		}
-		SigmaXGate(N/2);
 		psi = MPS(initState);
+		SigmaXGate(N/2);
 		psi.noPrime();
 
 	} else {
