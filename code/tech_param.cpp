@@ -68,7 +68,11 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	//Specify below all the allowed parameter names,
 	//and their default values
 	operator[]("N") = 10; //Length of the chain
-	operator[]("J") = 1.0;
+	operator[]("J") = 1.0; // coupling
+	operator[]("Jy") = 1.0; // coupling in the FoldedXYZ
+	operator[]("Delta") = 0; // Delta in XYZ and XXZ
+	operator[]("J2") = 0; // Integrability breaking term
+
 	operator[]("tau") = 0.02;  //time step for the unitary evolution
 	operator[]("T") = 2;  //Total (final) time
 	operator[]("Sz") = 0.1;
@@ -79,13 +83,11 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("sweeps") = 999;  //maximum number of sweeps in the DMRG
 	operator[]("TrotterOrder") = 2;
 
-	//Initial state protocols. One should chose ONE of them to be >0
+	//Initial state protocols. One should chose ONE of them to be > 0
 	operator[]("GroundState") = 0;
 	operator[]("LadderState") = 0;
-
 	operator[]("Neel") = 0;
 	operator[]("UUD") = 0;
-
 	operator[]("JammedImpurity") = 0;
 	operator[]("PPK") = 0;
 	operator[]("PPX") = 0;
@@ -93,6 +95,8 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("XXZGlobal") = 0;
 	operator[]("XXZDW") = 0;
 	operator[]("XP") = 0;
+	operator[]("FoldedXYZ") = 0;
+
 
 	operator[]("alpha") = 0; // U = exp[ i alpha  n*\sigma]
 	operator[]("begin") = 1;
@@ -117,11 +121,8 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("TrotterOrderXXZ") = 3;
 
 
-	operator[]("Delta") = 0;
+
 	operator[]("Distance") = 5;
-
-
-
 }
 
 

@@ -210,13 +210,7 @@ void Exp_B::initialize(const SiteSet &sites, const ThreeSiteParam &param,
 
 	} else {
 		cout << "trotter 2 scheme" << endl;
-		/*
-		 double a1 = 1. / 6;		// more precise arrpoximation coefficients
-		 double a2 = 1 - 2. * a1;
-		 double b1 = (3 - sqrt(3)) / 6.;
-		 double b2 = 1. / 2 - b1;
-		 double c1 = 1. / 2;
-		 */
+
 		double begin0 = begin; //this variable are needed to change operators ABC
 		double begin2 = begin + 1;
 		double begin4 = begin + 2;
@@ -229,17 +223,6 @@ void Exp_B::initialize(const SiteSet &sites, const ThreeSiteParam &param,
 		TimeGates(begin4, end, tau, sites, param); //C
 		TimeGates(begin2, end, 0.5 * tau, sites, param); //B
 		TimeGates(begin0, end, 0.5 * tau, sites, param); //A
-		/*
-		 TimeGates(begin0, end, a1 * tau, sites, param); //A
-		 TimeGates(begin2, end, b1 * tau, sites, param); //B
-		 TimeGates(begin4, end, c1 * tau, sites, param); //C
-		 TimeGates(begin2, end, b2 * tau, sites, param); //B
-		 TimeGates(begin0, end, a2 * tau, sites, param); //A
-		 TimeGates(begin2, end, b2 * tau, sites, param); //B
-		 TimeGates(begin4, end, c1 * tau, sites, param); //C
-		 TimeGates(begin2, end, b1 * tau, sites, param); //B
-		 TimeGates(begin0, end, a1 * tau, sites, param); //A
-		 */
 	}
 }
 
@@ -318,7 +301,6 @@ vector<MPO> XP_time_evol(const SiteSet &sites, const ThreeSiteParam &param) {
 		//Approx. with error O(tau^3)
 		time_steps.push_back(0.5 * ( 1 + Cplx_i) * tau);
 		time_steps.push_back(0.5 * (-1 + Cplx_i) * tau);
-
 	}
 	if (order == 3) {
 		//Approx. with error O(tau^4) [thanks to Kemal]
@@ -345,7 +327,6 @@ vector<MPO> XP_time_evol(const SiteSet &sites, const ThreeSiteParam &param) {
 		for (auto &time_step : time_steps){
 			time_step *= Cplx_i * tau;
 		}
-
 	}
 
 	vector<MPO> Exp_H_vec;
@@ -356,14 +337,10 @@ vector<MPO> XP_time_evol(const SiteSet &sites, const ThreeSiteParam &param) {
 		MPO expH_i = toExpH(H_XP.ampo, time_step);
 		Exp_H_vec.push_back(expH_i);
 	}
-
 	return Exp_H_vec;
 }
 
 
-
-
-//!!!!!!!!!!
 //Trotter Gates PPK. ie I'm adding some perturbation to the dynamical Hamiltonian
 TrotterExp_PPK::TrotterExp_PPK(const SiteSet &sites, const ThreeSiteParam &param,
 		const complex<double> tau) {
@@ -385,23 +362,8 @@ void TrotterExp_PPK::initialize(const SiteSet &sites, const ThreeSiteParam &para
 
 	} else {
 		cout << "trotter 2 scheme" << endl;
-		cout << "its NOT implemented"<< endl;
+		cout << "its NOT implemented"<< endl; // One needs to develop Exp for 4-site Hamiltonians
 		exit(1);
-
-		/*
-		double begin0 = begin; //this variable are needed to change operators ABC
-		double begin2 = begin + 1;
-		double begin4 = begin + 2;
-		//Trotter gates from arxiv.org/abs/1901.04974
-		// Eq. (38),(47)
-
-		cout << "Time evolutions " << endl;
-		TimeGates(begin0, end, 0.5 * tau, sites, param); //A
-		TimeGates(begin2, end, 0.5 * tau, sites, param); //B
-		TimeGates(begin4, end, tau, sites, param); //C
-		TimeGates(begin2, end, 0.5 * tau, sites, param); //B
-		TimeGates(begin0, end, 0.5 * tau, sites, param); //A
-		 */
 	}
 }
 
@@ -474,6 +436,92 @@ void TrotterExp_PPK::Evolve(MPS &psi, const Args &args) {
 	}
 }
 
+
+
+
+
+// Exp FoldedXYZ Trotter Gates
+TrotterExp_FoldedXYZ::TrotterExp_FoldedXYZ(const SiteSet &sites, const ThreeSiteParam &param,
+		const complex<double> tau) {
+	initialize(sites, param, tau);
+}
+void TrotterExp_FoldedXYZ::initialize(const SiteSet &sites, const ThreeSiteParam &param,
+		const complex<double> tau) {
+	//const int begin = param.val("begin");
+	const int begin = 1;
+	const int end = param.val("N");
+	const int order = param.val("TrotterOrder");
+	if (order == 1) {
+		cout << "trotter 1 scheme" << endl;
+		TimeGates(begin, end, tau, sites, param);
+		TimeGates(begin + 1, end, tau, sites, param);
+		TimeGates(begin + 2, end, tau, sites, param);
+	} else {
+		cout << "trotter 2 scheme" << endl;
+
+		double begin0 = begin; //these variables are needed to change operators ABC
+		double begin2 = begin + 1;
+		double begin4 = begin + 2;
+		//Trotter gates from arxiv.org/abs/1901.04974
+		// Eq. (38),(47)
+
+		cout << "Time evolution" << endl;
+		TimeGates(begin0, end, 0.5 * tau, sites, param); //A
+		TimeGates(begin2, end, 0.5 * tau, sites, param); //B
+		TimeGates(begin4, end, tau, sites, param); 		//C
+		TimeGates(begin2, end, 0.5 * tau, sites, param); //B
+		TimeGates(begin0, end, 0.5 * tau, sites, param); //A
+
+	}
+}
+
+void TrotterExp_FoldedXYZ::TimeGates(const int begin, const int end,
+		const complex<double> tau, const SiteSet &sites,
+		const ThreeSiteParam &param) {
+	const int step = 3;
+	const double Jx = param.val("J");
+	const double Jy = param.val("Jy");
+	const double Delta = param.val("Delta");
+	const double J2 = param.val("J2");
+
+	//cout << "Gates starts from " << begin << endl;
+	for (int j = begin; j < end - 1; j += step) {
+		auto X_0 = op(sites, "Sx", j);
+		auto Z_0 = op(sites, "Sz", j);
+		auto I_1 = op(sites, "Id", j + 1);
+		auto Z_1 = op(sites, "Sz", j + 1);
+		auto X_2 = op(sites, "Sx", j + 2);
+		auto I_2 = op(sites, "Id", j + 2);
+
+		auto hh = Jx * 4 * X_0 * I_1 * X_2;
+		hh+= -Jy * 8 * X_0 * Z_1 * X_2;
+		hh+= Delta * 2 * Z_0 * I_1 * I_2;
+		hh+= J2 * 4 * Z_0 * Z_1 * I_2;
+
+		auto G = expHermitian(hh, tau);
+		gates.emplace_back(j, move(G));
+	}
+}
+void TrotterExp_FoldedXYZ::Evolve(MPS &psi, const Args &args) {
+	for (auto &gate : gates) {
+		auto j = gate.i1;
+		auto &G = gate.G;
+		psi.position(j);
+		auto WF = psi(j) * psi(j + 1) * psi(j + 2);
+		WF = G * WF;
+		WF /= norm(WF);
+		WF.noPrime();
+		{
+			auto [Uj1, Vj1] = factor(WF,
+					{ siteIndex(psi, j), leftLinkIndex(psi, j) }, args);
+			auto indR = commonIndex(Uj1, Vj1);
+			auto [Uj2, Vj2] = factor(Vj1, { siteIndex(psi, j + 1), indR }, args);
+			psi.set(j, Uj1);
+			psi.set(j + 1, Uj2);
+			psi.set(j + 2, Vj2);
+		}
+	}
+}
 
 
 

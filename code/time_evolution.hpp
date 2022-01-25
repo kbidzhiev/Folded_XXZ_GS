@@ -85,6 +85,16 @@ private:
 	void init(const ThreeSiteParam &param);
 };
 
+// Folded XYZ with integrability breaking term
+// https://arxiv.org/abs/2110.11322 in SIGMA repr Eq(1)
+class HamiltonianFoldedXYZ{
+public:
+	AutoMPO ampo;
+	HamiltonianFoldedXYZ(const SiteSet &sites, const ThreeSiteParam &param);
+private:
+	int N;
+	void init(const ThreeSiteParam &param);
+};
 
 
 vector<MPO> XP_time_evol(const SiteSet &sites, const ThreeSiteParam &param);
@@ -161,6 +171,31 @@ public:
 private:
 	vector<TGate> gates;
 };
+
+
+
+//Trotter Gates Folded XYZ with integrability breaking term
+// https://arxiv.org/abs/2110.11322 in SIGMA repr Eq(1)
+class TrotterExp_FoldedXYZ {
+public:
+	struct TGate {
+		int i1 = 0;
+		ITensor G;
+		TGate(int i1_, ITensor G_)
+		: i1(i1_)
+		, G(G_) {
+		}
+	};
+	TrotterExp_FoldedXYZ(const SiteSet &sites, const ThreeSiteParam &param, const complex<double> tau);
+	void initialize(const SiteSet &sites, const ThreeSiteParam &param, const complex<double> tau);
+	void TimeGates(const int begin, const int end, const complex<double> tau,
+			const SiteSet &sites, const ThreeSiteParam &param);
+	void Evolve(MPS &psi, const Args &args) ;
+private:
+	vector<TGate> gates;
+};
+
+
 
 
 

@@ -341,6 +341,19 @@ int main(int argc, char *argv[]) {
 		psi = MPS(initState);
 		psi.noPrime();
 
+	} else if (param.val("FoldedXYZ") > 0) {
+		cout << "initial state is  |UDD> + flipped spin " << endl;
+		auto initState = InitState(sites);
+		for (int i = 1; i <= N; ++i) {
+			if (i % 3 == 0) {
+				initState.set(i, "Up");
+			} else {
+				initState.set(i, "Dn");
+			}
+		}
+		SigmaXGate(N/2);
+		psi = MPS(initState);
+		psi.noPrime();
 
 	} else {
 		cout << "One should choose: GroundState, Neel, DomainWall,Impurity, Jammed = 1" << endl;
@@ -364,8 +377,10 @@ int main(int argc, char *argv[]) {
 	} else if(param.val("XP") > 0){
 		XP_Hamiltonian Ham(sites, param);
 		H = toMPO(Ham.ampo);
+	} else if(param.val("FoldedXYZ") > 0){
+		HamiltonianFoldedXYZ Ham(sites, param);
+		H = toMPO(Ham.ampo);
 	}
-
 
 	const int dot = Ham.dot;
 
@@ -567,7 +582,7 @@ int main(int argc, char *argv[]) {
 	vector<MPO> XXZ_time_evol_vec = XXZ_time_evol(sites, param);
 	vector<MPO> XP_time_evol_vec = XP_time_evol(sites, param);
 	TrotterExp_PPK expH_Folded_XXZ_PPK(sites, param, -Cplx_i * tau);
-
+	TrotterExp_FoldedXYZ expH_Folded_XYZ(sites, param, -Cplx_i * tau);
 
 
 // Time evolution
@@ -920,6 +935,10 @@ int main(int argc, char *argv[]) {
 				expH_Folded_XXZ_PPK.Evolve(psi, args);
 				psi.noPrime();
 				cout << "PPK + Folded XXZ" << endl;
+			} else if(param.val("FoldedXYZ") != 0){
+				expH_Folded_XYZ.Evolve(psi, args);
+				psi.noPrime();
+				cout << "Folded XYZ" << endl;
 			} else{
 				expH_Folded_XXZ.Evolve(psi, args);
 				string ppx_is_on = "";
@@ -932,10 +951,10 @@ int main(int argc, char *argv[]) {
 
 
 			// Hadamard gates act at time == "Measurement"
-			if(  (double)param.val("Measurement") > 0
+			if (param.val("Measurement") > 0
 					&& n > 0
-					&& n  % (int)(param.val("Measurement")/param.val("tau")) == 0
-					){
+					&& n % (int) (param.val("Measurement") / param.val("tau"))
+							== 0) {
 				//AlphaGate(N/2-1, -0.5);
 				cout << "TIME IS == \"Measurement\". I ACT WITH SigmaXGate GATES" << endl;
 				SigmaXGate(N/2-1);
