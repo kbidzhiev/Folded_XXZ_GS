@@ -78,41 +78,50 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("energy") = 1e-13;  //convergence criterium on the energy
 	operator[]("sweeps") = 999;  //maximum number of sweeps in the DMRG
 	operator[]("TrotterOrder") = 2;
+
+	//Initial state protocols. One should chose ONE of them to be >0
 	operator[]("GroundState") = 0;
 	operator[]("LadderState") = 0;
-	operator[]("Lenart") = 1;
-	operator[]("JammedImpurity") = 0;
-	operator[]("alpha") = 0; // U = exp[ i alpha  n*\sigma]
+
+	operator[]("Neel") = 0;
 	operator[]("UUD") = 0;
-	operator[]("UUD2") = 0;
-	operator[]("ShiftUUD") = 0;
-	operator[]("DoubleSlit") = 0;
-	operator[]("SingleSlit") = 0;
+
+	operator[]("JammedImpurity") = 0;
+	operator[]("PPK") = 0;
+	operator[]("PPX") = 0;
+	operator[]("XXZ") = 0;
+	operator[]("XXZGlobal") = 0;
+	operator[]("XXZDW") = 0;
+	operator[]("XP") = 0;
+
+	operator[]("alpha") = 0; // U = exp[ i alpha  n*\sigma]
 	operator[]("begin") = 1;
 	operator[]("hL") = 0; //initial magnetization_L
 	operator[]("hR") = 0; //initial magnetization_R
 	operator[]("h") = 0.0;
 	operator[]("rho") = 0.0;
 	operator[]("n") = 1;
+
+	// Observables to be measured
 	operator[]("Q1Profile") = 0; // energy and current profile
 	operator[]("Q2Profile") = 0;
 	operator[]("Current") = 0;
 	operator[]("Entropy") = 0; //entanglement entropy p*log*p between left and right parts of system
 	operator[]("EntropyProfile") = 0; // Entropy Profile- parameter 0 -> nothing, dt>0 each second=integer parameter
 	operator[]("Loschmidt") = 0; // loschmidt echo <psi(t)|psi(0)>
-	operator[]("Dhar") = 0; // Deepak Dhar term in hamiltonian (time evolution ONLY)
+
+
+	operator[]("Dhar") = 0; // Deepak Dhar term in the Hamiltonian (time evolution ONLY)
 	operator[]("PXXP") = 0; //Integrability breaking term
 	operator[]("Measurement") = 0; // Project the central spin to be |Down> (time evolution ONLY)
 	operator[]("TrotterOrderXXZ") = 3;
-	operator[]("XXZ") = 0;
-	operator[]("XXZGlobal") = 0;
-	operator[]("XXZDW") = 0;
+
+
 	operator[]("Delta") = 0;
 	operator[]("Distance") = 5;
-	operator[]("Neel") = 0;
-	operator[]("XP") = 0;
-	operator[]("PPK") = 0;
-	operator[]("PPX") = 0;
+
+
+
 }
 
 

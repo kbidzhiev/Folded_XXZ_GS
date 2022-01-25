@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 	SpinHalf sites(N, { "ConserveQNs=", false }); // Creating a Hilbert space
 	MPS psi, psi0;
 	auto args = Args("Method=", "DensityMatrix", "Cutoff", param.val("trunc"),
-			"MaxDim", param.longval("max_bond"), "Normalize", true); // for FitApplyMPO RENAME
+			"MaxDim", param.longval("max_bond"), "Normalize", true);
 
 
 // Preparing an initial state
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 		H0 = toMPO(Init_H_XXZ.ampo);
 	}
 
-	auto HadamarGate = [&](int i) {
+	auto HadamardGate = [&](int i) {
 		auto ind = sites(i);
 		auto indP = prime(sites(i));
 		auto Had = ITensor(ind, indP);
@@ -131,27 +131,19 @@ int main(int argc, char *argv[]) {
 		auto sweeps = Sweeps(999); //number of sweeps is 5
 		sweeps.maxdim() = 10, 20, 50, 50, 100, 300, 4000;
 		sweeps.cutoff() = 1E-10;
-
 		psi = randomMPS(sites);
-
 		cout << "Before DMRG" << endl;
-
 		cout << "Norm is = " << real(innerC(psi, psi)) << endl;
 		energy_initial = real(innerC(psi, H0, psi)); //<psi|H0|psi>
 		cout << "1. Initial energy=" << energy_initial << endl;
-
 		MyDMRGObserver obs(psi, param.val("energy"));
-
 		tie(energy_initial, psi) = dmrg(H0, psi, sweeps, obs, "Quiet");
-
 		cout << "After DMRG" << endl;
-
 		//int central_site = Init_H.dot;
 		//SigmaXGate(central_site );
-		//HadamarGate(central_site);
+		//HadamardGate(central_site);
 		psi.noPrime();
-
-		//psi0 = psi; //we create two states. Psi for my time evolution, psi0 for standard one
+		//psi0 = psi; //we create two states. Psi for my time evolution, psi0 for initial
 
 	} else if (param.longval("LadderState") == 1) {
 		// GS of the LADDER Hamiltonian
@@ -163,7 +155,6 @@ int main(int argc, char *argv[]) {
 		auto sweeps = Sweeps(999); //number of sweeps is 5
 		sweeps.maxdim() = 20, 50, 50, 100, 300, 4000;
 		sweeps.cutoff() = 1E-10;
-
 //		auto psi0 = randomMPS(sites);
 		psi = randomMPS(sites);
 
@@ -179,73 +170,22 @@ int main(int argc, char *argv[]) {
 		tie(energy_initial, psi) = dmrg(H_Ladder, psi, sweeps, obs, "Quiet");
 
 		cout << "Second step is DONE. Ladder Ham is ready" << endl;
-
 		cout << "Norm (before unitary gates )is = " << real(innerC(psi, psi)) << endl;
 
-//		HadamarGate(N/2 - 1);
-//		HadamarGate(N/2    );
-//		HadamarGate(N/2 + 1);
-//		HadamarGate(N/2 + 2);
+//		HadamardGate(N/2 - 1);
+//		HadamardGate(N/2    );
+//		HadamardGate(N/2 + 1);
+//		HadamardGate(N/2 + 2);
 		int central_site = Init_H_Ladder.dot;
 		//SigmaXGate(central_site );
 		SigmaXGate(central_site);
 		psi.noPrime();
-
-
 		cout << "Norm (after unitary gates )is = " << real(innerC(psi, psi)) << endl;
 
-	} else if (param.longval("Lenart") == 1) {
-		// UP_GS_UP_GS etc
-		cout << "initial state is UP_GS_UP_GS" << endl;
-
-		LadderHamiltonian Init_H_Ising(sites, param, "Ising");
-		auto H_Ising = toMPO(Init_H_Ising.ampo);
-
-		auto sweeps = Sweeps(999); //number of sweeps is 5
-		sweeps.maxdim() = 20, 50, 50, 100, 300, 4000;
-		sweeps.cutoff() = 1E-10;
-
-//		auto initState = InitState(sites);
-//		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-//		for (int i = 1; i <= N; ++i){
-//			if (i % 2 == 0) initState.set(i, "Up");
-//			else initState.set(i, "Dn");
-//		}
-//		psi = MPS(initState);
-		psi = randomMPS(sites);
-
-		energy_initial = real(innerC(psi, H_Ising, psi)); //<psi|H0|psi>
-		MyDMRGObserver obs(psi, param.val("energy"));
-		tie(energy_initial, psi) = dmrg(H_Ising, psi, sweeps, obs, "Quiet");
-		cout << "First step is DONE. Ising Ham is ready" << endl;
-
-//		LadderHamiltonian Init_H_Ladder(sites, param, "Ladder");
-//		auto H_Ladder = toMPO(Init_H_Ladder.ampo);
-//		energy_initial = inner(psi, H_Ladder, psi); //<psi|H0|psi>
-//		//MyDMRGObserver obs(psi, param.val("energy"));
-//		tie(energy_initial, psi) = dmrg(H_Ladder, psi, sweeps, obs, "Quiet");
-//
-//		cout << "Second step is DONE. Ladder Ham is ready" << endl;
-
-		cout << "Norm (before unitary gates )is = " << real(innerC(psi, psi))
-				<< endl;
-
-
-		int central_site = (Init_H_Ising.dot % 2 == 0) ? Init_H_Ising.dot:
-				Init_H_Ising.dot + 1;
-		//SigmaXGate(central_site );
-		SigmaXGate(central_site);
-		psi.noPrime();
-
-		cout << "Norm (after unitary gates )is = " << real(innerC(psi, psi))
-				<< endl;
-
-
 	} else if (param.val("Neel") > 0) {
-		cout << "initial state is |Neel>  with the flipped spin" << endl;
+		cout << "initial state is |Neel> = |UDUD>  with the flipped spin" << endl;
 
 		auto initState = InitState(sites);
-		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
 		for (int i = 1; i <= N; ++i) {
 			if (i % 2 == 0) { // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
 				initState.set(i, "Dn");
@@ -255,16 +195,10 @@ int main(int argc, char *argv[]) {
 		}
 		psi = MPS(initState);
 		SigmaXGate(N / 2);
-		if (param.val("Neel") > 1) {
-			int dist = param.val("Neel");
-			for (int i = 0; i < 18; i += 2) {
-				SigmaXGate(N / 2 + dist + i);
-			}
-		}
 		psi.noPrime();
 
-	} else if ( param.val("UUD") > 0) {
-			cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
+	} else if (param.val("UUD") > 0) {
+			cout << "initial state is  | UUD >  with the flipped spin" << endl;
 			auto initState = InitState(sites);
 			// Hadamar_2 Hadamar_4 |---+> = |- left - right>
 			for (int i = 1; i <= N; ++i){
@@ -279,77 +213,32 @@ int main(int argc, char *argv[]) {
 			SigmaXGate(N/2 + 1 + dist);
 			psi.noPrime();
 
-	} else if ( param.longval("JammedImpurity") == 1
+	} else if (param.longval("JammedImpurity") == 1
 			|| param.val("PPK") != 0
-			|| param.val("PPX") != 0	) {
+			|| param.val("PPX") != 0) {
 		cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
 		auto initState = InitState(sites);
-		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
+
 		for (int i = 1; i <= N; ++i){
-			if (i % 4 == 0){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
+			if (i % 4 == 0){ // We start counting from 1, so the first sites will be |UUUD UUUD ...>
 				initState.set(i, "Dn");
 			} else {
 				initState.set(i, "Up");
 			}
 		}
-		//initState.set(N/2 - 1,"Dn");
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
 			if (i % 2 == 0  ) {
-				HadamarGate(i);
+				HadamardGate(i); // Hadamard U = L ;  Hadamard D = R
 			}
 		}
 		SigmaXGate(N/2);
 		psi.noPrime();
-	} else if ( param.val("DoubleSlit") > 0) {
-		cout << "initial state is  | Up Left Up Right >  with the 2 flipped spins" << endl;
-		auto initState = InitState(sites);
-		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-		for (int i = 1; i <= N; ++i){
-			if (i % 4 == 0){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
-				initState.set(i, "Dn");
-			} else {
-				initState.set(i, "Up");
-			}
-		}
-		psi = MPS(initState);
-		for (int i = 1; i <= N; ++i) {
-			if (i % 2 == 0  ) {
-				HadamarGate(i);
-			}
-		}
-		int distance = param.val("DoubleSlit");
-		SigmaXGate(N/2 + distance);
-		SigmaXGate(N/2 - distance);
-		psi.noPrime();
-	} else if ( param.val("SingleSlit") != 0) {
-		cout << "initial state is  | Up Left Up Right >  with the flipped spin" << endl;
-		auto initState = InitState(sites);
-		// Hadamar_2 Hadamar_4 |---+> = |- left - right>
-		for (int i = 1; i <= N; ++i){
-			if (i % 4 == 0){ // We start counting from 1 ! so the first sites will be |Up Up Up Dn>
-				initState.set(i, "Dn");
-			} else {
-				initState.set(i, "Up");
-			}
-		}
-		psi = MPS(initState);
-		for (int i = 1; i <= N; ++i) {
-			if (i % 2 == 0  ) {
-				HadamarGate(i);
-			}
-		}
-		int distance = param.val("SingleSlit");
-		SigmaXGate(N/2 + distance);
-		psi.noPrime();
+
 	} else if ( param.val("XXZ") > 0) {
 		cout << "initial state is (ddduuu)DDU(ddduuu) evolved with Eq (66)" << endl;
 				//<< " from https://scipost.org/SciPostPhysCore.4.2.010/pdf " << endl;
 		auto initState = InitState(sites);
-
-		initState.set(N/2-1, "Dn");
-		initState.set(N/2  , "Dn");
-		initState.set(N/2+1, "Up");
 
 		int counter = 0;
 		for (int i = N/2 - 2 ; i >0 ; --i) {
@@ -362,6 +251,10 @@ int main(int argc, char *argv[]) {
 			}
 			++counter;
 		}
+
+		initState.set(N/2-1, "Dn");
+		initState.set(N/2  , "Dn");
+		initState.set(N/2+1, "Up");
 
 		counter = 0;
 		for (int i = N/2 + 2 ; i <= N; ++i) {
@@ -404,7 +297,6 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-
 		psi = MPS(initState);
 		psi.noPrime();
 
@@ -421,11 +313,9 @@ int main(int argc, char *argv[]) {
 //		}
 
 	} else if ( param.val("XXZDW") > 0) {
-		cout << "LLLL RRRR in x direction" << endl;
+		cout << "LLLL RRRR" << endl;
 				//<< " from https://scipost.org/SciPostPhysCore.4.2.010/pdf " << endl;
 		auto initState = InitState(sites);
-
-
 		for (int i = 1 ; i<=N ; ++i) {
 			if(i<N/2){
 				initState.set(i, "Up");
@@ -433,34 +323,30 @@ int main(int argc, char *argv[]) {
 				initState.set(i, "Dn");
 			}
 		}
-
 		psi = MPS(initState);
 		for (int i = 1; i <= N; ++i) {
-			//HadamarGate(i);
+			HadamardGate(i); // comment this line to obtain |UU DD> domain wall
 		}
 		psi.noPrime();
-
 	} else if ( param.val("XP") > 0 ) {
-		cout << "initial state is  |DOWN> " << endl;
+		cout << "initial state is  |DOWN> + flipped spin " << endl;
 		auto initState = InitState(sites);
 		for (int i = 1; i <= N; ++i){
-//			if (i != N-5 ){
-			if (i != N/2 ){
-				initState.set(i, "Dn");
-			} else {
+			if(i == N/2) {
 				initState.set(i, "Up");
+			} else {
+				initState.set(i, "Dn");
 			}
 		}
 		psi = MPS(initState);
 		psi.noPrime();
 
 
-	}else {
-		cout << "Choose: GroundState, Neel, DomainWall,Impurity, Jammed = 1" << endl;
+	} else {
+		cout << "One should choose: GroundState, Neel, DomainWall,Impurity, Jammed = 1" << endl;
 		return 1;
 	}
-	//cout << "PSI = " << psi << endl;
-	psi0 = psi; //here I save the initial WF
+	psi0 = psi; //here I save the initial WF to study < psi|psi0 >
 
 
 
@@ -499,11 +385,11 @@ int main(int argc, char *argv[]) {
 	ios_base::openmode mode;
 	mode = std::ofstream::out; //Erase previous file (if present)
 
-	{
-		sztotal_strm.open("Sz_total.dat", mode);
-		sztotal_strm.precision(15);
-		sztotal_strm << "#time \t  <Sz_total>  \t <Sz_total - sz_min>\n";
-	}
+
+	sztotal_strm.open("Sz_total.dat", mode);
+	sztotal_strm.precision(15);
+	sztotal_strm << "#time \t  <Sz_total>  \t <Sz_total - sz_min>\n";
+
 	double dt = param.val("Loschmidt");
 	if (dt != 0) { //Loschmidt echo
 		loschmidt.open("Loschmidt.dat", mode);
@@ -717,7 +603,6 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-
 		// ------- Loschmidt echo -----
 		if (param.val("Loschmidt") > 0)
 			if (n % int(param.val("Loschmidt") / param.val("tau")) == 0) {
@@ -739,8 +624,8 @@ int main(int argc, char *argv[]) {
 				if (n < n_steps)
 					entropy_profile << endl << endl;
 			}
-		// ------- Sz profile -------
 
+		// ------- Sz profile -------
 		if (param.val("Sz") > 0) {
 			if (n % int(param.val("Sz") / param.val("tau")) == 0) {
 				sx << "\"t=" << time << "\"" << endl;
@@ -855,7 +740,6 @@ int main(int argc, char *argv[]) {
 								<< time	<< endl;
 					}
 
-
 					sz_tot += s;
 					sx_tot += sx1;
 					if (i < dot)
@@ -964,7 +848,7 @@ int main(int argc, char *argv[]) {
 					}
 				}
 
-				{ //I need this part to separate time steps in *.dat files (for gnuplot)
+				{ //I need this part to separate time blocks in *.dat files (for gnuplot)
 					sx << "\n\n";
 					sx_avrg << "\n\n";
 					sy << "\n\n";
@@ -1037,15 +921,6 @@ int main(int argc, char *argv[]) {
 				psi.noPrime();
 				cout << "PPK + Folded XXZ" << endl;
 			} else{
-//				if(time < 1){
-//					cout << "Maurizios XXZ" << endl;
-//					for(auto & expH_XXZ : XXZ_time_evol_vec)
-//						psi = applyMPO(expH_XXZ, psi, args);
-//					psi.noPrime();
-//				} else {
-//					cout << "Folded" << endl;
-//					expH_Folded_XXZ.Evolve(psi, args);
-//				}
 				expH_Folded_XXZ.Evolve(psi, args);
 				string ppx_is_on = "";
 				if (param.val("PPX") != 0){
@@ -1056,7 +931,7 @@ int main(int argc, char *argv[]) {
 			psi.orthogonalize(args);
 
 
-			// Hadamar gates act at time == "Measurement"
+			// Hadamard gates act at time == "Measurement"
 			if(  (double)param.val("Measurement") > 0
 					&& n > 0
 					&& n  % (int)(param.val("Measurement")/param.val("tau")) == 0
