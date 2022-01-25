@@ -109,7 +109,7 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("Loschmidt") = 0; // loschmidt echo <psi(t)|psi(0)>
 
 
-	operator[]("Dhar") = 0; // Deepak Dhar term in hamiltonian (time evolution ONLY)
+	operator[]("Dhar") = 0; // Deepak Dhar term in the Hamiltonian (time evolution ONLY)
 	operator[]("PXXP") = 0; //Integrability breaking term
 	operator[]("Measurement") = 0; // Project the central spin to be |Down> (time evolution ONLY)
 	operator[]("TrotterOrderXXZ") = 3;
