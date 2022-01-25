@@ -82,8 +82,10 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	//Initial state protocols. One should chose ONE of them to be >0
 	operator[]("GroundState") = 0;
 	operator[]("LadderState") = 0;
+
 	operator[]("Neel") = 0;
 	operator[]("UUD") = 0;
+
 	operator[]("JammedImpurity") = 0;
 	operator[]("PPK") = 0;
 	operator[]("PPX") = 0;
@@ -113,7 +115,6 @@ ThreeSiteParam::ThreeSiteParam() { //Constructor
 	operator[]("PXXP") = 0; //Integrability breaking term
 	operator[]("Measurement") = 0; // Project the central spin to be |Down> (time evolution ONLY)
 	operator[]("TrotterOrderXXZ") = 3;
-
 
 
 	operator[]("Delta") = 0;

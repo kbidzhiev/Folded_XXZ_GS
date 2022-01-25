@@ -182,6 +182,7 @@ int main(int argc, char *argv[]) {
 		psi.noPrime();
 		cout << "Norm (after unitary gates )is = " << real(innerC(psi, psi)) << endl;
 
+
 	} else if (param.val("Neel") > 0) {
 		cout << "initial state is |Neel> = |UDUD>  with the flipped spin" << endl;
 
